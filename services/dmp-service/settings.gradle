@@ -1,0 +1,15 @@
+rootProject.name = 'dmp-service'
+
+includeBuild("../../shares/api")
+includeBuild("../../shares/util")
+
+include 'common'
+include 'configuration'
+
+include 'adapters:openapi'
+include 'adapters:persistence'
+
+include 'application'
+
+
+

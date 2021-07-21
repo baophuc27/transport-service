@@ -1,0 +1,35 @@
+buildscript {
+	ext {
+		springBootVersion = '2.4.1'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+
+subprojects {
+
+	group = 'com.marvin.core.dmp'
+	version = '1.0.0-SNAPSHOT'
+
+	apply plugin: 'java'
+	apply plugin: 'io.spring.dependency-management'
+	apply plugin: 'java-library'
+
+	repositories {
+		mavenCentral()
+	}
+
+	dependencyManagement {
+		imports { mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}") }
+	}
+
+	sourceCompatibility = '1.8'
+
+}
+
+

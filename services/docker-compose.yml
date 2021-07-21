@@ -1,0 +1,26 @@
+version: '2.1'
+
+services:
+  dmp-service:
+    build: dmp-service/configuration
+    mem_limit: 350m
+    ports:
+      - "7001:7001"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  # $ mongo
+  mongodb:
+    image: mongo:3.6.9
+    mem_limit: 350m
+    ports:
+      - "27017:27017"
+    command: mongod --smallfiles
+    healthcheck:
+      test: "mongo --eval 'db.stats().ok'"
+      interval: 10s
+      timeout: 5s
+      retries: 10
