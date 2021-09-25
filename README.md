@@ -2,7 +2,7 @@
 Marvin is a ProductionReady project used for speed up building data management platform based application
 
 # Start dmp service
-- Point to dmp service work dir: cd /services/dmp-service
+- Point to dmp service work dir: cd services/core-service
 - Build and run container: docker-compose down && ./gradlew clean build && docker-compose build && docker-compose up -d
 - Sanity check: ./scripts/test-em-all.bash
 - Then: http://localhost:7001/swagger-ui/

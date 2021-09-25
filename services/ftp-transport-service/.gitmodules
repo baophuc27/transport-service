@@ -1,0 +1,3 @@
+[submodule "reeco-ftp-server"]
+	path = reeco-ftp-server
+	url = https://gitlab.com/ari-tech-data-platform/reeco-core-backend/reeco-ftp-server

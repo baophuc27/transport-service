@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT">
+            <builds>
+              <build path="$PROJECT_DIR$/shares/util" name="util">
+                <projects>
+                  <project path="$PROJECT_DIR$/shares/util" />
+                </projects>
+              </build>
+              <build path="$PROJECT_DIR$/shares/api" name="api">
+                <projects>
+                  <project path="$PROJECT_DIR$/shares/api" />
+                </projects>
+              </build>
+              <build path="$PROJECT_DIR$/services/core-service" name="core-service">
+                <projects>
+                  <project path="$PROJECT_DIR$/services/core-service" />
+                  <project path="$PROJECT_DIR$/services/core-service/adapters" />
+                  <project path="$PROJECT_DIR$/services/core-service/adapters/openapi" />
+                  <project path="$PROJECT_DIR$/services/core-service/adapters/persistence" />
+                  <project path="$PROJECT_DIR$/services/core-service/application" />
+                  <project path="$PROJECT_DIR$/services/core-service/common" />
+                  <project path="$PROJECT_DIR$/services/core-service/configuration" />
+                </projects>
+              </build>
+            </builds>
+          </compositeBuild>
+        </compositeConfiguration>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="11" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/services/core-service" />
+            <option value="$PROJECT_DIR$/services/core-service/adapters" />
+            <option value="$PROJECT_DIR$/services/core-service/adapters/openapi" />
+            <option value="$PROJECT_DIR$/services/core-service/adapters/persistence" />
+            <option value="$PROJECT_DIR$/services/core-service/application" />
+            <option value="$PROJECT_DIR$/services/core-service/common" />
+            <option value="$PROJECT_DIR$/services/core-service/configuration" />
+            <option value="$PROJECT_DIR$/shares/api" />
+            <option value="$PROJECT_DIR$/shares/util" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
