@@ -28,6 +28,21 @@
                   <project path="$PROJECT_DIR$/services/core-service/configuration" />
                 </projects>
               </build>
+              <build path="$PROJECT_DIR$/services/config-service" name="config-service">
+                <projects>
+                  <project path="$PROJECT_DIR$/services/config-service" />
+                </projects>
+              </build>
+              <build path="$PROJECT_DIR$/services/transport-service" name="transport-service">
+                <projects>
+                  <project path="$PROJECT_DIR$/services/transport-service" />
+                </projects>
+              </build>
+              <build path="$PROJECT_DIR$/services/ingestion-service" name="ingestion-service">
+                <projects>
+                  <project path="$PROJECT_DIR$/services/ingestion-service" />
+                </projects>
+              </build>
             </builds>
           </compositeBuild>
         </compositeConfiguration>
@@ -37,6 +52,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/services/config-service" />
             <option value="$PROJECT_DIR$/services/core-service" />
             <option value="$PROJECT_DIR$/services/core-service/adapters" />
             <option value="$PROJECT_DIR$/services/core-service/adapters/openapi" />
@@ -44,6 +60,8 @@
             <option value="$PROJECT_DIR$/services/core-service/application" />
             <option value="$PROJECT_DIR$/services/core-service/common" />
             <option value="$PROJECT_DIR$/services/core-service/configuration" />
+            <option value="$PROJECT_DIR$/services/ingestion-service" />
+            <option value="$PROJECT_DIR$/services/transport-service" />
             <option value="$PROJECT_DIR$/shares/api" />
             <option value="$PROJECT_DIR$/shares/util" />
           </set>

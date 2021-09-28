@@ -1,0 +1,57 @@
+
+server.port: 8000
+server.error.include-message: always
+
+spring:
+  datasource:
+    url: jdbc:postgresql://103.88.122.104:5432/configuration
+    username: root
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:http://localhost:29092}
+    consumer:
+      group-id: core
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+
+    topic:
+      data:
+        name: "reeco-telemetry-events"
+        partition: 1
+        replication-factor: 1
+      response:
+        name: "reeco-core-response"
+        partition: 1
+        replication-factor: 1
+      consume:
+        name: "reeco-core-backend"
+
+
+application:
+  file-directory: reeco-ftp-server/data/
+  sync-frequency: 2*500
+
+logging:
+  level:
+    root: INFO
+    com.reeco: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
+
+hdfs:
+  configuration:
+    server: hdfs://localhost:9000
+    rootDirectory: /data
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
