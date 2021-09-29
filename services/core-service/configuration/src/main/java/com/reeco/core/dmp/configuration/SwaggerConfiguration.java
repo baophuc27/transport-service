@@ -37,7 +37,7 @@ public class SwaggerConfiguration {
 
         return new Docket(SWAGGER_2)
                 .select()
-                .apis(basePackage("com.marvin"))
+                .apis(basePackage("com.reeco"))
                 .paths(PathSelectors.any())
                 .build()
                 .globalResponseMessage(POST, emptyList())

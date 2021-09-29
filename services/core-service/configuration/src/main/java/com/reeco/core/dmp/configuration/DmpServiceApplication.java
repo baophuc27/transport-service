@@ -8,7 +8,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan("com.marvin")
+@ComponentScan("com.reeco")
 public class DmpServiceApplication {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DmpServiceApplication.class);
