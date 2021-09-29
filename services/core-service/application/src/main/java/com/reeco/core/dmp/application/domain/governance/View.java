@@ -1,8 +1,8 @@
 package com.reeco.core.dmp.application.domain.governance;
 
-import com.reeco.core.dmp.application.domain.source.Category;
-import com.reeco.core.dmp.application.domain.source.DataSource;
-import com.reeco.core.dmp.application.domain.source.Tag;
+import com.reeco.core.dmp.application.domain.data.Category;
+import com.reeco.core.dmp.application.domain.data.DataSource;
+import com.reeco.core.dmp.application.domain.data.Tag;
 import lombok.Data;
 
 import java.util.HashSet;
@@ -17,7 +17,7 @@ public class View
 
     private String name;
 
-    private Type type;
+    private ViewType viewType;
 
     private String userId;
 
@@ -27,6 +27,8 @@ public class View
     Set<Category> categories = new HashSet<>();
 
     Set<Tag> tags = new HashSet<>();
+
+
 
 
 

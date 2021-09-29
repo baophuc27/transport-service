@@ -1,6 +1,6 @@
 package com.reeco.core.dmp.application.domain.governance;
 
-public enum Type
+public enum ViewType
 {
     ALL, CUSTOM
 }

@@ -1,4 +1,4 @@
-package com.reeco.core.dmp.application.domain.source;
+package com.reeco.core.dmp.application.domain.data;
 
 import lombok.Data;
 
