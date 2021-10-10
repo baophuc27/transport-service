@@ -1,7 +1,7 @@
 package com.reeco.ingestion.infrastructure;
 
 import com.reeco.ingestion.infrastructure.model.RegisterDeviceResource;
-import com.reeco.ingestion.application.usecase.DeviceManagementUseCase;
+import com.reeco.ingestion.application.usecase.EntityManagementUseCase;
 import com.reeco.ingestion.utils.annotators.Infrastructure;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 class DeviceManagementController {
 
-    private final DeviceManagementUseCase deviceManagementUseCase;
+    private final EntityManagementUseCase deviceManagementUseCase;
 
     @PostMapping(value="/register",produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)

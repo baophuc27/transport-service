@@ -1,16 +1,15 @@
 package com.reeco.ingestion.infrastructure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.reeco.ingestion.infrastructure.kafka.ActionType;
-import com.reeco.ingestion.infrastructure.kafka.EntityType;
+import com.reeco.ingestion.infrastructure.queue.ActionType;
+import com.reeco.ingestion.infrastructure.queue.EntityType;
 import com.reeco.ingestion.infrastructure.model.DeleteAttributeMessage;
 import com.reeco.ingestion.infrastructure.model.DeleteConnectionMessage;
 import com.reeco.ingestion.infrastructure.model.UpsertAttributeMessage;
-import com.reeco.ingestion.application.mapper.ConnectionMapper;
+import com.reeco.ingestion.application.mapper.DeviceMapper;
 import com.reeco.ingestion.application.usecase.DeleteDeviceCommand;
-import com.reeco.ingestion.application.usecase.DeviceManagementUseCase;
+import com.reeco.ingestion.application.usecase.EntityManagementUseCase;
 import com.reeco.ingestion.application.usecase.RegisterDeviceCommand;
-import com.reeco.ingestion.infrastructure.model.UpsertConnectionMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -28,12 +27,12 @@ import java.util.Map;
 public class KafkaMessageSubscriber {
 
     @Autowired
-    private final DeviceManagementUseCase deviceManagementUseCase;
+    private final EntityManagementUseCase deviceManagementUseCase;
 
     private ObjectMapper objectMapper;
 
     @Autowired
-    private ConnectionMapper connectionMapper;
+    private DeviceMapper connectionMapper;
 
     @PostConstruct
     private void postProcess(){

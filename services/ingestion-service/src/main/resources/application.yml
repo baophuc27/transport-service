@@ -10,33 +10,27 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:http://localhost:29092}
-    consumer:
-      group-id: core
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+    consumers:
+      event-consumer:
+        topic-in: reeco_time_series_event
+        group-id: reeco_time_series_event_cg
+        auto-offset-reset: earliest
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+        max-concurency: 2
+
+      config-consumer:
+        topic-in: reeco_config_event
+        group-id: reeco_config_cg
+        auto-offset-reset: earliest
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+        max-concurency: 2
 
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-
-    topic:
-      data:
-        name: "reeco-telemetry-events"
-        partition: 1
-        replication-factor: 1
-      response:
-        name: "reeco-core-response"
-        partition: 1
-        replication-factor: 1
-      consume:
-        name: "reeco-core-backend"
-
-
-application:
-  file-directory: reeco-ftp-server/data/
-  sync-frequency: 2*500
 
 logging:
   level:
@@ -45,10 +39,6 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
 
-hdfs:
-  configuration:
-    server: hdfs://localhost:9000
-    rootDirectory: /data
 
 eureka:
   client:

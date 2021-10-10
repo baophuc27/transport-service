@@ -1,8 +1,8 @@
 package com.reeco.ingestion.infrastructure.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.reeco.ingestion.infrastructure.kafka.ActionType;
-import com.reeco.ingestion.infrastructure.kafka.EntityType;
+import com.reeco.ingestion.infrastructure.queue.ActionType;
+import com.reeco.ingestion.infrastructure.queue.EntityType;
 
 public class DeleteConnectionMessage {
     public static class ConnectionConfig {

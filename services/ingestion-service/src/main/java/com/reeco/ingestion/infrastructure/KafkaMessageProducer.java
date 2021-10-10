@@ -1,9 +1,8 @@
 package com.reeco.ingestion.infrastructure;
 
-import com.reeco.ingestion.infrastructure.kafka.ByteSerializer;
-import com.reeco.ingestion.infrastructure.kafka.KafkaBaseMsg;
-import com.reeco.ingestion.infrastructure.kafka.KafkaMsgCallback;
-import com.reeco.ingestion.infrastructure.model.DataRecordMessage;
+import com.reeco.ingestion.infrastructure.queue.ByteSerializer;
+import com.reeco.ingestion.infrastructure.queue.KafkaBaseMsg;
+import com.reeco.ingestion.infrastructure.queue.KafkaMsgCallback;
 import com.reeco.ingestion.infrastructure.model.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
