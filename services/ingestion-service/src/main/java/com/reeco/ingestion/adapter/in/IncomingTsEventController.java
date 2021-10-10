@@ -1,6 +1,7 @@
 package com.reeco.ingestion.adapter.in;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.reeco.ingestion.application.port.in.IncomingTsEvent;
 import com.reeco.ingestion.application.usecase.StoreTsEventUseCase;
 import com.reeco.ingestion.domain.NumericTsEvent;
 import com.reeco.ingestion.infrastructure.queue.kafka.QueueConsumer;
@@ -26,6 +27,7 @@ public class IncomingTsEventController implements QueueConsumer {
 
 
     private <T> T parseObject(byte[] message, Class<T> valueType){
+        // TODO: Change to msg queue deserializer
         try {
             return objectMapper.readValue(message,valueType);
         } catch (RuntimeException | IOException e) {
@@ -37,7 +39,7 @@ public class IncomingTsEventController implements QueueConsumer {
     @Override
     @KafkaListener(topics = "reeco_time_series_event",containerFactory = "timeSeriesEventListener")
     public void listen(@Headers Map<String,byte[]> header, @Payload ConsumerRecord<String,byte[]> message){
-        NumericTsEvent timeSeriesEvent = parseObject(message.value(), NumericTsEvent.class);
+        IncomingTsEvent timeSeriesEvent = parseObject(message.value(), IncomingTsEvent.class);
         storeTsEventUseCase.storeEvent(timeSeriesEvent);
     }
 }

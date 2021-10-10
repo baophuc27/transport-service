@@ -1,5 +1,9 @@
 package com.reeco.ingestion.application.mapper;
 
+import com.reeco.ingestion.application.port.in.IncomingTsEvent;
+import com.reeco.ingestion.domain.NumericTsEvent;
+import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.NumTsByStation;
+import lombok.extern.log4j.Log4j2;
 import org.mapstruct.*;
 
 import java.lang.annotation.ElementType;
@@ -24,7 +28,21 @@ public interface TsEventMapper {
             @Mapping(source = "lat", target = "lat"),
             @Mapping(source = "lon", target = "lon")
     })
-    DataRecordMessage domainEntityToMessage(DataRecord dataRecord);
+    NumTsByStation mapDomainToCassEntity(NumericTsEvent numericTsEvent);
+
+    @Mappings({
+            @Mapping(source = "deviceId", target = "connection_id"),
+            @Mapping(source = "stationId", target = "station_id"),
+            @Mapping(source = "key", target = "parameter"),
+            @Mapping(source = "value", target = "measure"),
+            @Mapping(source = "timeStamp", target = "event_ts", qualifiedBy = FormatLocalDateTime.class),
+            @Mapping(source = "receivedAt", target = "received_at", qualifiedBy = FormatLocalDateTime.class),
+            @Mapping(expression = "java(getNowTime())", target = "sent_at"),
+            @Mapping(source = "timeStamp",target = "date", qualifiedBy = GetLocalDate.class),
+            @Mapping(source = "lat", target = "lat"),
+            @Mapping(source = "lon", target = "lon")
+    })
+    NumericTsEvent mapEventToDomain(IncomingTsEvent incomingTsEvent);
 
     @FormatLocalDateTime
     default String format(LocalDateTime dateTime){
@@ -43,6 +61,15 @@ public interface TsEventMapper {
         LocalDate date = dateTime.toLocalDate();
         return date.toString();
     }
+
+    default Double convertStringToDouble(String s){
+        try{
+            return Double.valueOf(s);}
+        catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
 }
 
 @Qualifier

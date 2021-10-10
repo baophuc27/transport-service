@@ -17,8 +17,6 @@ public class TextTsEvent {
 
     String value;
 
-    Metric.ValueType valueType;
-
     Long deviceId;
 
     LocalDateTime receivedAt;

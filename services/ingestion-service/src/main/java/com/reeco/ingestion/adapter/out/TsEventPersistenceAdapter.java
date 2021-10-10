@@ -6,9 +6,7 @@ import com.reeco.ingestion.domain.Metric;
 import com.reeco.ingestion.domain.NumericTsEvent;
 import com.reeco.ingestion.domain.TextTsEvent;
 import com.reeco.ingestion.domain.UnitConverter;
-import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.MetricByStation;
-import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.NumTsByMetric;
-import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.NumTsByStation;
+import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.*;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.MetricByStationRepository;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.TsByMetricRepository;
 import com.reeco.ingestion.utils.annotators.Adapter;
@@ -35,19 +33,20 @@ public class TsEventPersistenceAdapter implements TsEventRepository, MetricRepos
 
     @Override
     public void insertNumericEvent(NumericTsEvent event) {
-
         final ReactiveCassandraBatchOperations batchOps = reactiveCassandraTemplate.batchOps();
-
-        Mono<WriteResult> writeResult = metricByStationRepository
-                .findById(metricKey)
-                .switchIfEmpty(Mono.error(new EventProcessingException("Metric with Key: " + metricKey.toString() + " not found!")))
-
+        insertNumSeriesByStation(event, batchOps);
+        insertNumSeriesByMetric(event, batchOps);
+        Mono<WriteResult> writeResult = batchOps.execute();
         writeResult.map(WriteResult::getRows).flatMapMany(Flux::fromIterable).log().subscribe();
     }
 
     @Override
-    public void insertTextEvent(TextTsEvent e) {
-
+    public void insertTextEvent(TextTsEvent event) {
+        final ReactiveCassandraBatchOperations batchOps = reactiveCassandraTemplate.batchOps();
+        insertTextSeriesByStation(event, batchOps);
+        insertTextSeriesByMetric(event, batchOps);
+        Mono<WriteResult> writeResult = batchOps.execute();
+        writeResult.map(WriteResult::getRows).flatMapMany(Flux::fromIterable).log().subscribe();
     }
 
     private void insertNumSeriesByStation(NumericTsEvent event, ReactiveCassandraBatchOperations batchOps) {
@@ -70,24 +69,26 @@ public class TsEventPersistenceAdapter implements TsEventRepository, MetricRepos
         batchOps.insert(new NumTsByMetric(partitionKey, event.getValue()));
     }
 
-    private void insertTextSeriesByStation(NumericTsEvent event, ReactiveCassandraBatchOperations batchOps) {
-        NumTsByStation.Key partitionKey = new NumTsByStation.Key(
+    private void insertTextSeriesByStation(TextTsEvent event, ReactiveCassandraBatchOperations batchOps) {
+        TextTsByStation.Key partitionKey = new TextTsByStation.Key(
                 event.getStationId(),
                 event.getDeviceId(),
+                event.getTimeStamp(),
                 event.getMetric(),
-                event.getTimeStamp());
+                event.getValue());
 
-        batchOps.insert(new NumTsByStation(partitionKey, event.getValue()));
+        batchOps.insert(new TextTsByStation(partitionKey, event.getValue()));
     }
 
-    private void insertTextSeriesByMetric(NumericTsEvent event, ReactiveCassandraBatchOperations batchOps) {
-        NumTsByStation.Key partitionKey = new NumTsByStation.Key(
+    private void insertTextSeriesByMetric(TextTsEvent event, ReactiveCassandraBatchOperations batchOps) {
+        TextTsByMetric.Key partitionKey = new TextTsByMetric.Key(
                 event.getStationId(),
-                event.getDeviceId(),
                 event.getMetric(),
-                event.getTimeStamp());
+                event.getTimeStamp(),
+                event.getValue(),
+                event.getDeviceId(),);
 
-        batchOps.insert(new NumTsByStation(partitionKey, event.getValue()));
+        batchOps.insert(new TextTsByMetric(partitionKey, event.getValue()));
     }
 
 
@@ -98,7 +99,7 @@ public class TsEventPersistenceAdapter implements TsEventRepository, MetricRepos
                 .findById(Mono.just(partitionKey))
                 .switchIfEmpty(Mono.error(new EventProcessingException("Metric with Key: " + partitionKey.toString() + " not found!")))
                 .map(
-                        // TODO: implement spring boot map struct
+                        // TODO: implement Metric mapper
                         v -> new Metric(v.getPartitionKey().getStationId(),
                                 v.getPartitionKey().getDeviceId(),
                                 v.getPartitionKey().getMetric(),

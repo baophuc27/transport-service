@@ -28,8 +28,9 @@ public class TextTsByStation {
         @PrimaryKeyColumn(name = "metric", ordinal = 3, type = PrimaryKeyType.CLUSTERED)
         private String metric;
 
-        @Column("value")
+        @PrimaryKeyColumn(name = "value", ordinal = 4, type = PrimaryKeyType.CLUSTERED)
         private String value;
+
 
     }
     @PrimaryKey

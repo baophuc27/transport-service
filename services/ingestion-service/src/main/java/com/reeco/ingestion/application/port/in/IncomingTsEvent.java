@@ -1,5 +1,6 @@
-package com.reeco.ingestion.domain;
+package com.reeco.ingestion.application.port.in;
 
+import com.reeco.ingestion.domain.Metric;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -7,8 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
-public class NumericTsEvent {
-
+public class IncomingTsEvent {
 
     Long stationId;
 
@@ -16,7 +16,7 @@ public class NumericTsEvent {
 
     String metric;
 
-    Double value;
+    String value;
 
     Long deviceId;
 
@@ -25,7 +25,5 @@ public class NumericTsEvent {
     Double lat;
 
     Double lon;
-
-    // TODO : handle converting to standard unit
 
 }

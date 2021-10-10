@@ -24,6 +24,6 @@ public interface MetricMapper {
             @Mapping(source = "attribute.keyName", target = "keyName"),
             @Mapping(source = "connectionId", target = "deviceId")
     })
-    Metric mapToMetricEntity(UpsertAttributeMessage upsertAttributeMessage);
+    Metric mapToDomainMetric(UpsertAttributeMessage upsertAttributeMessage);
 
 }

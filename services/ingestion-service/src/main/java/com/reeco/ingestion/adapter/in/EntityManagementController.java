@@ -24,16 +24,8 @@ public class EntityManagementController implements QueueConsumer {
     private final ObjectMapper objectMapper;
 
     @Override
-    public Device registerDevice(RegisterDeviceCommand registerDeviceCommand){
-
-            Device deviceConnection = connectionMapper.registerCommandToFTPDeviceConnection(registerDeviceCommand);
-            log.info("Received register request with device id: {}",deviceConnection.getDeviceId());
-            return deviceConnection;
-    }
-
-    @Override
     @KafkaListener(topics = "reeco_time_series_ev",containerFactory = "timeSeriesEventListener")
     public void listen(Map<String, byte[]> header, ConsumerRecord<String, byte[]> message) {
-
+        // implement this
     }
 }
