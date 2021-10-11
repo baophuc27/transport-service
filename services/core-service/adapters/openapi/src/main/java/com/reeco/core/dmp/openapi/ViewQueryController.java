@@ -3,6 +3,10 @@ package com.reeco.core.dmp.openapi;
 import com.reeco.core.dmp.application.domain.governance.View;
 import com.reeco.core.dmp.application.port.in.ViewQuery;
 import com.reeco.core.dmp.common.OpenApiAdapter;
+import com.reeco.shares.api.dmp.view.ChartDto;
+import com.reeco.shares.api.dmp.view.DataPointDto;
+import com.reeco.shares.api.dmp.view.IndicatorDataDto;
+import com.reeco.shares.api.dmp.view.IndicatorDto;
 import com.reeco.shares.api.dmp.view.ViewDto;
 import com.reeco.shares.api.dmp.view.ViewService;
 import com.reeco.shares.util.exceptions.InvalidInputException;
@@ -17,6 +21,11 @@ import reactor.core.publisher.Mono;
 
 import static reactor.core.publisher.Mono.error;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @OpenApiAdapter
 @RestController
@@ -27,42 +36,42 @@ public class ViewQueryController implements ViewService {
 
     private final ServiceUtil serviceUtil;
 
-    private  final ViewQuery viewQuery;
+    private final ViewQuery viewQuery;
 
-    private  final ViewMapper viewMapper;
+    private final ViewMapper viewMapper;
 
     @Override
     public Mono<ViewDto> getView(int viewId) {
         LOG.debug("/view return the found view for viewId={}", viewId);
 
-        if (viewId < 1) throw new InvalidInputException("Invalid viewId: " + viewId);
+        if (viewId < 1)
+            throw new InvalidInputException("Invalid viewId: " + viewId);
 
         return viewQuery.getView(viewId)
-                .switchIfEmpty(error(new NotFoundException("No view found for viewId: " + viewId)))
-                .log()
-                .map(e -> viewMapper.entityToApi(e))
-                .map(e -> {e.setServiceAddress(serviceUtil.getServiceAddress()); return e;});
+                .switchIfEmpty(error(new NotFoundException("No view found for viewId: " + viewId))).log()
+                .map(e -> viewMapper.entityToApi(e)).map(e -> {
+                    e.setServiceAddress(serviceUtil.getServiceAddress());
+                    return e;
+                });
 
     }
 
     @Override
     public Mono<ViewDto> createView(ViewDto body) {
 
-        if (body.getViewId() < 1) throw new InvalidInputException("Invalid accountId: " + body.getViewId());
+        if (body.getViewId() < 1)
+            throw new InvalidInputException("Invalid accountId: " + body.getViewId());
 
         try {
 
             LOG.debug("createView: creates a new account entity for userId: {}", body.getUserId());
             View viewEntity = viewMapper.apiToEntity(body);
-            Mono<ViewDto> newEntity = viewQuery.saveView(viewEntity)
-                    .log()
-                    .onErrorMap(
-                            DuplicateKeyException.class,
+            Mono<ViewDto> newEntity = viewQuery.saveView(viewEntity).log()
+                    .onErrorMap(DuplicateKeyException.class,
                             ex -> new InvalidInputException("Duplicate key, View Id: " + body.getViewId()))
                     .map(e -> viewMapper.entityToApi(e));
 
             return newEntity;
-
 
         } catch (RuntimeException re) {
             LOG.warn("createView failed: {}", re.toString());
@@ -72,11 +81,76 @@ public class ViewQueryController implements ViewService {
 
     @Override
     public Mono<Void> deleteView(int viewId) {
-        if (viewId < 1) throw new InvalidInputException("Invalid viewId: " + viewId);
+        if (viewId < 1)
+            throw new InvalidInputException("Invalid viewId: " + viewId);
 
         LOG.debug("deleteView: tries to delete an entity with viewId: {}", viewId);
         return viewQuery.deleteView(viewId);
     }
 
+    @Override
+    public Mono<ChartDto> viewChartSeries(ChartDto chartDto) {
+        System.out.println(chartDto);
+        if (chartDto.getStartTime().getTime() > chartDto.getEndTime().getTime()) {
+            throw new InvalidInputException("Invalid Time Range");
+        }
+        ChartDto chartDto1 = new ChartDto();
+        chartDto1.setStartTime(chartDto.getStartTime());
+        chartDto1.setEndTime(chartDto.getEndTime());
+        chartDto1.setStationId(chartDto.getStationId());
+        chartDto1.setIndicatorDtos(chartDto.getIndicatorDtos());
+
+        List<IndicatorDataDto> indicatorDataDtos = new ArrayList<>();
+        for (IndicatorDto indicatorDto : chartDto.getIndicatorDtos()) {
+
+            IndicatorDataDto indicatorDataDto = new IndicatorDataDto();
+            indicatorDataDto.setIndicatorDto(indicatorDto);
+            List<DataPointDto> dataPointDtos = new ArrayList<>();
+            if (chartDto.getStartTime().equals(chartDto.getEndTime())) {
+                // Query Data point
+                for (int j = 0; j < 2; j++) {
+                    DataPointDto dataPointDto = new DataPointDto();
+                    dataPointDto.setStaionId(chartDto.getStationId());
+                    dataPointDto.setEventTime(
+                            new Timestamp(chartDto.getStartTime().getTime() - TimeUnit.MINUTES.toMillis(j * 2)));
+                    Random generator = new Random();
+                    dataPointDto.setValue(String.valueOf(generator.nextInt((30 - 10) + 1) + 10));
+                    // dataPointDto.setLat(generator.nextDouble() * 360.0);
+                    // dataPointDto.setLon(generator.nextDouble() * 360.0);
+                    dataPointDtos.add(dataPointDto);
+                }
+            } else {
+                // Data series
+                // time range < 24h
+
+                // 1day < time range < 7day
+
+                // 7day < time rang < 30 day
+
+                // time range > 30 day
+
+                // nhiệt độ (NUMBER_MEAN)
+                for (int j = 0; j < 1000; j++) {
+                    DataPointDto dataPointDto = new DataPointDto();
+                    dataPointDto.setStaionId(chartDto.getStationId());
+                    dataPointDto.setEventTime(new Timestamp((chartDto.getStartTime().getTime()
+                            + (chartDto.getEndTime().getTime() - chartDto.getStartTime().getTime()) * j / 10)));
+                    Random generator = new Random();
+                    dataPointDto.setValue(String.valueOf(generator.nextInt((30 - 10) + 1) + 10));
+                    // dataPointDto.setLat(generator.nextDouble() * 360.0);
+                    // dataPointDto.setLon(generator.nextDouble() * 360.0);
+                    dataPointDtos.add(dataPointDto);
+                }
+            }
+            indicatorDataDto.setDataPointDtos(dataPointDtos);
+            indicatorDataDtos.add(indicatorDataDto);
+
+        }
+        chartDto1.setIndicatorDatas(indicatorDataDtos);
+
+        // Call data from chartQuery
+        Mono<ChartDto> chartDtoMono = Mono.just(chartDto1);
+        return chartDtoMono;
+    }
 
 }
