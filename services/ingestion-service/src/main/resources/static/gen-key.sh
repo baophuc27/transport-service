@@ -1,1 +1,0 @@
-keytool -genkey -alias Reeco -keyalg RSA -keystore reeco.jks -keysize 2048

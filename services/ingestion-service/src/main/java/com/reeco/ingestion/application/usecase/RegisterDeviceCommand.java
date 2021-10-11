@@ -1,6 +1,6 @@
 package com.reeco.ingestion.application.usecase;
 
-import com.reeco.ingestion.domain.DeviceConnection;
+import com.reeco.ingestion.domain.Device;
 import com.reeco.ingestion.domain.protocol.FTPConfiguration;
 import com.reeco.ingestion.utils.annotators.SelfValidating;
 import lombok.Data;
@@ -25,7 +25,7 @@ public class RegisterDeviceCommand extends SelfValidating<RegisterDeviceCommand>
     int removeAfterDays;
 
     @NotNull
-    DeviceConnection.NotificationType notificationType;
+    Device.NotificationType notificationType;
 
     @NotNull
     List<String> ipWhiteList;
@@ -38,7 +38,7 @@ public class RegisterDeviceCommand extends SelfValidating<RegisterDeviceCommand>
     @NotNull
     String englishName;
 
-    public RegisterDeviceCommand(int stationId,int deviceId, DeviceConnection.FileType fileType, int maximumAttachment, int removeAfterDays, DeviceConnection.NotificationType notificationType, List<String> ipWhiteList, FTPConfiguration protocolConfiguration, String vietnameseName, String englishName) {
+    public RegisterDeviceCommand(int stationId, int deviceId, Device.FileType fileType, int maximumAttachment, int removeAfterDays, Device.NotificationType notificationType, List<String> ipWhiteList, FTPConfiguration protocolConfiguration, String vietnameseName, String englishName) {
         this.stationId = stationId;
         this.deviceId = deviceId;
         this.maximumAttachment = maximumAttachment;
