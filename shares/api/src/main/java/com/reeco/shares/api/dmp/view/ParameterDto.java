@@ -9,13 +9,17 @@ import lombok.Setter;
 
 @Data
 @NoArgsConstructor
-public class IndicatorDto {
+public class ParameterDto {
 
-    private Long id;
+    private Long parameterId;
 
-    private String name;
+    private String parameterName;
 
-    private String type;
+    private String indicatorName;
 
-    private String key;
+    private String indicatorType;
+
+    private String indicatorKey;
+
+    private String unit;
 }

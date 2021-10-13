@@ -10,8 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class IndicatorDataDto {
-    private IndicatorDto indicatorDto;
+public class ParameterDataDto {
+    private ParameterDto parameterDto;
 
     private List<DataPointDto> dataPointDtos;
 }

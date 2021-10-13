@@ -5,8 +5,8 @@ import com.reeco.core.dmp.application.port.in.ViewQuery;
 import com.reeco.core.dmp.common.OpenApiAdapter;
 import com.reeco.shares.api.dmp.view.ChartDto;
 import com.reeco.shares.api.dmp.view.DataPointDto;
-import com.reeco.shares.api.dmp.view.IndicatorDataDto;
-import com.reeco.shares.api.dmp.view.IndicatorDto;
+import com.reeco.shares.api.dmp.view.ParameterDataDto;
+import com.reeco.shares.api.dmp.view.ParameterDto;
 import com.reeco.shares.api.dmp.view.ViewDto;
 import com.reeco.shares.api.dmp.view.ViewService;
 import com.reeco.shares.util.exceptions.InvalidInputException;
@@ -22,6 +22,10 @@ import reactor.core.publisher.Mono;
 import static reactor.core.publisher.Mono.error;
 
 import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -91,28 +95,31 @@ public class ViewQueryController implements ViewService {
     @Override
     public Mono<ChartDto> viewChartSeries(ChartDto chartDto) {
         System.out.println(chartDto);
-        if (chartDto.getStartTime().getTime() > chartDto.getEndTime().getTime()) {
+        // Timestamp startTime = new Timestamp(chartDto.getStartTime().getTime());
+        if (chartDto.getStartTime().isAfter(chartDto.getEndTime())) {
             throw new InvalidInputException("Invalid Time Range");
         }
         ChartDto chartDto1 = new ChartDto();
-        chartDto1.setStartTime(chartDto.getStartTime());
-        chartDto1.setEndTime(chartDto.getEndTime());
+
         chartDto1.setStationId(chartDto.getStationId());
-        chartDto1.setIndicatorDtos(chartDto.getIndicatorDtos());
+        // chartDto1.setParameterDtos(chartDto.getParameterDtos());
 
-        List<IndicatorDataDto> indicatorDataDtos = new ArrayList<>();
-        for (IndicatorDto indicatorDto : chartDto.getIndicatorDtos()) {
+        List<ParameterDataDto> indicatorDataDtos = new ArrayList<>();
+        for (ParameterDto indicatorDto : chartDto.getParameterDtos()) {
 
-            IndicatorDataDto indicatorDataDto = new IndicatorDataDto();
-            indicatorDataDto.setIndicatorDto(indicatorDto);
+            ParameterDataDto indicatorDataDto = new ParameterDataDto();
+            indicatorDto.setIndicatorType("NUMBER");
+            indicatorDataDto.setParameterDto(indicatorDto);
             List<DataPointDto> dataPointDtos = new ArrayList<>();
             if (chartDto.getStartTime().equals(chartDto.getEndTime())) {
+                chartDto1.setStartTime(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
+                chartDto1.setEndTime(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
                 // Query Data point
                 for (int j = 0; j < 2; j++) {
                     DataPointDto dataPointDto = new DataPointDto();
                     dataPointDto.setStaionId(chartDto.getStationId());
-                    dataPointDto.setEventTime(
-                            new Timestamp(chartDto.getStartTime().getTime() - TimeUnit.MINUTES.toMillis(j * 2)));
+                    dataPointDto.setEventTime(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"))
+                            .minus(Duration.of(j * 10, ChronoUnit.MINUTES)));
                     Random generator = new Random();
                     dataPointDto.setValue(String.valueOf(generator.nextInt((30 - 10) + 1) + 10));
                     // dataPointDto.setLat(generator.nextDouble() * 360.0);
@@ -130,11 +137,15 @@ public class ViewQueryController implements ViewService {
                 // time range > 30 day
 
                 // nhiệt độ (NUMBER_MEAN)
-                for (int j = 0; j < 1000; j++) {
+                chartDto1.setStartTime(chartDto.getStartTime());
+                chartDto1.setEndTime(chartDto.getEndTime());
+                for (int j = 0; j < 50; j++) {
                     DataPointDto dataPointDto = new DataPointDto();
                     dataPointDto.setStaionId(chartDto.getStationId());
-                    dataPointDto.setEventTime(new Timestamp((chartDto.getStartTime().getTime()
-                            + (chartDto.getEndTime().getTime() - chartDto.getStartTime().getTime()) * j / 10)));
+                    dataPointDto.setEventTime(new Timestamp((Timestamp.valueOf(chartDto.getStartTime()).getTime()
+                            + (Timestamp.valueOf(chartDto.getEndTime()).getTime()
+                                    - Timestamp.valueOf(chartDto.getStartTime()).getTime()) * j / 50))
+                                            .toLocalDateTime());
                     Random generator = new Random();
                     dataPointDto.setValue(String.valueOf(generator.nextInt((30 - 10) + 1) + 10));
                     // dataPointDto.setLat(generator.nextDouble() * 360.0);
@@ -146,7 +157,7 @@ public class ViewQueryController implements ViewService {
             indicatorDataDtos.add(indicatorDataDto);
 
         }
-        chartDto1.setIndicatorDatas(indicatorDataDtos);
+        chartDto1.setParameterDatas(indicatorDataDtos);
 
         // Call data from chartQuery
         Mono<ChartDto> chartDtoMono = Mono.just(chartDto1);

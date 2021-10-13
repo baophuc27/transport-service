@@ -3,6 +3,7 @@ package com.reeco.shares.api.dmp.view;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,14 +16,14 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ChartDto {
 
-    private Timestamp startTime;
+    private LocalDateTime startTime;
 
-    private Timestamp endTime;
+    private LocalDateTime endTime;
 
-    private List<IndicatorDataDto> indicatorDatas = new ArrayList<>();
+    private List<ParameterDataDto> parameterDatas = new ArrayList<>();
 
     private Long stationId;
 
-    private List<IndicatorDto> indicatorDtos = new ArrayList<>();
+    private List<ParameterDto> parameterDtos = new ArrayList<>();
 
 }
