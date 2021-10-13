@@ -117,7 +117,7 @@ public class ViewQueryController implements ViewService {
                 // Query Data point
                 for (int j = 0; j < 2; j++) {
                     DataPointDto dataPointDto = new DataPointDto();
-                    dataPointDto.setStaionId(chartDto.getStationId());
+                    dataPointDto.setStationId(chartDto.getStationId());
                     dataPointDto.setEventTime(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"))
                             .minus(Duration.of(j * 10, ChronoUnit.MINUTES)));
                     Random generator = new Random();
@@ -141,7 +141,7 @@ public class ViewQueryController implements ViewService {
                 chartDto1.setEndTime(chartDto.getEndTime());
                 for (int j = 0; j < 50; j++) {
                     DataPointDto dataPointDto = new DataPointDto();
-                    dataPointDto.setStaionId(chartDto.getStationId());
+                    dataPointDto.setStationId(chartDto.getStationId());
                     dataPointDto.setEventTime(new Timestamp((Timestamp.valueOf(chartDto.getStartTime()).getTime()
                             + (Timestamp.valueOf(chartDto.getEndTime()).getTime()
                                     - Timestamp.valueOf(chartDto.getStartTime()).getTime()) * j / 50))
