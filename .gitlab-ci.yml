@@ -1,48 +1,49 @@
-image: openjdk:11
-services:
- - docker:19-dind
+# image: openjdk:11
+# services:
+#  - docker:19-dind
 
 stages:
- - build
- - build docker image
+#  - build
+#  - build docker image
  - deploy
 
-before_script:
- - export GRADLE_USER_HOME=`pwd`/.gradle
+# before_script:
+#  - export GRADLE_USER_HOME=`pwd`/.gradle
 
 cache:
   paths:
     - .gradle/wrapper
     - .gradle/caches
 
-variables:
-  DOCKER_IMAGE_NAME: reeco-dmp
+# variables:
+#   DOCKER_IMAGE_NAME: reeco-dmp
 
-build:
-  stage: build
-  script:
-    - cd services/core-service
-    - ./gradlew clean build
-  artifacts:
-    paths:
-      - services/core-service/configuration/build/libs/*.jar
-  only:
-    - deployment
+# build:
+#   stage: build
+#   script:
+#     - cd services/core-service
+#     - ./gradlew clean build
+#   artifacts:
+#     paths:
+#       - services/core-service/configuration/build/libs/*.jar
+#   only:
+#     - deployment
 
-docker build:
-  image: docker:stable
-  stage: build docker image
-  variables:
-    DOCKER_HOST: tcp://docker:2375/
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
-  before_script:
-   - export IMAGE_TAG=${DOCKER_USER}/${DOCKER_IMAGE_NAME}:${CI_COMMIT_REF_NAME##*/}-${CI_COMMIT_SHORT_SHA}
-   - echo "Building docker image for $IMAGE_TAG"
-  script:
-   - docker-compose build
-  only:
-    - deployment
+# docker build:
+#   image: docker:stable
+#   stage: build docker image
+#   variables:
+#     DOCKER_HOST: tcp://docker:2375/
+#     DOCKER_DRIVER: overlay2
+#     DOCKER_TLS_CERTDIR: ""
+#   before_script:
+#    - export IMAGE_TAG=${DOCKER_USER}/${DOCKER_IMAGE_NAME}:${CI_COMMIT_REF_NAME##*/}-${CI_COMMIT_SHORT_SHA}
+#    - echo "Building docker image for $IMAGE_TAG"
+#   script:
+#    - apk add docker-compose
+#    - docker-compose build
+#   only:
+#     - deployment
 
 deploy:
   image: ubuntu:latest
@@ -58,8 +59,11 @@ deploy:
    - echo "Deploying docker image $IMAGE_TAG to $CI_COMMIT_REF_NAME"
   script:
     - ssh SSH_USERNAME@$SSH_HOST
-    - docker system prune -a -f
-    - docker-compose down
-    - docker-compose up -d
+    - sudo docker system prune -a -f
+    - cd services/core-service
+    - ./gradlew clean build
+    - cd ~/reco-dmp/services
+    - sudo docker-compose down
+    - sudo docker-compose up -d --build core-service
   only:
     - deployment
