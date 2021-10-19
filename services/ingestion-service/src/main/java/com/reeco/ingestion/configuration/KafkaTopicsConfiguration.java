@@ -1,36 +1,41 @@
-package com.reeco.ingestion.infrastructure.queue.kafka;
+package com.reeco.ingestion.configuration;
 
+import lombok.Data;
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.SingletonBeanRegistry;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaAdmin;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Configuration
 @Getter
-public class KafkaTopicConfig {
+@Log4j2
+public class KafkaTopicsConfiguration {
 
-    @Value(value = "${kafka.settings.bootstrapServers}")
+    @Value(value = "${kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-    @Value("${kafka.topic.core.properties}")
-    private String coreProperties;
+    @Value(value = "${kafka.topics.event-topic.name}")
+    private String eventTopic;
 
-    @Value(value = "${kafka.topic.prefix}")
-    private String topicPrefix;
+    @Value(value = "${kafka.topics.config-topic.name}")
+    private String configTopic;
 
-    @Value(value = "${kafka.topic.core.name}")
-    private String topicName;
+    @Value(value = "${kafka.topics.config-topic.properties}")
+    private String eventProps;
 
-    @Value(value = "${kafka.topic.core.partitions}")
-    private Integer numPartitions;
+    @Value(value = "${kafka.topics.config-topic.properties}")
+    private String configProps;
 
-    private Map<String, String> coreConfigs;
 
     private Map<String, String> getConfigs(String properties) {
         Map<String, String> configs = new HashMap<>();
@@ -51,11 +56,19 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public NewTopic createCoreTopic() {
-        coreConfigs = getConfigs(coreProperties);
-        String fullTopicName = topicPrefix + "_" + topicName;
-        NewTopic newTopic = new NewTopic(fullTopicName, numPartitions, (short) 1);
-        newTopic.configs(coreConfigs);
+    public NewTopic createEventTopic() {
+        Map<String, String> eventConfigs = getConfigs(eventProps);
+        NewTopic newTopic = new NewTopic(eventTopic,1,(short) 1);
+        newTopic.configs(eventConfigs);
         return newTopic;
     }
+
+    @Bean
+    public NewTopic createConfigTopic() {
+        Map<String, String> configs = getConfigs(configProps);
+        NewTopic newTopic = new NewTopic(configTopic,1,(short) 1);
+        newTopic.configs(configs);
+        return newTopic;
+    }
+
 }

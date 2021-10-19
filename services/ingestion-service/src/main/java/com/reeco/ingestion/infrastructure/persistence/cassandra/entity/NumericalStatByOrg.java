@@ -6,29 +6,28 @@ import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-@Table("numeric_statistics_by_device")
+@Table("numeric_stats_by_organization")
 @Data
-public class NumStatByDevice {
+public class NumericalStatByOrg {
     @PrimaryKeyClass
     @Data
     public static class Key implements Serializable {
 
-        @PrimaryKeyColumn(name = "device_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
-        private Long deviceId;
+        @PrimaryKeyColumn(name = "organization_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
+        private Long organizationId;
 
-        @PrimaryKeyColumn(name = "metric", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
-        private String metric;
+        @PrimaryKeyColumn(name = "date", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
+        private String date;
 
-        @PrimaryKeyColumn(name = "date", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
-        private Date date;
+        @PrimaryKeyColumn(name = "param_id", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
+        private Long paramId;
     }
 
     @PrimaryKey
-    private TextStatByDevice.Key partitionKey;
+    private CategoricalStatByOrg.Key partitionKey;
 
     @Column("min")
     private Double min;
@@ -52,5 +51,5 @@ public class NumStatByDevice {
     private Long count;
 
     @Column("last_updated")
-    LocalDateTime last_updated;
+    LocalDateTime lastUpdated;
 }

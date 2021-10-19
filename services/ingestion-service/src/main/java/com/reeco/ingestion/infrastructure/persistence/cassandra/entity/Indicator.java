@@ -1,17 +1,16 @@
 package com.reeco.ingestion.infrastructure.persistence.cassandra.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
 
 import java.io.Serializable;
 
-@Table("metrics_by_station")
+@Table("indicators")
 @AllArgsConstructor
 @Getter
-public class MetricByStation {
+public class Indicator {
 
 
     @PrimaryKeyClass
@@ -19,18 +18,22 @@ public class MetricByStation {
     @Getter
     public static class Key implements Serializable {
 
-        @PrimaryKeyColumn(name = "station_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
-        private Long stationId;
+        @PrimaryKeyColumn(name = "indicator_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
+        private Long indicatorId;
 
-        @PrimaryKeyColumn(name = "device_id", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
-        private Long deviceId;
-
-        @PrimaryKeyColumn(name = "metric", ordinal = 2, type = PrimaryKeyType.CLUSTERED)
-        private String metric;
     }
 
     @PrimaryKey
-    private MetricByStation.Key partitionKey;
+    private Indicator.Key partitionKey;
+
+    @Column("group_id")
+    private Long groupId;
+
+    @Column("group_name")
+    private String groupName;
+
+    @Column("indicator_name")
+    private String indicatorName;
 
     @Column("value_type")
     private String valueType;

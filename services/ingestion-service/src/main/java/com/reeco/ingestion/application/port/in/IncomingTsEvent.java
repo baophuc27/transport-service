@@ -1,8 +1,9 @@
 package com.reeco.ingestion.application.port.in;
 
-import com.reeco.ingestion.domain.Metric;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -10,19 +11,33 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class IncomingTsEvent {
 
+    public IncomingTsEvent() {
+    }
+
+    Long organizationId;
+
     Long stationId;
-
-    LocalDateTime timeStamp;
-
-    String metric;
-
-    String value;
 
     Long deviceId;
 
+    Long paramId;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+    LocalDateTime eventTime;
+
+    Long indicatorId;
+
+    String indicatorName;
+
+    String value;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
     LocalDateTime receivedAt;
 
-    Double lat;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+    LocalDateTime sentAt;
+
+    Double lat; // nullable
 
     Double lon;
 

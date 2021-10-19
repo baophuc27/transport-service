@@ -7,16 +7,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class Metric {
-
-    public enum ValueType{
-        DOUBLE, STRING
-    }
-
+public class Parameter {
     private Long stationId;
     private Long deviceId;
     private String metric;
-    private ValueType valueType;
     private String unit;
     private String standardUnit;
 }
