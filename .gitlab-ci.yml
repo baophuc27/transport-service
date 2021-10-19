@@ -26,6 +26,8 @@ build:
   artifacts:
     paths:
       - build/libs/*.jar
+  only:
+    - deployment
 
 docker build:
   image: docker:stable
@@ -49,7 +51,6 @@ deploy:
   before_script:
    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
    - eval $(ssh-agent -s)
-   - source env/.${CI_COMMIT_REF_NAME}.env
    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
    - mkdir -p ~/.ssh
    - chmod 700 ~/.ssh
@@ -58,8 +59,8 @@ deploy:
    - echo "Deploying docker image $IMAGE_TAG to $CI_COMMIT_REF_NAME"
   script:
     - ssh SSH_USERNAME@$SSH_HOST
-    - docker stop $APP_NAME
     - docker system prune -a -f
+    - sudo docker-compose down
     - sudo docker-compose up -d
   only:
     - deployment
