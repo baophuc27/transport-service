@@ -27,11 +27,6 @@ build:
     paths:
       - build/libs/*.jar
 
-test:
-  stage: test
-  script:
-    - ./gradlew check
-
 docker build:
   image: docker:stable
   stage: build docker image
