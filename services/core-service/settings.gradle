@@ -3,6 +3,9 @@ rootProject.name = 'core-service'
 includeBuild("../../shares/api")
 includeBuild("../../shares/util")
 
+// include ':ingestion-service'
+// project(':ingestion-service').projectDir = new File(settingsDir, '../ingestion-service')
+
 include 'common'
 include 'configuration'
 

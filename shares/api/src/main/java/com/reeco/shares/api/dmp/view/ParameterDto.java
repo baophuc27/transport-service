@@ -11,6 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ParameterDto {
 
+    private Long stationId;
+
     private Long parameterId;
 
     private String parameterName;

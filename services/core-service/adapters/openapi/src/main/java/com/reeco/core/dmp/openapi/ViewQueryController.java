@@ -8,6 +8,7 @@ import com.reeco.shares.api.dmp.view.DataPointDto;
 import com.reeco.shares.api.dmp.view.ParameterDataDto;
 import com.reeco.shares.api.dmp.view.ParameterDto;
 import com.reeco.shares.api.dmp.view.ViewDto;
+import com.reeco.shares.api.dmp.view.ChartResolution;
 import com.reeco.shares.api.dmp.view.ViewService;
 import com.reeco.shares.util.exceptions.InvalidInputException;
 import com.reeco.shares.util.exceptions.NotFoundException;
@@ -101,7 +102,7 @@ public class ViewQueryController implements ViewService {
         }
         ChartDto chartDto1 = new ChartDto();
 
-        chartDto1.setStationId(chartDto.getStationId());
+        // chartDto1.setStationId(chartDto.getStationId());
         // chartDto1.setParameterDtos(chartDto.getParameterDtos());
 
         List<ParameterDataDto> indicatorDataDtos = new ArrayList<>();
@@ -117,7 +118,6 @@ public class ViewQueryController implements ViewService {
                 // Query Data point
                 for (int j = 0; j < 2; j++) {
                     DataPointDto dataPointDto = new DataPointDto();
-                    dataPointDto.setStationId(chartDto.getStationId());
                     dataPointDto.setEventTime(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"))
                             .minus(Duration.of(j * 10, ChronoUnit.MINUTES)));
                     Random generator = new Random();
@@ -128,30 +128,51 @@ public class ViewQueryController implements ViewService {
                 }
             } else {
                 // Data series
-                // time range < 24h
-
-                // 1day < time range < 7day
-
-                // 7day < time rang < 30 day
-
-                // time range > 30 day
-
-                // nhiệt độ (NUMBER_MEAN)
                 chartDto1.setStartTime(chartDto.getStartTime());
                 chartDto1.setEndTime(chartDto.getEndTime());
-                for (int j = 0; j < 50; j++) {
+                Timestamp endTimestamp = Timestamp.valueOf(chartDto.getStartTime());
+                ChartResolution chartResolution = ChartResolution.valueOf(chartDto.getResolution());
+                while (endTimestamp.before(Timestamp.valueOf(chartDto.getEndTime()))) {
                     DataPointDto dataPointDto = new DataPointDto();
-                    dataPointDto.setStationId(chartDto.getStationId());
-                    dataPointDto.setEventTime(new Timestamp((Timestamp.valueOf(chartDto.getStartTime()).getTime()
-                            + (Timestamp.valueOf(chartDto.getEndTime()).getTime()
-                                    - Timestamp.valueOf(chartDto.getStartTime()).getTime()) * j / 50))
-                                            .toLocalDateTime());
+                    dataPointDto.setEventTime(endTimestamp.toLocalDateTime());
+                    endTimestamp = new Timestamp(
+                            endTimestamp.getTime() + (int) (chartResolution.getValueFromEnum() * 3600000));
                     Random generator = new Random();
                     dataPointDto.setValue(String.valueOf(generator.nextInt((30 - 10) + 1) + 10));
-                    // dataPointDto.setLat(generator.nextDouble() * 360.0);
-                    // dataPointDto.setLon(generator.nextDouble() * 360.0);
+                    // switch (chartResolution) {
+                    // case DEFAULT:
+                    // dataPointDto.setEventTime(endTimestamp.toLocalDateTime());
+                    // endTimestamp = new Timestamp(endTimestamp.getTime() + 600000);
+                    // break;
+                    // case HOUR_4:
+                    // dataPointDto.setEventTime(endTimestamp.toLocalDateTime());
+                    // endTimestamp = new Timestamp(endTimestamp.getTime() + 14400000);
+
+                    // break;
+                    // case DAY_1:
+                    // dataPointDto.setEventTime(endTimestamp.toLocalDateTime());
+                    // endTimestamp = new Timestamp(endTimestamp.getTime() + 86400000);
+                    // break;
+                    // default:
+                    // throw new InvalidInputException("Invalid Resolution");
+                    // }
+
                     dataPointDtos.add(dataPointDto);
+
                 }
+                // for (int j = 0; j < 50; j++) {
+                // DataPointDto dataPointDto = new DataPointDto();
+                // dataPointDto.setEventTime(new
+                // Timestamp((Timestamp.valueOf(chartDto.getStartTime()).getTime()
+                // + (Timestamp.valueOf(chartDto.getEndTime()).getTime()
+                // - Timestamp.valueOf(chartDto.getStartTime()).getTime()) * j / 50))
+                // .toLocalDateTime());
+                // Random generator = new Random();
+                // dataPointDto.setValue(String.valueOf(generator.nextInt((30 - 10) + 1) + 10));
+                // // dataPointDto.setLat(generator.nextDouble() * 360.0);
+                // // dataPointDto.setLon(generator.nextDouble() * 360.0);
+                // dataPointDtos.add(dataPointDto);
+                // }
             }
             indicatorDataDto.setDataPointDtos(dataPointDtos);
             indicatorDataDtos.add(indicatorDataDto);

@@ -20,9 +20,11 @@ public class ChartDto {
 
     private LocalDateTime endTime;
 
+    private String resolution;
+
     private List<ParameterDataDto> parameterDatas = new ArrayList<>();
 
-    private Long stationId;
+    // private Long stationId;
 
     private List<ParameterDto> parameterDtos = new ArrayList<>();
 
