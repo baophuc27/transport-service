@@ -7,17 +7,24 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-public class CategoricalTsEvent extends BaseEvent{
+public class CategoricalTsEvent extends BaseEvent {
 
-    @Getter @Setter
+    @Getter
+    @Setter
     String value;
 
     public CategoricalTsEvent(Long organizationId,
-                          Long stationId,
-                          Long paramId,
-                          LocalDateTime timeStamp,
-                          String metric, Long deviceId, LocalDateTime receivedAt, Double lat, Double lon, String value) {
-        super(organizationId, stationId, paramId, timeStamp, metric, deviceId, receivedAt, lat, lon);
+                              Long stationId,
+                              Long paramId,
+                              LocalDateTime eventTime,
+                              String indicatorName,
+                              String paramName,
+                              Long deviceId,
+                              LocalDateTime receivedAt,
+                              Double lat,
+                              Double lon,
+                              String value) {
+        super(organizationId, stationId, paramId, eventTime, indicatorName, paramName, deviceId, receivedAt, lat, lon);
         this.value = value;
     }
 }

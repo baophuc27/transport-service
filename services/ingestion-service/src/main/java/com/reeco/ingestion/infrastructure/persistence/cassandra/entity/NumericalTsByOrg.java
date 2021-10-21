@@ -6,6 +6,7 @@ import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Table("numeric_series_by_organization")
@@ -20,13 +21,23 @@ public class NumericalTsByOrg {
         private Long organizationId;
 
         @PrimaryKeyColumn(name = "date", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
-        private String date;
+        private LocalDate date;
 
         @PrimaryKeyColumn(name = "event_time", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
         private LocalDateTime eventTime;
 
         @PrimaryKeyColumn(name = "param_id", ordinal = 3, type = PrimaryKeyType.CLUSTERED)
         private Long paramId;
+
+        @Override
+        public String toString() {
+            return "Key{" +
+                    "organizationId=" + organizationId +
+                    ", date=" + date +
+                    ", eventTime=" + eventTime +
+                    ", paramId=" + paramId +
+                    '}';
+        }
     }
 
     @PrimaryKey
@@ -55,4 +66,19 @@ public class NumericalTsByOrg {
 
     @Column("lon")
     private Double lon;
+
+    @Override
+    public String toString() {
+        return "NumericalTsByOrg{" +
+                "partitionKey=" + partitionKey.toString() +
+                ", indicatorName='" + indicatorName + '\'' +
+                ", paramName='" + paramName + '\'' +
+                ", stationId=" + stationId +
+                ", connectionId=" + connectionId +
+                ", value=" + value +
+                ", receivedAt=" + receivedAt +
+                ", lat=" + lat +
+                ", lon=" + lon +
+                '}';
+    }
 }

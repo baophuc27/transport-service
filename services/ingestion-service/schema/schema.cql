@@ -1,15 +1,11 @@
-//CREATE TABLE organization(
-//  organization_id BIGINT,
-//  station_id BIGINT,
-//  connection_id BIGINT,
-//  param_id BIGINT,
-//  lat DOUBLE,
-//  lon DOUBLE,
-//  status BOOLEAN,
-//  PRIMARY KEY((organization_id), station_id, connection_id)
-//) WITH CLUSTERING ORDER BY(station_id ASC, connection_id DESC);
 
-CREATE TABLE IF NOT EXISTS indicators(
+CREATE KEYSPACE IF NOT EXISTS reecotech
+WITH REPLICATION = {
+'class' : 'SimpleStrategy',
+'replication_factor' : 1
+};
+
+CREATE TABLE IF NOT EXISTS reecotech.indicators(
   indicator_id BIGINT,
   group_id BIGINT,
   group_name TEXT,
@@ -20,7 +16,7 @@ CREATE TABLE IF NOT EXISTS indicators(
   PRIMARY KEY(indicator_id)
 );
 
-CREATE TABLE IF NOT EXISTS params_by_organization(
+CREATE TABLE IF NOT EXISTS reecotech.params_by_organization(
   organization_id BIGINT,
   param_id BIGINT,
   indicator_id BIGINT,
@@ -32,7 +28,7 @@ CREATE TABLE IF NOT EXISTS params_by_organization(
 ) WITH CLUSTERING ORDER BY (param_id ASC);
 
 
-CREATE TABLE IF NOT EXISTS numeric_series_by_organization(
+CREATE TABLE IF NOT EXISTS reecotech.numeric_series_by_organization(
   organization_id BIGINT,
   date DATE,
   param_id BIGINT,
@@ -48,7 +44,7 @@ CREATE TABLE IF NOT EXISTS numeric_series_by_organization(
   PRIMARY KEY((organization_id, date), event_time, param_id)
 ) WITH CLUSTERING ORDER BY (event_time DESC, param_id ASC);
 
-CREATE TABLE IF NOT EXISTS categorical_series_by_organization(
+CREATE TABLE IF NOT EXISTS reecotech.categorical_series_by_organization(
   organization_id BIGINT,
   date DATE,
   param_id BIGINT,
@@ -64,7 +60,7 @@ CREATE TABLE IF NOT EXISTS categorical_series_by_organization(
   PRIMARY KEY((organization_id, date), event_time, param_id, value)
 ) WITH CLUSTERING ORDER BY (event_time DESC, param_id ASC, value ASC);
 
-CREATE TABLE IF NOT EXISTS numeric_stats_by_organization(
+CREATE TABLE IF NOT EXISTS reecotech.numeric_stats_by_organization(
   organization_id BIGINT,
   param_id BIGINT,
   date DATE,
@@ -79,7 +75,7 @@ CREATE TABLE IF NOT EXISTS numeric_stats_by_organization(
   PRIMARY KEY((organization_id, date), param_id)
 ) WITH CLUSTERING ORDER BY (param_id ASC);
 
-CREATE TABLE IF NOT EXISTS categorical_stats_by_organization(
+CREATE TABLE IF NOT EXISTS reecotech.categorical_stats_by_organization(
   organization_id BIGINT,
   date DATE,
   param_id BIGINT,

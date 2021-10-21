@@ -13,10 +13,10 @@ public class Indicator {
         DOUBLE, STRING
     }
 
-    Long indicator_id;
-    Long group_id;
-    String group_name;
-    String indicator_name;
+    Long indicatorId;
+    Long groupId;
+    String groupName;
+    String indicatorName;
     ValueType valueType;
     String unit;
     String standardUnit;

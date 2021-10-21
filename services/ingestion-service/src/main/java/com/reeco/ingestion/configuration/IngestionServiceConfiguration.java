@@ -2,7 +2,6 @@ package com.reeco.ingestion.configuration;
 
 import com.reeco.ingestion.adapter.out.IndicatorPersistenceAdapter;
 import com.reeco.ingestion.adapter.out.TsEventPersistenceAdapter;
-import com.reeco.ingestion.application.mapper.NumericalTsEventMapper;
 import com.reeco.ingestion.application.port.out.IndicatorRepository;
 import com.reeco.ingestion.application.port.out.TsEventRepository;
 import com.reeco.ingestion.application.service.EntityManagementService;

@@ -40,6 +40,8 @@ services:
       - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
     depends_on:
       - zookeeper
+    volumes:
+      - ./schema/events.json:/opt/events.json
 
   kafdrop:
     image: obsidiandynamics/kafdrop
@@ -65,3 +67,5 @@ services:
     ports:
       - "9160:9160"
       - "9042:9042"
+    volumes:
+    - ./schema/schema.cql:/opt/schema.cql

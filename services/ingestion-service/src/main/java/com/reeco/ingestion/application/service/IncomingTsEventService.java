@@ -10,7 +10,6 @@ import com.reeco.ingestion.domain.CategoricalTsEvent;
 import com.reeco.ingestion.utils.annotators.UseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import reactor.core.publisher.Mono;
 
 @UseCase
 @RequiredArgsConstructor
@@ -72,7 +71,8 @@ public class IncomingTsEventService implements StoreTsEventUseCase {
                     event.getParamId(),
                     event.getEventTime(),
                     event.getIndicatorName(),
-                    event.getDeviceId(),
+                    event.getParamName(),
+                    event.getConnectionId(),
                     event.getReceivedAt(),
                     event.getLat(),
                     event.getLon(),
@@ -87,7 +87,8 @@ public class IncomingTsEventService implements StoreTsEventUseCase {
                     event.getParamId(),
                     event.getEventTime(),
                     event.getIndicatorName(),
-                    event.getDeviceId(),
+                    event.getParamName(),
+                    event.getConnectionId(),
                     event.getReceivedAt(),
                     event.getLat(),
                     event.getLon(),
