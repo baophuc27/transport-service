@@ -6,18 +6,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
-
 @Mapper(componentModel = "spring")
 public interface ViewMapper {
 
-    @Mappings({
-        @Mapping(target = "serviceAddress", ignore = true),
-    })
+    @Mappings({ @Mapping(target = "serviceAddress", ignore = true), })
     ViewDto entityToApi(View entity);
 
-    @Mappings({
-        @Mapping(target = "id", ignore = true),
-            @Mapping(target = "type", ignore = true),
-    })
+    @Mappings({ @Mapping(target = "id", ignore = true), @Mapping(target = "name", ignore = true), })
     View apiToEntity(ViewDto api);
 }
