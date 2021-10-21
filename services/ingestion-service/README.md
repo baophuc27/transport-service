@@ -4,7 +4,8 @@
 - Please make sure you have already installed docker & docker-compose
 
 ## Starting project
-- Just run ``` ./start_all.sh ```
+- Just run ``` ./start_all.sh ``` for infrastructure & containers. 
+- Use Idea for start running service to develop and see log in console
 
 ## Kafka-UI
 - Go to **localhost:19000** and keep track events came to the kafka topic
