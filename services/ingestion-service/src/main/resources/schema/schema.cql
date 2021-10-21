@@ -1,70 +1,92 @@
-CREATE TABLE devices_by_station(
-  station_id BIGINT,
-  device_id BIGINT,
-  decription TEXT,
-  lat DOUBLE,
-  lon DOUBLE,
-  status BOOLEAN,
-  PRIMARY KEY((station_id), device_id, status)
-) WITH CLUSTERING ORDER BY(device_id DESC);
+//CREATE TABLE organization(
+//  organization_id BIGINT,
+//  station_id BIGINT,
+//  connection_id BIGINT,
+//  param_id BIGINT,
+//  lat DOUBLE,
+//  lon DOUBLE,
+//  status BOOLEAN,
+//  PRIMARY KEY((organization_id), station_id, connection_id)
+//) WITH CLUSTERING ORDER BY(station_id ASC, connection_id DESC);
 
-CREATE TABLE numeric_series_by_station(
-  station_id BIGINT,
-  device_id BIGINT,
-  metric TEXT,
-  value DOUBLE,
-  event_ts TIMESTAMP,
-  PRIMARY KEY((station_id, device_id), metric, event_ts)
-) WITH CLUSTERING ORDER BY (metric DESC, event_ts DESC)
-
-CREATE TABLE numeric_series_by_metric(
-  station_id BIGINT,
-  metric TEXT,
-  value DOUBLE,
-  event_ts TIMESTAMP,
-  device_id BIGINT
-  PRIMARY KEY((station_id, metric), event_ts, device_id)
-) WITH CLUSTERING ORDER BY (metric DESC, event_ts DESC)
-
-CREATE TABLE metrics_by_station(
-  station_id BIGINT,
-  device_id BIGINT,
-  metric TEXT,
+CREATE TABLE IF NOT EXISTS indicators(
+  indicator_id BIGINT,
+  group_id BIGINT,
+  group_name TEXT,
+  indicator_name TEXT,
   value_type TEXT,
   unit TEXT,
   standard_unit TEXT,
-  PRIMARY KEY((station_id), device_id, metric)
-) WITH CLUSTERING ORDER BY (metric DESC)
+  PRIMARY KEY(indicator_id)
+);
 
-CREATE TABLE numeric_statistics_by_device(
-  device_id BIGINT,
-  metric TEXT,
+CREATE TABLE IF NOT EXISTS params_by_organization(
+  organization_id BIGINT,
+  param_id BIGINT,
+  indicator_id BIGINT,
+  indicator_name TEXT,
+  param_name TEXT,
+  station_id BIGINT,
+  connection_id BIGINT,
+  PRIMARY KEY((organization_id), param_id)
+) WITH CLUSTERING ORDER BY (param_id ASC);
+
+
+CREATE TABLE IF NOT EXISTS numeric_series_by_organization(
+  organization_id BIGINT,
+  date DATE,
+  param_id BIGINT,
+  indicator_name TEXT,
+  param_name TEXT,
+  station_id BIGINT,
+  connection_id BIGINT,
+  value DOUBLE,
+  received_at TIMESTAMP,
+  event_time TIMESTAMP,
+  lat DOUBLE,
+  lon DOUBLE,
+  PRIMARY KEY((organization_id, date), event_time, param_id)
+) WITH CLUSTERING ORDER BY (event_time DESC, param_id ASC);
+
+CREATE TABLE IF NOT EXISTS categorical_series_by_organization(
+  organization_id BIGINT,
+  date DATE,
+  param_id BIGINT,
+  station_id BIGINT,
+  connection_id BIGINT,
+  value TEXT,
+  indicator_name TEXT,
+  param_name TEXT,
+  received_at TIMESTAMP,
+  event_time TIMESTAMP,
+  lat DOUBLE,
+  lon DOUBLE,
+  PRIMARY KEY((organization_id, date), event_time, param_id, value)
+) WITH CLUSTERING ORDER BY (event_time DESC, param_id ASC, value ASC);
+
+CREATE TABLE IF NOT EXISTS numeric_stats_by_organization(
+  organization_id BIGINT,
+  param_id BIGINT,
   date DATE,
   min DOUBLE,
   max DOUBLE,
-  median DOUBLE
+  median DOUBLE,
   mean DOUBLE,
   acc DOUBLE,
+  cnt BIGINT,
+  std DOUBLE,
   last_updated TIMESTAMP,
-  PRIMARY KEY((device_id, metric), date)
-) WITH CLUSTERING ORDER BY (date DESC)
+  PRIMARY KEY((organization_id, date), param_id)
+) WITH CLUSTERING ORDER BY (param_id ASC);
 
-CREATE TABLE text_statistics_by_device(
-  device_id BIGINT,
-  metric TEXT,
-  value TEXT,
+CREATE TABLE IF NOT EXISTS categorical_stats_by_organization(
+  organization_id BIGINT,
   date DATE,
-  value_count BIGINT,
-  PRIMARY KEY((device_id, metric), date, value)
-) WITH CLUSTERING ORDER BY (date ASC, value ASC)
-
-CREATE TABLE text_series_by_device(
-device_id BIGINT,
-metric TEXT,
-value TEXT,
-date DATE,
-value_count BIGINT,
-PRIMARY KEY((device_id, metric), date, value)
-) WITH CLUSTERING ORDER BY (date ASC, value ASC)
+  param_id BIGINT,
+  value TEXT,
+  cnt BIGINT,
+  last_updated TIMESTAMP,
+  PRIMARY KEY((organization_id, date), param_id, value)
+) WITH CLUSTERING ORDER BY (param_id ASC, value ASC);
 
 

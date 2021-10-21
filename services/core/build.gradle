@@ -1,0 +1,49 @@
+plugins {
+	id "org.springframework.boot" version '2.4.1'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+}
+
+
+group = 'com.reeco'
+version = '0.1.0'
+sourceCompatibility = '1.8'
+
+
+ext {
+	mapstructVersion = "1.4.2.Final"
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+
+}
+
+repositories {
+	mavenCentral()
+}
+
+
+dependencies {
+
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// implementation('com.marvin.shares.api:api')
+	// implementation('com.marvin.shares.util:util')
+
+
+	implementation('org.springframework.boot:spring-boot-starter-actuator')
+	implementation('org.springframework.boot:spring-boot-starter-webflux')
+	implementation('io.springfox:springfox-boot-starter:3.0.0')
+	implementation('org.springframework.boot:spring-boot-starter-data-cassandra-reactive:2.5.4')
+	// implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
+
+
+	testImplementation('org.springframework.boot:spring-boot-starter-test')
+	testImplementation('io.projectreactor:reactor-test')
+}
+
+
