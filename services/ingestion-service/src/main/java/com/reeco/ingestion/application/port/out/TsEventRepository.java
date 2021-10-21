@@ -1,9 +1,11 @@
 package com.reeco.ingestion.application.port.out;
 
-import com.reeco.ingestion.domain.NumericTsEvent;
-import com.reeco.ingestion.domain.TextTsEvent;
+import com.reeco.ingestion.domain.NumericalTsEvent;
+import com.reeco.ingestion.domain.CategoricalTsEvent;
 
 public interface TsEventRepository {
-    void insertNumericEvent(NumericTsEvent e);
-    void insertTextEvent(TextTsEvent e);
+    void insertNumericEvent(NumericalTsEvent e);
+
+    void insertCategoricalEvent(CategoricalTsEvent e);
+
 }

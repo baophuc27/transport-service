@@ -1,16 +1,22 @@
 package com.reeco.ingestion.application.usecase;
 
-import com.reeco.ingestion.infrastructure.model.DeleteAttributeMessage;
-import com.reeco.ingestion.infrastructure.model.UpsertAttributeMessage;
 
 public interface EntityManagementUseCase {
 
-    void registerDevice(RegisterDeviceCommand command);
+    void registerAlarm(
+            // might have some arguments
+    );
 
-    void deleteDevice(DeleteDeviceCommand command);
+    void registerParam(
+            // might have some arguments
+    );
 
-    void registerAttribute(UpsertAttributeMessage message);
+    void deleteAlarm(
+            // might have some arguments
+    );
 
-    void deleteAttribute(DeleteAttributeMessage message);
+    void deleteParam(
+            // might have some arguments
+    );
 
 }
