@@ -1,6 +1,7 @@
 package com.reeco.core.dmp.core.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
@@ -10,6 +11,7 @@ import java.io.Serializable;
 @Table("indicators")
 @AllArgsConstructor
 @Getter
+@Data
 public class Indicator {
 
     @PrimaryKeyClass

@@ -11,11 +11,11 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan("com.reeco")
 public class DmpServiceApplication {
 
-	private static final Logger LOG = LoggerFactory.getLogger(DmpServiceApplication.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DmpServiceApplication.class);
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		ConfigurableApplicationContext ctx = SpringApplication.run(DmpServiceApplication.class, args);
-	}
-
+        ConfigurableApplicationContext ctx = SpringApplication.run(DmpServiceApplication.class, args);
+    }
+// export PATH=$PATH:/opt/gradle/gradle-6.4.1/bin
 }

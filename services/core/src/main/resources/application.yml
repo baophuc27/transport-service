@@ -54,9 +54,9 @@ spring:
   data:
     cassandra:
       keyspace-name: reecotech
-      username: cassandra
-      password: cassandra
-      contact-points: 113.22.109.120
+#      username: cassandra
+#      password: cassandra
+      contact-points: localhost
       port: 9042
       local-datacenter: datacenter1
 ---
