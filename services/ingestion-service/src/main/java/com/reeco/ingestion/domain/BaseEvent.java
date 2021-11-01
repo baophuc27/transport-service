@@ -1,12 +1,13 @@
 package com.reeco.ingestion.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
+@ToString
 public class BaseEvent {
     private Long organizationId;
 
@@ -18,7 +19,9 @@ public class BaseEvent {
 
     private String indicatorName;
 
-    private Long deviceId;
+    private String paramName;
+
+    private Long connectionId;
 
     private LocalDateTime receivedAt;
 

@@ -18,7 +18,7 @@ public class IncomingTsEvent {
 
     Long stationId;
 
-    Long deviceId;
+    Long connectionId;
 
     Long paramId;
 
@@ -28,6 +28,8 @@ public class IncomingTsEvent {
     Long indicatorId;
 
     String indicatorName;
+
+    String paramName;
 
     String value;
 

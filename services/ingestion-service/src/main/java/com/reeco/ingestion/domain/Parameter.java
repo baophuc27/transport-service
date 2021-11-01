@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 public class Parameter {
     private Long stationId;
-    private Long deviceId;
+    private Long connectionId;
     private String metric;
     private String unit;
     private String standardUnit;
