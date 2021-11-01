@@ -46,7 +46,7 @@ api:
 
 
 
-server.port: 7000
+server.port: 7001
 
 server.error.include-message: always
 
@@ -56,13 +56,12 @@ spring:
       keyspace-name: reecotech
 #      username: cassandra
 #      password: cassandra
-      contact-points: localhost
+      contact-points: 118.69.53.93
       port: 9042
       local-datacenter: datacenter1
----
-spring.profiles: docker
 
-server.port: 7001
+
+
 
 
 

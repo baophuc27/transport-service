@@ -5,7 +5,7 @@
       <driver-ref>cassandra</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.dbschema.CassandraJdbcDriver</jdbc-driver>
-      <jdbc-url>jdbc:cassandra://118.69.53.93:9042/</jdbc-url>
+      <jdbc-url>jdbc:cassandra://118.69.53.93:9042/reecotech</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
     <data-source source="LOCAL" name="sql-server" uuid="41c136c7-66d5-401d-adf7-c76f81f1b933">
@@ -19,7 +19,7 @@
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://113.22.109.120:8081/postgres</jdbc-url>
+      <jdbc-url>jdbc:postgresql://118.69.53.93:8081/postgres</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
