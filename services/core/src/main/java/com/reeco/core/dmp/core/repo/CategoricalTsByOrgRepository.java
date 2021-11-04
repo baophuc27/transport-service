@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
-public interface CategoricalTsByOrgRepository extends CassandraRepository<CategoricalTsByOrg, CategoricalTsByOrg.Key> {
+public interface CategoricalTsByOrgRepository extends CassandraRepository<CategoricalTsByOrg, Long> {
 
     @Query("select * from categorical_series_by_organization\n" +
             "where event_time >= ?0 and event_time <= ?1 \n" +
@@ -20,4 +20,8 @@ public interface CategoricalTsByOrgRepository extends CassandraRepository<Catego
             "  and param_id = ?3 \n" +
             "  ALLOW FILTERING ;")
     List<CategoricalTsByOrg> findDataDetail(Timestamp startTime, Timestamp endTime, Long organizationId, Long paramId);
+
+    @Query("SELECT * FROM categorical_series_by_organization WHERE organization_id=?0 and param_id=?1\n" +
+            "LIMIT 2 ALLOW FILTERING ;")
+    List<CategoricalTsByOrg> find2LatestRow(Long orgId, Long paramId);
 }

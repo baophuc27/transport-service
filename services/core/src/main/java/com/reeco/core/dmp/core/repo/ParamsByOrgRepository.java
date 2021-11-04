@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.data.cassandra.repository.ReactiveCassandraRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Mono;
+//import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 

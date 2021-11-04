@@ -7,8 +7,8 @@ import org.springframework.data.cassandra.repository.Query;
 import org.springframework.data.cassandra.repository.ReactiveCassandraRepository;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+//import reactor.core.publisher.Flux;
+//import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -25,4 +25,8 @@ public interface NumericalTsByOrgRepository extends CassandraRepository<Numerica
             "  and param_id = ?3 \n" +
             "  ALLOW FILTERING ;")
     List<NumericalTsByOrg> findDataDetail(Timestamp startTime, Timestamp endTime, Long organizationId, Long paramId);
+
+    @Query("SELECT * FROM numeric_series_by_organization WHERE organization_id=?0 and param_id=?1\n" +
+            "LIMIT 2 ALLOW FILTERING ;")
+    List<NumericalTsByOrg> find2LatestRow(Long orgId, Long paramId);
 }

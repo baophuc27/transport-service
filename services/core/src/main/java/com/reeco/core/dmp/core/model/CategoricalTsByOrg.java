@@ -7,6 +7,7 @@ import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Table("categorical_series_by_organization")
@@ -22,7 +23,7 @@ public class CategoricalTsByOrg {
         private Long organizationId;
 
         @PrimaryKeyColumn(name = "date", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
-        private String date;
+        private LocalDate date;
 
         @PrimaryKeyColumn(name = "event_time", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
         private LocalDateTime eventTime;
