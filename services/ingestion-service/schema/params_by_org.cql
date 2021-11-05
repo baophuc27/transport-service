@@ -1,0 +1,2 @@
+INSERT INTO reecotech.params_by_organization (organization_id, param_id, indicator_id, station_id, unit, connection_id)
+VALUES ((1, 1, 1, 1, '', 1), (1, 2, 1, 1, '', 1), (1, 3, 1, 1, '', 1), (2, 1, 1, 1, '', 1), (2, 2, 1, 1, '', 1))

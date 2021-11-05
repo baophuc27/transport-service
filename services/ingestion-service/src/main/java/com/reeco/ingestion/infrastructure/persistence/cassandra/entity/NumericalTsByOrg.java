@@ -1,4 +1,4 @@
-package com.reeco.core.dmp.core.model;
+package com.reeco.ingestion.infrastructure.persistence.cassandra.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.cassandra.core.cql.Ordering;
@@ -39,7 +39,7 @@ public class NumericalTsByOrg {
     }
 
     @PrimaryKey
-    private NumericalTsByOrg.Key partitionKey;
+    private Key partitionKey;
 
     @Column("indicator_name")
     private String indicatorName;

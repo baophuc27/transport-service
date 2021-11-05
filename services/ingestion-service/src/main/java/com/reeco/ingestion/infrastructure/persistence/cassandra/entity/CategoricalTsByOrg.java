@@ -2,6 +2,7 @@ package com.reeco.ingestion.infrastructure.persistence.cassandra.entity;
 
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.data.cassandra.core.cql.Ordering;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
@@ -11,10 +12,12 @@ import java.time.LocalDateTime;
 
 @Table("categorical_series_by_organization")
 @AllArgsConstructor
+@Data
 public class CategoricalTsByOrg {
 
     @PrimaryKeyClass
     @AllArgsConstructor
+    @Data
     public static class Key implements Serializable {
         @PrimaryKeyColumn(name = "organization_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
         private Long organizationId;
