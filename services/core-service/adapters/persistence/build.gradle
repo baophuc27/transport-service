@@ -15,7 +15,8 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
+	implementation('org.springframework.boot:spring-boot-starter-data-cassandra-reactive:2.5.4')
+	// implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'

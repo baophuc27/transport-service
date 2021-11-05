@@ -17,9 +17,11 @@ public class DmpServiceApplication {
 
 		ConfigurableApplicationContext ctx = SpringApplication.run(DmpServiceApplication.class, args);
 
-		String mongodDbHost = ctx.getEnvironment().getProperty("spring.data.mongodb.host");
-		String mongodDbPort = ctx.getEnvironment().getProperty("spring.data.mongodb.port");
-		LOG.info("Connected to MongoDb: " + mongodDbHost + ":" + mongodDbPort);
+		// String mongodDbHost =
+		// ctx.getEnvironment().getProperty("spring.data.mongodb.host");
+		// String mongodDbPort =
+		// ctx.getEnvironment().getProperty("spring.data.mongodb.port");
+		// LOG.info("Connected to MongoDb: " + mongodDbHost + ":" + mongodDbPort);
 	}
 
 }

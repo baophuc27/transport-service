@@ -1,0 +1,39 @@
+server.port: 7001
+
+server.error.include-message: always
+
+spring:
+  data:
+    cassandra:
+      keyspace-name: reecotech
+#      username: cassandra
+#      password: cassandra
+      contact-points: 118.69.53.93
+      port: 9042
+      local-datacenter: datacenter1
+      request:
+        timeout: 15s
+      connection:
+        init-query-timeout: 15s
+#  datasource:
+#    username: ari
+#    password: password
+#    url: jdbc:postgresql://118.69.53.93:8081/postgres
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+
+
+
+
+
+
+
+
+
+
+
+
+

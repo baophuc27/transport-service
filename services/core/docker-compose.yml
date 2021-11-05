@@ -1,0 +1,59 @@
+version: '2.1'
+
+services:
+
+
+  # core services
+  core:
+    build: .
+    mem_limit: 350m
+    ports:
+      - "7001:7001"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+
+
+  # kafka
+  # kafka:
+  #   image: wurstmeister/kafka:2.12-2.1.0
+  #   mem_limit: 350m
+  #   ports:
+  #     - "9092:9092"
+  #   environment:
+  #     - KAFKA_ADVERTISED_HOST_NAME=kafka
+  #     - KAFKA_ADVERTISED_PORT=9092
+  #     - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+  #    depends_on:
+  #      - zookeeper
+
+  # zookeeper
+  #  zookeeper:
+  #    image: wurstmeister/zookeeper:3.4.6
+  #    mem_limit: 350m
+  #    ports:
+  #      - "2181:2181"
+  #    environment:
+  #      - KAFKA_ADVERTISED_HOST_NAME=zookeeper
+
+  # $ mongo
+  # mongodb:
+  #   image: mongo:3.6.9
+  #   mem_limit: 350m
+  #   ports:
+  #     - "27017:27017"
+  #   command: mongod --smallfiles
+  #   healthcheck:
+  #     test: "mongo --eval 'db.stats().ok'"
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 10
+
+
+
+
+
+
+
+
+

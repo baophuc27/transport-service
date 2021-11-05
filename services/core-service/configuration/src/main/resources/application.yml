@@ -50,23 +50,21 @@ server.port: 7000
 
 server.error.include-message: always
 
-spring.data.mongodb:
-  host: localhost
-  port: 27017
-  database: view-db
-
-logging:
-  level:
-    root: INFO
-    com.marvin: DEBUG
-    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
-
+spring:
+  data:
+    cassandra:
+      keyspace-name: reecotech
+      username: cassandra
+      password: cassandra
+      contact-points: 113.22.109.120
+      port: 9042
+      local-datacenter: datacenter1
 ---
 spring.profiles: docker
 
 server.port: 7001
 
-spring.data.mongodb.host: mongodb
+
 
 
 
