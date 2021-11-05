@@ -68,4 +68,4 @@ services:
       - "9160:9160"
       - "9042:9042"
     volumes:
-    - ./schema/schema.cql:/opt/schema.cql
+    - ./schema/:/opt/initdb/

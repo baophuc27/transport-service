@@ -1,6 +1,7 @@
 package com.reeco.ingestion.infrastructure.persistence.cassandra.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.data.cassandra.core.cql.Ordering;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
@@ -11,29 +12,27 @@ import java.time.LocalDateTime;
 
 @Table("numeric_series_by_organization")
 @AllArgsConstructor
+@Data
 public class NumericalTsByOrg {
 
     @PrimaryKeyClass
     @AllArgsConstructor
+    @Data
     public static class Key implements Serializable {
 
         @PrimaryKeyColumn(name = "organization_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
         private Long organizationId;
 
-        @PrimaryKeyColumn(name = "date", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
-        private LocalDate date;
+        @PrimaryKeyColumn(name = "param_id", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
+        private Long paramId;
 
         @PrimaryKeyColumn(name = "event_time", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
         private LocalDateTime eventTime;
-
-        @PrimaryKeyColumn(name = "param_id", ordinal = 3, type = PrimaryKeyType.CLUSTERED)
-        private Long paramId;
 
         @Override
         public String toString() {
             return "Key{" +
                     "organizationId=" + organizationId +
-                    ", date=" + date +
                     ", eventTime=" + eventTime +
                     ", paramId=" + paramId +
                     '}';
@@ -48,6 +47,10 @@ public class NumericalTsByOrg {
 
     @Column("param_name")
     private String paramName;
+
+//    @PrimaryKeyColumn(name = "date", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
+    @Column("date")
+    private LocalDate date;
 
     @Column("station_id")
     private Long stationId;

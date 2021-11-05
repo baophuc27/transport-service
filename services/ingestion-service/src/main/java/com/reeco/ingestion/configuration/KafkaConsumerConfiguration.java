@@ -1,6 +1,7 @@
 package com.reeco.ingestion.configuration;
 
 import com.reeco.ingestion.application.port.in.IncomingTsEvent;
+import lombok.extern.log4j.Log4j2;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +16,11 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 @Configuration
+@Log4j2
 public class KafkaConsumerConfiguration {
 
     @Value(value = "${kafka.bootstrap-servers}")
@@ -37,11 +38,12 @@ public class KafkaConsumerConfiguration {
 
     @Bean
     public ConsumerFactory<String, IncomingTsEvent> eventConsumerFactory() {
+        List<String> bootstrapServers = new ArrayList<>(Collections.singletonList(bootstrapAddress));
         Map<String, Object> props = new HashMap<>();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, eventCg);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, eventCgResetOffset);
-        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        log.info("CONSUMERS: " + props.toString());
         return new DefaultKafkaConsumerFactory<>(props,
                 new StringDeserializer(),
                 new JsonDeserializer<>(IncomingTsEvent.class));
