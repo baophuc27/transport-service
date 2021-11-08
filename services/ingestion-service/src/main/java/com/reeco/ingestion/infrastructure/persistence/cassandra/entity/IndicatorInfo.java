@@ -6,11 +6,12 @@ import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Table("indicators")
 @AllArgsConstructor
 @Getter
-public class Indicator {
+public class IndicatorInfo {
 
 
     @PrimaryKeyClass
@@ -24,13 +25,10 @@ public class Indicator {
     }
 
     @PrimaryKey
-    private Indicator.Key partitionKey;
+    private IndicatorInfo.Key partitionKey;
 
     @Column("group_id")
     private Long groupId;
-
-    @Column("group_name")
-    private String groupName;
 
     @Column("indicator_name")
     private String indicatorName;
@@ -38,8 +36,11 @@ public class Indicator {
     @Column("value_type")
     private String valueType;
 
-    @Column("unit")
-    private String unit;
+    @Column("created_at")
+    private LocalDateTime createdAt;
+
+    @Column("updated_at")
+    private LocalDateTime updatedAt;
 
     @Column("standard_unit")
     private String standardUnit;

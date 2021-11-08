@@ -1,6 +1,5 @@
 package com.reeco.ingestion.infrastructure.persistence.cassandra.repository;
 
-import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.Indicator;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.ParamsByOrg;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.cassandra.repository.ReactiveCassandraRepository;

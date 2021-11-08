@@ -1,5 +1,6 @@
 package com.reeco.ingestion.infrastructure.persistence.cassandra.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.cassandra.core.cql.Ordering;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
@@ -14,20 +15,31 @@ import java.util.Date;
 public class NumericalStatByOrg {
     @PrimaryKeyClass
     @Data
+    @AllArgsConstructor
     public static class Key implements Serializable {
 
         @PrimaryKeyColumn(name = "organization_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
         private Long organizationId;
 
-        @PrimaryKeyColumn(name = "date", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
+        @PrimaryKeyColumn(name = "date", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
         private String date;
 
         @PrimaryKeyColumn(name = "param_id", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
         private Long paramId;
     }
 
+    public NumericalStatByOrg(Long organizationId, String date, Long paramId, Double min, Double max, Double mean, Double acc, Long count, LocalDateTime lastUpdated) {
+        this.partitionKey = new NumericalStatByOrg.Key(organizationId, date, paramId);
+        this.min = min;
+        this.max = max;
+        this.mean = mean;
+        this.acc = acc;
+        this.count = count;
+        this.lastUpdated = lastUpdated;
+    }
+
     @PrimaryKey
-    private CategoricalStatByOrg.Key partitionKey;
+    private NumericalStatByOrg.Key partitionKey;
 
     @Column("min")
     private Double min;
@@ -35,17 +47,11 @@ public class NumericalStatByOrg {
     @Column("max")
     private Double max;
 
-    @Column("median")
-    private Double median;
-
     @Column("mean")
     private Double mean;
 
     @Column("acc")
     private Double acc;
-
-    @Column("std")
-    private Double std;
 
     @Column("count")
     private Long count;

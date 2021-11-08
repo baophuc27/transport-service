@@ -8,11 +8,12 @@ WITH REPLICATION = {
 CREATE TABLE IF NOT EXISTS reecotech.indicators(
   indicator_id BIGINT,
   group_id BIGINT,
-  group_name TEXT,
   indicator_name TEXT,
+  indicator_name_vi TEXT,
   value_type TEXT,
-  unit TEXT,
   standard_unit TEXT,
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP,
   PRIMARY KEY(indicator_id)
 );
 
@@ -20,9 +21,8 @@ CREATE TABLE IF NOT EXISTS reecotech.params_by_organization(
   organization_id BIGINT,
   param_id BIGINT,
   indicator_id BIGINT,
-  indicator_name TEXT,
-  param_name TEXT,
   station_id BIGINT,
+  unit TEXT,
   connection_id BIGINT,
   PRIMARY KEY((organization_id), param_id)
 ) WITH CLUSTERING ORDER BY (param_id ASC);
@@ -41,8 +41,8 @@ CREATE TABLE IF NOT EXISTS reecotech.numeric_series_by_organization(
   event_time TIMESTAMP,
   lat DOUBLE,
   lon DOUBLE,
-  PRIMARY KEY((organization_id, date), event_time, param_id)
-) WITH CLUSTERING ORDER BY (event_time DESC, param_id ASC);
+PRIMARY KEY((organization_id, date), param_id, event_time)
+) WITH CLUSTERING ORDER BY (param_id ASC, event_time DESC);
 
 CREATE TABLE IF NOT EXISTS reecotech.categorical_series_by_organization(
   organization_id BIGINT,
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS reecotech.categorical_series_by_organization(
   event_time TIMESTAMP,
   lat DOUBLE,
   lon DOUBLE,
-  PRIMARY KEY((organization_id, date), event_time, param_id, value)
+  PRIMARY KEY((organization_id, date), param_id, event_time, value)
 ) WITH CLUSTERING ORDER BY (event_time DESC, param_id ASC, value ASC);
 
 CREATE TABLE IF NOT EXISTS reecotech.numeric_stats_by_organization(
