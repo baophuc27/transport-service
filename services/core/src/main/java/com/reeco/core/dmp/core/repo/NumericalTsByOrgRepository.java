@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface NumericalTsByOrgRepository extends CassandraRepository<NumericalTsByOrg, Long> {
@@ -29,4 +30,6 @@ public interface NumericalTsByOrgRepository extends CassandraRepository<Numerica
     @Query("SELECT * FROM numeric_series_by_organization WHERE organization_id=?0 and param_id=?1\n" +
             "LIMIT 2 ALLOW FILTERING ;")
     List<NumericalTsByOrg> find2LatestRow(Long orgId, Long paramId);
+
+    Optional<NumericalTsByOrg> findByPartitionKey(NumericalTsByOrg.Key key);
 }

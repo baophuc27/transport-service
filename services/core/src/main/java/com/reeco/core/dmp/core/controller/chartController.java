@@ -18,11 +18,11 @@ public class chartController {
 
     @PostMapping("/history-data")
     public ChartDto getChartHistory(@RequestBody ChartDto chartDto) throws  Exception{
-        return chartService.historyData(chartDto);
+        return chartService.allData(chartDto);
     }
 
     @PostMapping("/allData")
     public ChartDto allData(@RequestBody ChartDto chartDto) throws Exception{
-        return  chartService.allData(chartDto);
+        return  chartService.historyData(chartDto);
     }
 }

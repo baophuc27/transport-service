@@ -155,6 +155,7 @@ public class ChartService {
                         List<CategoricalTsByOrg> categoricalTsByOrgs = categoricalTsByOrgRepository.findDataDetail(Timestamp.valueOf(chartDto.getStartTime()),
                                 Timestamp.valueOf(chartDto.getEndTime()), parameterDto.getOrganizationId(), parameterDto.getParameterId());
 //                  dataPointDtos = numericalTsByOrgs.stream().map(DataPointDto::new).collect(Collectors.toList());
+                        Collections.sort(categoricalTsByOrgs, reverseComparator1);
                         dataPointDtos = calculateCategoricalData(categoricalTsByOrgs, chartResolution);
                     } else {
                         List<CategoricalStatByOrg> categoricalStatByOrgs = categoricalStatByOrgRepository.findCatelogicalDataDate(parameterDto.getOrganizationId(),

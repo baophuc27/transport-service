@@ -33,6 +33,7 @@ public class ParamsByOrg {
 
     private String indicatorName;
 
+    @Column("param_name")
     private String paramName;
 
     private Long stationId;

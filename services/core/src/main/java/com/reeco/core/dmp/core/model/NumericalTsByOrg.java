@@ -31,6 +31,7 @@ public class NumericalTsByOrg {
         @PrimaryKeyColumn(name = "param_id", ordinal = 3, type = PrimaryKeyType.CLUSTERED)
         private Long paramId;
 
+
         @Override
         public String toString() {
             return "Key{" +

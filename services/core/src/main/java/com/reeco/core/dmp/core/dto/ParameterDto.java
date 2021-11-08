@@ -21,4 +21,8 @@ public class ParameterDto {
     private String indicatorKey;
 
     private String unit;
+
+    private String columnKey;
+
+    private Long connectionId;
 }
