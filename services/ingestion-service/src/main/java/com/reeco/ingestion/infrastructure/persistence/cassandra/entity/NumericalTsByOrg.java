@@ -17,12 +17,12 @@ public class NumericalTsByOrg {
     @PrimaryKeyClass
     @AllArgsConstructor
     @Data
-    public static class Key implements Serializable {
+    public static class NumericalTsKey implements Serializable {
 
         @PrimaryKeyColumn(name = "organization_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
         private Long organizationId;
 
-        @PrimaryKeyColumn(name = "param_id", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
+        @PrimaryKeyColumn(name = "param_id", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
         private Long paramId;
 
         @PrimaryKeyColumn(name = "event_time", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
@@ -39,7 +39,7 @@ public class NumericalTsByOrg {
     }
 
     @PrimaryKey
-    private Key partitionKey;
+    private NumericalTsKey partitionKey;
 
     @Column("indicator_name")
     private String indicatorName;
@@ -47,7 +47,6 @@ public class NumericalTsByOrg {
     @Column("param_name")
     private String paramName;
 
-//    @PrimaryKeyColumn(name = "date", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
     @Column("date")
     private LocalDate date;
 

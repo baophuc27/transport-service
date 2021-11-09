@@ -1,0 +1,2 @@
+INSERT INTO reecotech.numeric_stats_by_organization (organization_id,date,param_id,min,max,mean,acc,count,std,last_updated)
+VALUES (2, '2021-10-17' ,2 , 30.0, 30.0, 30.0, 60.0, 2, 29.99, '2021-10-17 00:01:00.001+0000')

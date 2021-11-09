@@ -2,7 +2,7 @@ package com.reeco.ingestion.adapter.in;
 
 import com.reeco.ingestion.application.port.in.IncomingTsEvent;
 //import com.reeco.ingestion.application.usecase.UpdateStatEventUseCase;
-import com.reeco.ingestion.application.usecase.UpdateStatEventUseCase;
+import com.reeco.ingestion.application.usecase.StatisticEventUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +22,14 @@ public class EventStatisticController {
     private KafkaTemplate<String, IncomingTsEvent> kafkaProducerEventTemplate;
 
     @Autowired
-    private final UpdateStatEventUseCase updateStatEventUseCase;
+    private final StatisticEventUseCase updateStatEventUseCase;
 
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    @Scheduled(fixedRate = 2000)
-    public void scheduleTaskWithFixedRate() {
-        updateStatEventUseCase.updateNumStatEvent();
+    @Scheduled(fixedRate = 120000)
+    public void aggStatisticEvent() {
+        LocalDateTime endTime = LocalDateTime.now();
+        updateStatEventUseCase.updateNumStatEvent(endTime);
     }
 
     @Scheduled(fixedRate = 60000)
