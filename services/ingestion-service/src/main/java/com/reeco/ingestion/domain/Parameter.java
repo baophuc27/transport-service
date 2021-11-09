@@ -29,5 +29,14 @@ public class Parameter {
     public static class ParamsByOrg{
         private Long organizationId;
         private List<Long> paramsId;
+
+        @Override
+        public String toString() {
+            return "ParamsByOrg{" +
+                    "organizationId=" + organizationId +
+                    ", paramsId=" + paramsId +
+                    '}';
+        }
     }
+
 }

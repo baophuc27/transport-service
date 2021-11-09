@@ -7,39 +7,31 @@ import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Table("numeric_stats_by_organization")
 @Data
+@AllArgsConstructor
 public class NumericalStatByOrg {
+
     @PrimaryKeyClass
     @Data
     @AllArgsConstructor
-    public static class Key implements Serializable {
+    public static class NumericalStatKey implements Serializable {
 
         @PrimaryKeyColumn(name = "organization_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
         private Long organizationId;
 
-        @PrimaryKeyColumn(name = "date", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
-        private String date;
+        @PrimaryKeyColumn(name = "date", ordinal = 1, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
+        private LocalDate date;
 
-        @PrimaryKeyColumn(name = "param_id", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
+        @PrimaryKeyColumn(name = "param_id", ordinal = 2, type = PrimaryKeyType.CLUSTERED)
         private Long paramId;
     }
 
-    public NumericalStatByOrg(Long organizationId, String date, Long paramId, Double min, Double max, Double mean, Double acc, Long count, LocalDateTime lastUpdated) {
-        this.partitionKey = new NumericalStatByOrg.Key(organizationId, date, paramId);
-        this.min = min;
-        this.max = max;
-        this.mean = mean;
-        this.acc = acc;
-        this.count = count;
-        this.lastUpdated = lastUpdated;
-    }
-
     @PrimaryKey
-    private NumericalStatByOrg.Key partitionKey;
+    private NumericalStatKey partitionKey;
 
     @Column("min")
     private Double min;
@@ -55,6 +47,9 @@ public class NumericalStatByOrg {
 
     @Column("count")
     private Long count;
+
+    @Column("std")
+    private Double std;
 
     @Column("last_updated")
     LocalDateTime lastUpdated;
