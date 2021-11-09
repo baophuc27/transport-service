@@ -27,7 +27,7 @@ public class EventStatisticController {
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     @Scheduled(fixedRate = 120000)
-    public void scheduleTaskWithFixedRate() {
+    public void aggStatisticEvent() {
         LocalDateTime endTime = LocalDateTime.now();
         updateStatEventUseCase.updateNumStatEvent(endTime);
     }
