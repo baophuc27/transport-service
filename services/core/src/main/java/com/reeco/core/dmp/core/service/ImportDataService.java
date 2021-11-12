@@ -4,6 +4,7 @@ import com.reeco.core.dmp.core.dto.ParameterDto;
 import com.reeco.core.dmp.core.dto.ResponseMessage;
 import com.reeco.core.dmp.core.model.*;
 import com.reeco.core.dmp.core.repo.*;
+import com.reeco.core.dmp.core.until.Comparison;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
@@ -16,10 +17,7 @@ import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -46,10 +44,8 @@ public class ImportDataService {
     @Autowired
     IndicatorInfoRepository indicatorInfoRepository;
 
+
     public ResponseMessage recieveDataCsv(MultipartFile file, Long orgId, Long stationId, List<ParameterDto> parameterDtoList) throws Exception{
-
-
-            Base64.Decoder decoder = Base64.getDecoder();
             byte[] bytes = file.getBytes();
 
             ByteArrayInputStream inputFilestream = new ByteArrayInputStream(bytes);
@@ -57,11 +53,15 @@ public class ImportDataService {
             String line = "";
             List<NumericalTsByOrg> numericalTsByOrgs = new ArrayList<>();
             List<CategoricalTsByOrg> categoricalTsByOrgs = new ArrayList<>();
+            List<NumericalStatByOrg> numericalStatByOrgs = new ArrayList<>();
+            List<CategoricalStatByOrg> categoricalStatByOrgs = new ArrayList<>();
             List<ParameterDto> parameterDtos =new ArrayList<>();
+            HashMap<String, List<Double>> numHasSet = new HashMap<>();
+            HashMap<String, List<String>> cateHasSet = new HashMap<>();
             while ((line = br.readLine()) != null) {
                 String[] listLine = line.split(",");
 
-                if (listLine[0].equals("timestamp")) {
+                if (listLine[0].equals("event_time")) {
                     for (int j = 1; j < listLine.length-2; j++){
                         for (ParameterDto parameterDto: parameterDtoList){
                             if(listLine[j].equals(parameterDto.getColumnKey())){
@@ -86,7 +86,7 @@ public class ImportDataService {
                     DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                     LocalDate date = LocalDate.parse(listLine[0].split(" ")[0], df);
-                    LocalDateTime event_time = LocalDateTime.parse(listLine[0], dtf);
+                    LocalDateTime event_time = LocalDateTime.parse(listLine[0].substring(0,19), dtf);
                     Double lat = null;
                     Double lon = null;
                     if((listLine.length-2) == parameterDtos.size()){
@@ -96,6 +96,7 @@ public class ImportDataService {
                         lon = Double.parseDouble(listLine[listLine.length-2]);
                         lat = Double.parseDouble(listLine[listLine.length-1]);
                     }
+
                     for(int i = 1; i <= parameterDtos.size(); i++) {
                             if(listLine[i].equals("null")){
                                 continue;
@@ -106,11 +107,19 @@ public class ImportDataService {
                                 );
     //                        Optional<NumericalTsByOrg> numericalTsByOrgOld = numericalTsByOrgRepository.findByPartitionKey(nkey);
                                 NumericalTsByOrg numericalTsByOrg = new NumericalTsByOrg(
-                                        nkey, parameterDtos.get(i-1).getParameterName(), parameterDtos.get(i-1).getIndicatorName(), stationId, 0L,
+                                        nkey, parameterDtos.get(i-1).getIndicatorName(),parameterDtos.get(i-1).getParameterName(),  stationId, 0L,
                                         Double.parseDouble(listLine[i]), event_time, lat, lon
                                 );
     //                    numericalTsByOrgRepository.save(numericalTsByOrg);
     //                    break;
+                                String key =date.toString()+","+numericalTsByOrg.getPartitionKey().getParamId().toString();
+                                if(!numHasSet.containsKey(key)){
+                                    List<Double> tempList = new ArrayList<>();
+                                    tempList.add(numericalTsByOrg.getValue());
+                                    numHasSet.put(key, tempList);
+                                }else{
+                                    numHasSet.get(key).add(numericalTsByOrg.getValue());
+                                }
                                 numericalTsByOrgs.add(numericalTsByOrg);
                             }else {
                                 CategoricalTsByOrg.Key nkey = new CategoricalTsByOrg.Key(
@@ -118,11 +127,19 @@ public class ImportDataService {
                                 );
     //
                                 CategoricalTsByOrg categoricalTsByOrg = new CategoricalTsByOrg(
-                                        nkey, parameterDtos.get(i-1).getParameterName(), parameterDtos.get(i-1).getIndicatorName(), stationId, 0L,
+                                        nkey,  parameterDtos.get(i-1).getIndicatorName(), parameterDtos.get(i-1).getParameterName(), stationId, 0L,
                                          event_time, lat, lon
                                 );
     //                    numericalTsByOrgRepository.save(numericalTsByOrg);
     //                    break;
+                                String key =date.toString()+","+categoricalTsByOrg.getPartitionKey().getParamId().toString();
+                                if(!cateHasSet.containsKey(key)){
+                                    List<String> tempList = new ArrayList<>();
+                                    tempList.add(categoricalTsByOrg.getPartitionKey().getValue());
+                                    cateHasSet.put(key, tempList);
+                                }else{
+                                    cateHasSet.get(key).add(categoricalTsByOrg.getPartitionKey().getValue());
+                                }
                                 categoricalTsByOrgs.add(categoricalTsByOrg);
                             }
 
@@ -130,12 +147,39 @@ public class ImportDataService {
                     }
                 }
             }
-//            numericalTsByOrgRepository.saveAll(numericalTsByOrgs);
-//            categoricalTsByOrgRepository.saveAll(categoricalTsByOrgs);
             br.close();
-            TimeUnit.SECONDS.sleep(5);
+            for (Map.Entry<String, List<Double>> entry: numHasSet.entrySet()){
+                DoubleSummaryStatistics stats = entry.getValue().stream()
+                        .mapToDouble((x) -> x)
+                        .summaryStatistics();
+                String key = entry.getKey();
+                String[] dp = key.split(",");
+                DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate numDate = LocalDate.parse(dp[0].split(" ")[0], df);
+                Long paramId = Long.parseLong(dp[1]);
+                NumericalStatByOrg.Key numericalStatByOrgKey = new NumericalStatByOrg.Key(orgId,numDate,paramId);
+                NumericalStatByOrg numericalStatByOrg = new NumericalStatByOrg(numericalStatByOrgKey, stats.getMin(),stats.getMax(),
+                        Comparison.roundNum(Comparison.median(entry.getValue()),2),
+                        Comparison.roundNum(stats.getAverage(),2),0d,
+                        Comparison.roundNum(Comparison.std(entry.getValue(), stats.getAverage()),2),
+                        stats.getCount(),LocalDateTime.now());
+                numericalStatByOrgs.add(numericalStatByOrg);
+            }
+            numericalTsByOrgRepository.saveAll(numericalTsByOrgs);
+            categoricalTsByOrgRepository.saveAll(categoricalTsByOrgs);
+            numericalStatByOrgRepository.saveAll(numericalStatByOrgs);
+            categoricalStatByOrgRepository.saveAll(categoricalStatByOrgs);
+//                numHasSet
+//            cateHasSet
+//        numericalStatByOrgs
+
+//            TimeUnit.SECONDS.sleep(5);
             return new ResponseMessage("Import data successful!");
 
 
     }
+
+
+
+
 }

@@ -32,7 +32,7 @@ public class importDataController {
             throw new IllegalArgumentException("Bad data: " + str);
         String[] strArray = str.substring(1, str.length() - 1).split("},", -1);
         List<ParameterDto> parameterDtoList = new ArrayList<>();
-        Integer i=0;
+        Integer i=1;
         for (String param: strArray){
             ObjectMapper mapper = new ObjectMapper();
             if(i<strArray.length){
