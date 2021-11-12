@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS reecotech.numeric_series_by_organization(
   event_time TIMESTAMP,
   lat DOUBLE,
   lon DOUBLE,
-PRIMARY KEY((organization_id, date), param_id, event_time)
+PRIMARY KEY((organization_id), param_id, event_time)
 ) WITH CLUSTERING ORDER BY (param_id ASC, event_time DESC);
 
 CREATE TABLE IF NOT EXISTS reecotech.categorical_series_by_organization(
@@ -69,11 +69,11 @@ CREATE TABLE IF NOT EXISTS reecotech.numeric_stats_by_organization(
   median DOUBLE,
   mean DOUBLE,
   acc DOUBLE,
-  cnt BIGINT,
+  count BIGINT,
   std DOUBLE,
   last_updated TIMESTAMP,
-  PRIMARY KEY((organization_id, date), param_id)
-) WITH CLUSTERING ORDER BY (param_id ASC);
+  PRIMARY KEY((organization_id), date, param_id)
+) WITH CLUSTERING ORDER BY (date DESC, param_id ASC);
 
 CREATE TABLE IF NOT EXISTS reecotech.categorical_stats_by_organization(
   organization_id BIGINT,

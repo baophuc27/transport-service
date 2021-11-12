@@ -6,11 +6,8 @@ import com.reeco.ingestion.adapter.out.TsEventPersistenceAdapter;
 import com.reeco.ingestion.application.port.out.*;
 import com.reeco.ingestion.application.service.EntityManagementService;
 import com.reeco.ingestion.application.service.IncomingTsEventService;
-import com.reeco.ingestion.application.service.StatisticEventService;
 import com.reeco.ingestion.application.usecase.EntityManagementUseCase;
 import com.reeco.ingestion.application.usecase.StoreTsEventUseCase;
-import com.reeco.ingestion.application.usecase.UpdateStatEventUseCase;
-import com.reeco.ingestion.domain.Parameter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

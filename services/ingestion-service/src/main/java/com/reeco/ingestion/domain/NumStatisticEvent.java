@@ -1,22 +1,29 @@
 package com.reeco.ingestion.domain;
 
-import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.CategoricalStatByOrg;
-import lombok.Data;
-import org.springframework.data.cassandra.core.cql.Ordering;
-import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
-import org.springframework.data.cassandra.core.mapping.*;
+import com.datastax.oss.driver.shaded.guava.common.math.StatsAccumulator;
+import com.reeco.ingestion.utils.Utils;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import reactor.core.publisher.Flux;
 
-import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
 public class NumStatisticEvent {
 
     private Long organizationId;
 
-    private String date;
-
     private Long paramId;
+
+    private LocalDate date;
 
     private Double min;
 
@@ -29,4 +36,11 @@ public class NumStatisticEvent {
     private Long count;
 
     LocalDateTime lastUpdated;
+
+    public NumStatisticEvent(Long organizationId, Long paramId) {
+        this.organizationId = organizationId;
+        this.paramId = paramId;
+    }
+
+
 }
