@@ -1,19 +1,13 @@
 package com.reeco.ingestion.application.port.out;
 
-import com.reeco.ingestion.domain.CategoricalTsEvent;
-import com.reeco.ingestion.domain.NumStatisticEvent;
-import com.reeco.ingestion.domain.NumericalTsEvent;
-import com.reeco.ingestion.domain.Parameter;
+import com.reeco.ingestion.domain.NumericalStatEvent;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
+import java.sql.Timestamp;
 
 public interface AggregateEventsPort {
 
-    Flux<NumStatisticEvent> aggEventByOrgAndParams();
+    Flux<NumericalStatEvent> aggEventByOrgAndParams(Timestamp startTime, Timestamp endTime);
 
 
 }

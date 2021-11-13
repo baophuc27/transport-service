@@ -1,14 +1,10 @@
 package com.reeco.ingestion.application.service;
 
-import com.reeco.ingestion.application.port.in.LoadOrgAndParamPort;
-import com.reeco.ingestion.application.port.out.AggregateEventsPort;
 import com.reeco.ingestion.application.port.out.NumStatRepository;
 import com.reeco.ingestion.application.usecase.StatisticEventUseCase;
-import com.reeco.ingestion.domain.NumStatisticEvent;
 import com.reeco.ingestion.utils.annotators.UseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
 

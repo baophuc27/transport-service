@@ -10,7 +10,11 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 @Slf4j
@@ -28,7 +32,11 @@ public class EventStatisticController {
 
     @Scheduled(fixedRate = 120000)
     public void aggStatisticEvent() {
-        LocalDateTime endTime = LocalDateTime.now();
+
+        LocalDate date = LocalDate.now();
+        LocalTime time = LocalTime.MIN;
+        LocalDateTime endTime = LocalDateTime.of(date, time);
+        System.out.println(endTime.toString());
         updateStatEventUseCase.updateNumStatEvent(endTime);
     }
 
