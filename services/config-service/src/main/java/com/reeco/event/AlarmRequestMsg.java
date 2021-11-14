@@ -6,7 +6,6 @@ import com.reeco.kafka.MessageHeaders;
 import com.reeco.model.ActionType;
 import com.reeco.model.AlarmType;
 import com.reeco.model.EntityType;
-import com.reeco.model.ParamType;
 import com.reeco.model.dto.AlarmDTO;
 import com.reeco.utils.Utils;
 import lombok.Getter;
@@ -17,18 +16,18 @@ public class AlarmRequestMsg extends BaseApiRequestMsg {
     private final Long paramId;
 
     @Getter
-    private final AlarmDTO alarmDTO;
+    private final AlarmDTO alarm;
 
     public AlarmRequestMsg(long createdTime,
                            Long orgId,
                            Long paramId,
                            ActionType eventAction,
                            EntityType entityType,
-                           AlarmDTO alarmDTO){
+                           AlarmDTO alarm){
 
         super(orgId, createdTime, eventAction, entityType);
         this.paramId = paramId;
-        this.alarmDTO = alarmDTO;
+        this.alarm = alarm;
     }
 
     public byte[] toByteArray(){
@@ -36,7 +35,7 @@ public class AlarmRequestMsg extends BaseApiRequestMsg {
     }
 
     public AlarmType getAlarmType() {
-        return alarmDTO.getAlarmType();
+        return alarm.getAlarmType();
     }
 
     @Override
