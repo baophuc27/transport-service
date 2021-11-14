@@ -34,8 +34,8 @@ public class SendMessageRequestService implements SendMessageRequest {
     }
 
     private KafkaTopicInfo getKafkaTopicInfo(RequestMsg msg){
-        Integer partition = msg.getStationId().intValue() % kafkaTopicConfig.getNumPartitions();
-        KafkaTopicInfo tpi = new KafkaTopicInfo(kafkaTopicConfig.getTopicName(), kafkaTopicConfig.getTopicPrefix(), partition);
+        Integer partition = msg.getOrgId().intValue() % kafkaTopicConfig.getNumPartitions();
+        KafkaTopicInfo tpi = new KafkaTopicInfo(kafkaTopicConfig.getTopicName(), partition);
         return tpi;
     }
 }

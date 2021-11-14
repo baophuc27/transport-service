@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 public abstract class BaseApiRequestMsg implements RequestMsg {
 
-    private Long stationId;
+    private Long orgId;
 
     private long createdTime;
 
@@ -18,11 +18,11 @@ public abstract class BaseApiRequestMsg implements RequestMsg {
 
     private EntityType entityType;
 
-    public BaseApiRequestMsg(Long stationId,
+    public BaseApiRequestMsg(Long orgId,
                              long createdTime,
                              ActionType eventAction,
                              EntityType entityType) {
-        this.stationId = stationId;
+        this.orgId = orgId;
         this.createdTime = createdTime;
         this.actionType = eventAction;
         this.entityType = entityType;

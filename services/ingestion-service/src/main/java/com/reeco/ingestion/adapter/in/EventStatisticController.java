@@ -10,7 +10,12 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 @Slf4j
@@ -26,10 +31,16 @@ public class EventStatisticController {
 
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    @Scheduled(fixedRate = 120000)
+    @Scheduled(fixedRate = 12000)
     public void aggStatisticEvent() {
-        LocalDateTime endTime = LocalDateTime.now();
-        updateStatEventUseCase.updateNumStatEvent(endTime);
+        LocalDate date = LocalDate.now();
+        LocalTime time = LocalTime.MIN;
+        LocalDateTime endTime = LocalDateTime.of(date, time).atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime();
+        LocalDateTime startTime = endTime.minusDays(40);
+        Timestamp timestampEnd = Timestamp.valueOf(endTime);
+        Timestamp timestampStart = Timestamp.valueOf(startTime);
+        log.info("Start aggregation job with time range from {} to {}", startTime.toString(), endTime.toString());
+        updateStatEventUseCase.updateNumStatEvent(timestampStart, timestampEnd);
     }
 
     @Scheduled(fixedRate = 60000)
@@ -41,23 +52,9 @@ public class EventStatisticController {
         // kafkaProducerEventTemplate.send();
     }
 
-    @Scheduled(fixedRate = 1500)
-    public void scheduleTaskWithFixedRate2() {
-        log.info("Fixed Rate Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()) );
-    }
-
     @Scheduled(cron = "0 * * * * ?")
     public void scheduleTaskWithCronExpression() {
         log.info("Cron Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
     }
-//
-//    @Scheduled(cron = "0 * * * * ?")
-//    public void updateNumStatisticEvent() {
-//        numericStatEventUseCase.updateNumStatEvent();
-//    }
-//
-//    @Scheduled(cron = "0 * * * * ?")
-//    public void updateCatStatisticEvent() {
-//        numericStatEventUseCase.updateCatStatEvent();
-//    }
+
 }

@@ -10,7 +10,7 @@ public class KafkaJsonRequestMsg<T extends RequestMsg> implements QueueMsg {
     private final MessageHeaders headers;
 
     public KafkaJsonRequestMsg(T value) {
-        this.key = value.getStationId().toString();
+        this.key = value.getOrgId().toString();
         this.value = value;
         this.headers = value.buildHeaders();
     }
