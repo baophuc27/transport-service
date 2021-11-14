@@ -19,12 +19,12 @@ public class ConnectionRequestMsg extends BaseApiRequestMsg implements Connectio
 
 
     public ConnectionRequestMsg(long createdTime,
-                                Long stationId,
+                                Long orgId,
                                 ActionType actionType,
                                 EntityType entityType,
                                 Connection connection){
 
-        super(stationId, createdTime, actionType, entityType);
+        super(orgId, createdTime, actionType, entityType);
         this.connection = connection;
     }
 

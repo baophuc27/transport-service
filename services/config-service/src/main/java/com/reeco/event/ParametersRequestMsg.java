@@ -4,28 +4,28 @@ package com.reeco.event;
 import com.reeco.kafka.DefaultMsgHeaders;
 import com.reeco.kafka.MessageHeaders;
 import com.reeco.model.ActionType;
-import com.reeco.model.Attribute;
-import com.reeco.model.AttributeType;
+import com.reeco.model.Parameter;
+import com.reeco.model.ParamType;
 import com.reeco.model.EntityType;
 import com.reeco.utils.Utils;
 import lombok.Getter;
 
-public class ParametersRequestMsg extends BaseApiRequestMsg implements Attribute{
+public class ParametersRequestMsg extends BaseApiRequestMsg implements Parameter {
 
     @Getter
     private final Long connectionId;
 
     @Getter
-    private final Attribute attribute;
+    private final Parameter attribute;
 
     public ParametersRequestMsg(long createdTime,
-                                Long stationId,
+                                Long orgId,
                                 Long connectionId,
                                 ActionType eventAction,
                                 EntityType entityType,
-                                Attribute attribute){
+                                Parameter attribute){
 
-        super(stationId, createdTime, eventAction, entityType);
+        super(orgId, createdTime, eventAction, entityType);
         this.connectionId = connectionId;
         this.attribute = attribute;
     }
@@ -35,7 +35,7 @@ public class ParametersRequestMsg extends BaseApiRequestMsg implements Attribute
     }
 
     @Override
-    public AttributeType getParameterType() {
+    public ParamType getParameterType() {
         return attribute.getParameterType();
     }
 

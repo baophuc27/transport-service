@@ -17,7 +17,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @AllArgsConstructor
-public class NumStatisticEvent {
+public class NumericalStatEvent {
 
     private Long organizationId;
 
@@ -35,12 +35,9 @@ public class NumStatisticEvent {
 
     private Long count;
 
-    LocalDateTime lastUpdated;
+    private Double std;
 
-    public NumStatisticEvent(Long organizationId, Long paramId) {
-        this.organizationId = organizationId;
-        this.paramId = paramId;
-    }
+    LocalDateTime lastUpdated;
 
 
 }

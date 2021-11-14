@@ -21,10 +21,7 @@ public class KafkaTopicConfig {
     @Value("${kafka.topic.core.properties}")
     private String coreProperties;
 
-    @Value(value = "${kafka.topic.prefix}")
-    private String topicPrefix;
-
-    @Value(value = "${kafka.topic.core.name}")
+    @Value(value = "${kafka.topic.name}")
     private String topicName;
 
     @Value(value = "${kafka.topic.core.partitions}")
@@ -53,8 +50,7 @@ public class KafkaTopicConfig {
     @Bean
     public NewTopic createCoreTopic() {
         coreConfigs = getConfigs(coreProperties);
-        String fullTopicName = topicPrefix + "_" + topicName;
-        NewTopic newTopic = new NewTopic(fullTopicName, numPartitions, (short) 1);
+        NewTopic newTopic = new NewTopic(topicName, numPartitions, (short) 1);
         newTopic.configs(coreConfigs);
         return newTopic;
     }
