@@ -1,5 +1,5 @@
 package com.reeco.model;
 
-public enum AttributeType {
+public enum ParamType {
     CONFIGURE, COMPUTED
 }

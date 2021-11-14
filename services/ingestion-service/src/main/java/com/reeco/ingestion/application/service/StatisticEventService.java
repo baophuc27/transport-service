@@ -6,13 +6,14 @@ import com.reeco.ingestion.utils.annotators.UseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @UseCase
 @RequiredArgsConstructor
 @Log4j2
 public class StatisticEventService implements StatisticEventUseCase {
-//
+
     private final NumStatRepository numStatRepository;
 //
 //    private final ParameterRepository parameterRepository;
@@ -22,8 +23,8 @@ public class StatisticEventService implements StatisticEventUseCase {
 //    private final LoadOrgAndParamPort loadOrgAndParamPort;
 
     @Override
-    public void updateNumStatEvent(LocalDateTime endTime) {
-        numStatRepository.insert(endTime);
+    public void updateNumStatEvent(Timestamp startTime, Timestamp endTime) {
+        numStatRepository.insert(startTime, endTime);
     }
 
     @Override

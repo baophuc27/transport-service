@@ -88,15 +88,15 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
     }
 
     @Override
-    public void insert(LocalDateTime localDateTime) {
-        String strStart = "2021-10-11 21:04:23.344";
-        String strEnd = "2021-10-13 11:30:00.234";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-        LocalDateTime endTime = LocalDateTime.parse(strEnd, formatter).atZone(ZoneId.of("UTC")).toLocalDateTime();
-        LocalDateTime startTime = endTime.minusDays(2);
-        Timestamp timestampEnd = Timestamp.valueOf(endTime);
-        Timestamp timestampStart = Timestamp.valueOf(startTime);
-        aggEventByOrgAndParams(timestampStart, timestampEnd)
+    public void insert(Timestamp startTime, Timestamp endTime) {
+//        String strStart = "2021-10-11 21:04:23.344";
+//        String strEnd = "2021-10-13 11:30:00.234";
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+//        LocalDateTime endTime = LocalDateTime.parse(strEnd, formatter).atZone(ZoneId.of("UTC")).toLocalDateTime();
+//        LocalDateTime startTime = endTime.minusDays(2);
+//        Timestamp timestampEnd = Timestamp.valueOf(endTime);
+//        Timestamp timestampStart = Timestamp.valueOf(startTime);
+        aggEventByOrgAndParams(startTime, endTime)
                 .map(v-> numStatEventMapper.toPort(v))
                 .flatMap(v->numericalStatByOrgRepository.save(v))
                 .subscribe(v->log.info("SAVE: "+v.toString()));

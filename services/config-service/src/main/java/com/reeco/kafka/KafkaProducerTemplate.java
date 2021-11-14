@@ -39,6 +39,6 @@ public class KafkaProducerTemplate implements QueueProducer {
         String key = msg.getKey();
         byte[] data = msg.getData();
         Iterable<Header> headers = msg.getHeaders().getData().entrySet().stream().map(e -> new RecordHeader(e.getKey(), e.getValue())).collect(Collectors.toList());
-        return new ProducerRecord<>(tpi.getFullTopicName(), tpi.getPartition(), null, key, data, headers);
+        return new ProducerRecord<>(tpi.getTopic(), tpi.getPartition(), null, key, data, headers);
     }
 }

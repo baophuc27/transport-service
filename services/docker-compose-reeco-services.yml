@@ -1,0 +1,18 @@
+version: '3'
+
+# Define services
+services:
+  # App backend service
+  configservice:
+    build:
+      context: config-service
+      dockerfile: Dockerfile
+    restart: always
+    network_mode: host
+
+  ingestionservice:
+    build:
+      context: ingestion-service
+      dockerfile: Dockerfile
+    restart: always
+    network_mode: host

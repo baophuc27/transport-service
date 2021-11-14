@@ -5,22 +5,14 @@ import java.util.Objects;
 public class KafkaTopicInfo {
 
     private final String topic;
-    private final String prefix;
     private final Integer partition;
 
-    public KafkaTopicInfo(String topic, String prefix, Integer partition) {
+    public KafkaTopicInfo(String topic, Integer partition) {
         this.topic = topic;
         this.partition = partition;
-        this.prefix = prefix;
     }
 
-    public String getFullTopicName() {
-        if (prefix != null){
-            return prefix + "_" + topic;
-        }
-        return topic;
-    }
-
+    public String getTopic(){return topic;}
 
     public Integer getPartition() {
         return partition;
@@ -32,12 +24,11 @@ public class KafkaTopicInfo {
         if (o == null || getClass() != o.getClass()) return false;
         KafkaTopicInfo that = (KafkaTopicInfo) o;
         return topic.equals(that.topic) &&
-                Objects.equals(prefix, that.prefix) &&
                 Objects.equals(partition, that.partition);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(topic, prefix, getPartition());
+        return Objects.hash(topic, getPartition());
     }
 }

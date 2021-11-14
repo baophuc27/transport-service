@@ -10,7 +10,7 @@ public interface RequestMsg extends Serializable {
 
     byte[] toByteArray();
 
-    Long getStationId();
+    Long getOrgId();
 
     ActionType getActionType();
 

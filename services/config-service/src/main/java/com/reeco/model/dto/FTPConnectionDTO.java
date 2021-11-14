@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.reeco.model.Protocol;
 import lombok.Getter;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 
@@ -13,10 +15,15 @@ public class FTPConnectionDTO extends BaseConnectionDTO {
 
     private static final long serialVersionUID = 1L;
 
+
     private String userName;
 
+    @NotNull(message = "hostName must be not NULL")
+    @NotBlank(message = "hostName must be not BLANK")
     private String hostName;
 
+    @NotNull(message = "port must be not NULL")
+    @NotBlank(message = "port must be not BLANK")
     private String port;
 
     private String password;
@@ -29,6 +36,7 @@ public class FTPConnectionDTO extends BaseConnectionDTO {
 
     private String fileType;
 
+    @NotNull(message = "templateFormat must be not NULL")
     private Integer templateFormat;
 
     private Integer maximumTimeout;
