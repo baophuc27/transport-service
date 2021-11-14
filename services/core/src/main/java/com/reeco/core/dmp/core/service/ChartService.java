@@ -115,6 +115,7 @@ public class ChartService {
             Indicator indicator = indicatorInfoRepository.findByPartitionKeyIndicatorId(paramsByOrg.getIndicatorId()).orElseThrow(()-> new Exception("Invalid Indicator"));
             ParameterDataDto parameterDataDto = new ParameterDataDto();
             parameterDto.setIndicatorType(indicator.getValueType());
+            parameterDto.setIndicatorName(indicator.getIndicatorName());
             parameterDto.setUnit(indicator.getUnit());
             parameterDto.setParameterName(indicator.getIndicatorName());
             parameterDataDto.setParameterDto(parameterDto);
@@ -191,7 +192,7 @@ public class ChartService {
         Double sumValue =0d;
         Long count = 0l;
         dataPointDtoList.add(new DataPointDto(numericalTsByOrgs.get(0)));
-        for (NumericalTsByOrg numericalTsByOrg: numericalTsByOrgs){
+        for (NumericalTsByOrg numericalTsByOrg: numericalTsByOrgs.subList(1,numericalTsByOrgs.size())){
             rangeTime = Timestamp.valueOf(numericalTsByOrg.getPartitionKey().getEventTime()).getTime() - sTime.getTime();
             sumValue += numericalTsByOrg.getValue();
             count +=1;

@@ -16,14 +16,16 @@ public class AlarmRequestMsg extends BaseApiRequestMsg {
     private final Long paramId;
 
     @Getter
+
     private final AlarmDTO alarm;
+
 
     public AlarmRequestMsg(long createdTime,
                            Long orgId,
                            Long paramId,
                            ActionType eventAction,
                            EntityType entityType,
-                           AlarmDTO alarm){
+                           AlarmDTO alarm) {
 
         super(orgId, createdTime, eventAction, entityType);
         this.paramId = paramId;
@@ -36,6 +38,7 @@ public class AlarmRequestMsg extends BaseApiRequestMsg {
 
     public AlarmType getAlarmType() {
         return alarm.getAlarmType();
+
     }
 
     @Override
