@@ -31,6 +31,7 @@ public class ParamsByOrg {
     @Column("indicator_id")
     private Long indicatorId;
 
+    @Column("indicator_name")
     private String indicatorName;
 
     @Column("param_name")

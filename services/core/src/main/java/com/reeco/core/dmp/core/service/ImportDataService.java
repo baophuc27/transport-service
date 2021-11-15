@@ -1,19 +1,23 @@
 package com.reeco.core.dmp.core.service;
 
+import com.reeco.core.dmp.core.dto.ChartDto;
 import com.reeco.core.dmp.core.dto.ParameterDto;
 import com.reeco.core.dmp.core.dto.ResponseMessage;
 import com.reeco.core.dmp.core.model.*;
 import com.reeco.core.dmp.core.repo.*;
 import com.reeco.core.dmp.core.until.Comparison;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -179,7 +183,55 @@ public class ImportDataService {
 
     }
 
+    public String exportDataCsv(@RequestBody ChartDto chartDto) throws Exception{
+        String[] csvHeader = {
+                "Data Export"
+        };
+        List<List<String>> csvBody = new ArrayList<>();
+        ByteArrayInputStream byteArrayOutputStream = null;
+        String encodedString = "";
+        csvBody.add(Arrays.asList("Time event", "Value", "Param", "Indicator", "Unit", "Lat","Lon"));
+        for (ParameterDto parameterDto : chartDto.getParameterDtos()) {
+            ParamsByOrg paramsByOrg = paramsByOrgRepository.findByPartitionKeyOrganizationIdAndPartitionKeyParamId(parameterDto.getOrganizationId(), parameterDto.getParameterId())
+                    .orElseThrow(() -> new Exception("Invalid Parameter!"));
+            Indicator indicator = indicatorInfoRepository.findByPartitionKeyIndicatorId(paramsByOrg.getIndicatorId()).orElseThrow(() -> new Exception("Invalid Indicator"));
+            if(chartDto.getStartTime().isBefore(chartDto.getEndTime())){
+                List<NumericalTsByOrg> numericalTsByOrgs = numericalTsByOrgRepository.findDataDetail(Timestamp.valueOf(chartDto.getStartTime()),
+                        Timestamp.valueOf(chartDto.getEndTime()), parameterDto.getOrganizationId(), parameterDto.getParameterId());
+                for (NumericalTsByOrg numericalTsByOrg: numericalTsByOrgs){
+                    List<String> rowData = new ArrayList<>();
+                    rowData.add(numericalTsByOrg.getPartitionKey().getEventTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                    rowData.add(numericalTsByOrg.getValue().toString());
+                    rowData.add(paramsByOrg.getParamName());
+                    rowData.add(indicator.getIndicatorName());
+                    rowData.add(indicator.getStandardUnit());
+                    rowData.add((numericalTsByOrg.getLat()!= null)? numericalTsByOrg.getLat().toString() : null);
+                    rowData.add((numericalTsByOrg.getLon()!= null)? numericalTsByOrg.getLon().toString() : null);
+                    csvBody.add(rowData);
+                }
 
 
+            }
+
+        }
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CSVPrinter csvPrinter = new CSVPrinter(
+                new PrintWriter(out),
+                CSVFormat.DEFAULT.withHeader(csvHeader)
+        );
+        for (List<String> record : csvBody){
+            csvPrinter.printRecord(record);
+        }
+
+        csvPrinter.flush();
+
+        byteArrayOutputStream = new ByteArrayInputStream(out.toByteArray());
+
+        InputStreamResource template = new InputStreamResource(byteArrayOutputStream);
+        encodedString = Base64.getEncoder().encodeToString(template.getInputStream().readAllBytes());
+        return encodedString;
+
+    }
 
 }
