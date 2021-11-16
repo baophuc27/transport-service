@@ -7,6 +7,8 @@ services:
     build:
       context: config-service
       dockerfile: Dockerfile
+      args:
+        VERSION: 0.1.0
     restart: always
     network_mode: host
 
@@ -14,5 +16,7 @@ services:
     build:
       context: ingestion-service
       dockerfile: Dockerfile
+      args:
+        VERSION: 0.1.0
     restart: always
     network_mode: host

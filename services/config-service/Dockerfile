@@ -5,10 +5,10 @@ RUN gradle build --no-daemon
 
 
 FROM openjdk:11
+ARG VERSION
+EXPOSE 8986
 
-EXPOSE 8082
-
-COPY --from=build /home/gradle/src/build/libs/*.jar reeco-config-service.jar
+COPY --from=build /home/gradle/src/build/libs/config-service-${VERSION}.jar reeco-config-service.jar
 
 COPY entrypoint.sh entrypoint.sh
 

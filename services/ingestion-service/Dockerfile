@@ -5,10 +5,10 @@ RUN gradle build --no-daemon
 
 
 FROM openjdk:11
-
+ARG VERSION
 EXPOSE 8086
 
-COPY --from=build /home/gradle/src/build/libs/*.jar reeco-ingestion-service.jar
+COPY --from=build /home/gradle/src/build/libs/ingestion-service-${VERSION}.jar reeco-ingestion-service.jar
 
 COPY entrypoint.sh entrypoint.sh
 
