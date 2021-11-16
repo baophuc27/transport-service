@@ -22,16 +22,13 @@ public class CategoricalTsByOrg {
         @PrimaryKeyColumn(name = "organization_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
         private Long organizationId;
 
-        @PrimaryKeyColumn(name = "date", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
-        private String date;
+        @PrimaryKeyColumn(name = "param_id", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
+        private Long paramId;
 
         @PrimaryKeyColumn(name = "event_time", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
         private LocalDateTime eventTime;
 
-        @PrimaryKeyColumn(name = "param_id", ordinal = 3, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
-        private Long paramId;
-
-        @PrimaryKeyColumn(name = "value", ordinal = 4, type = PrimaryKeyType.CLUSTERED)
+        @PrimaryKeyColumn(name = "value", ordinal = 3, type = PrimaryKeyType.CLUSTERED)
         private String value;
 
 
@@ -41,6 +38,9 @@ public class CategoricalTsByOrg {
 
     @Column("indicator_name")
     private String indicatorName;
+
+    @Column("date")
+    private String date;
 
     @Column("param_name")
     private String paramName;
