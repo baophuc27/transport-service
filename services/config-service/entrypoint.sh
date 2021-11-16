@@ -1,4 +1,4 @@
 #!/bin/sh
-echo "Starting Reeco Backend Service ..."
+echo "Starting Reeco Config Service ..."
 
 exec "$@"

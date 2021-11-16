@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS reecotech.numeric_series_by_organization(
 PRIMARY KEY((organization_id), param_id, event_time)
 ) WITH CLUSTERING ORDER BY (param_id ASC, event_time DESC);
 
+
 CREATE TABLE IF NOT EXISTS reecotech.categorical_series_by_organization(
   organization_id BIGINT,
   date DATE,

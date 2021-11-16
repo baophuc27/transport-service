@@ -30,11 +30,11 @@ public interface CatEventMapper extends DomainEntityMapper<CategoricalTsEvent, C
 
     @Mappings({
             @Mapping(source = "organizationId", target = "partitionKey.organizationId"),
-            @Mapping(source = "eventTime",target = "partitionKey.date", qualifiedBy = GetEventDate.class),
             @Mapping(source = "eventTime", target = "partitionKey.eventTime"),
             @Mapping(source = "paramId", target = "partitionKey.paramId"),
             @Mapping(source = "value", target = "partitionKey.value"),
             @Mapping(source = "indicatorName", target = "indicatorName"),
+            @Mapping(source = "eventTime",target = "date", qualifiedBy = GetEventDate.class),
             @Mapping(source = "connectionId", target = "connectionId"),
             @Mapping(source = "receivedAt", target = "receivedAt"),
             @Mapping(source = "lat", target = "lat"),
