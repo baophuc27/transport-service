@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS reecotech.params_by_organization(
   param_id BIGINT,
   indicator_id BIGINT,
   station_id BIGINT,
+  param_name      TEXT,
   unit TEXT,
   connection_id BIGINT,
   PRIMARY KEY((organization_id), param_id)
