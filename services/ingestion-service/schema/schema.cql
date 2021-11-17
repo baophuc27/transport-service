@@ -83,6 +83,7 @@ CREATE TABLE IF NOT EXISTS reecotech.numeric_stats_by_organization(
   median DOUBLE,
   mean DOUBLE,
   acc DOUBLE,
+  median DOUBLE,
   count BIGINT,
   std DOUBLE,
   last_updated TIMESTAMP,

@@ -1,5 +1,6 @@
 package com.reeco.ingestion.adapter.out;
 
+import com.datastax.oss.driver.shaded.guava.common.math.Quantiles;
 import com.datastax.oss.driver.shaded.guava.common.math.StatsAccumulator;
 import com.reeco.ingestion.application.mapper.NumStatEventMapper;
 import com.reeco.ingestion.application.mapper.NumericEventMapper;
@@ -22,9 +23,7 @@ import reactor.core.publisher.Flux;
 import java.sql.Timestamp;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Adapter
 @Log4j2
@@ -69,6 +68,7 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
                                 .map(NumericalTsEvent::getValue)
                                 .collectList()
                                 .map(v -> {
+                                    Collections.sort(v);
                                     StatsAccumulator statsAccumulator = new StatsAccumulator();
                                     statsAccumulator.addAll(v);
                                     return new NumericalStatEvent(
@@ -79,12 +79,19 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
                                             statsAccumulator.max(),
                                             statsAccumulator.mean(),
                                             statsAccumulator.sum(),
+                                            median(v),
                                             statsAccumulator.count(),
                                             statsAccumulator.populationStandardDeviation(),
                                             LocalDateTime.now()
                                     );
                                 })
                 );
+    }
+
+    private Double median(List<Double> sortedArr){
+        int middle = sortedArr.size() / 2;
+        middle = middle > 0 && middle % 2 == 0 ? middle - 1 : middle;
+        return sortedArr.get(middle);
     }
 
     @Override
@@ -96,10 +103,8 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
 //        LocalDateTime startTime = endTime.minusDays(2);
 //        Timestamp timestampEnd = Timestamp.valueOf(endTime);
 //        Timestamp timestampStart = Timestamp.valueOf(startTime);
-        aggEventByOrgAndParams(startTime, endTime)
-                .map(v-> numStatEventMapper.toPort(v))
-                .flatMap(v->numericalStatByOrgRepository.save(v))
-                .subscribe(v->log.info("SAVE: "+v.toString()));
+        numericalStatByOrgRepository.saveAll(aggEventByOrgAndParams(startTime, endTime)
+                .map(v-> numStatEventMapper.toPort(v))).subscribe(log::info);
 
     }
 
