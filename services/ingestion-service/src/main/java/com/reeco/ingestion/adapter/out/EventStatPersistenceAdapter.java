@@ -58,7 +58,6 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
                             v.getParamsIds(),
                             startTime,
                             endTime))
-                .log()
                 .map(v -> numericEventMapper.toDomain(v))
                 .groupBy(v -> new OrgAndParam(v.getOrganizationId(),
                         v.getParamId(),
@@ -118,11 +117,7 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
                         group -> group
                                 .map(Parameter::getParamId)
                                 .collectList()
-                                .map(list -> {
-                                    Map<Long, List<Long>> mapper = new HashMap<>();
-                                    mapper.put(group.key(), list);
-                                    return new Parameter.ParamsByOrg(group.key(), list);
-                                })
+                                .map(list -> new Parameter.ParamsByOrg(group.key(), list))
                 );
     }
 
