@@ -41,9 +41,9 @@ dependencies {
 //    implementation('io.springfox:springfox-boot-starter:3.0.0')
     implementation('org.springframework.boot:spring-boot-starter-data-cassandra:2.5.4')
     implementation ('org.springframework.boot:spring-boot-starter-parent:2.1.12.RELEASE')
-    implementation ('org.springframework.boot:spring-boot-starter-data-jdbc')
-    implementation ('org.springframework.boot:spring-boot-starter-data-jpa')
-    implementation ('org.springframework.boot:spring-boot-starter-jdbc')
+//    implementation ('org.springframework.boot:spring-boot-starter-data-jdbc')
+//    implementation ('org.springframework.boot:spring-boot-starter-data-jpa')
+//    implementation ('org.springframework.boot:spring-boot-starter-jdbc')
     implementation('org.postgresql:postgresql')
     implementation "org.apache.commons:commons-csv:1.8"
     // implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')

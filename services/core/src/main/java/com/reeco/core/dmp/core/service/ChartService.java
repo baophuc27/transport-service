@@ -116,7 +116,7 @@ public class ChartService {
             ParameterDataDto parameterDataDto = new ParameterDataDto();
             parameterDto.setIndicatorType(indicator.getValueType());
             parameterDto.setIndicatorName(indicator.getIndicatorName());
-            parameterDto.setUnit(indicator.getUnit());
+            parameterDto.setUnit(indicator.getStandardUnit());
             parameterDto.setParameterName(indicator.getIndicatorName());
             parameterDataDto.setParameterDto(parameterDto);
             List<DataPointDto> dataPointDtos = new ArrayList<>();

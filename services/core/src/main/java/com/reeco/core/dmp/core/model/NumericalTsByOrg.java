@@ -22,8 +22,8 @@ public class NumericalTsByOrg {
         @PrimaryKeyColumn(name = "organization_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
         private Long organizationId;
 
-        @PrimaryKeyColumn(name = "date", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
-        private LocalDate date;
+//        @PrimaryKeyColumn(name = "date", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
+//        private LocalDate date;
 
         @PrimaryKeyColumn(name = "event_time", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
         private LocalDateTime eventTime;
@@ -36,7 +36,7 @@ public class NumericalTsByOrg {
         public String toString() {
             return "Key{" +
                     "organizationId=" + organizationId +
-                    ", date=" + date +
+//                    ", date=" + date +
                     ", eventTime=" + eventTime +
                     ", paramId=" + paramId +
                     '}';
@@ -51,6 +51,9 @@ public class NumericalTsByOrg {
 
     @Column("param_name")
     private String paramName;
+
+    @Column("date")
+    private LocalDate date;
 
     @Column("station_id")
     private Long stationId;
@@ -76,6 +79,7 @@ public class NumericalTsByOrg {
                 "partitionKey=" + partitionKey.toString() +
                 ", indicatorName='" + indicatorName + '\'' +
                 ", paramName='" + paramName + '\'' +
+                ",date=" + date.toString() +
                 ", stationId=" + stationId +
                 ", connectionId=" + connectionId +
                 ", value=" + value +

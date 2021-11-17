@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface NumericalTsByOrgRepository extends CassandraRepository<NumericalTsByOrg, Long> {
+public interface NumericalTsByOrgRepository extends CassandraRepository<NumericalTsByOrg, NumericalTsByOrg.Key> {
 
     List<NumericalTsByOrg> findByPartitionKeyOrganizationIdAndPartitionKeyParamId(Long orgId, Long pramId);
 

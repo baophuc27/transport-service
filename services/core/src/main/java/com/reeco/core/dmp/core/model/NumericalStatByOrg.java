@@ -52,7 +52,7 @@ public class NumericalStatByOrg {
     @Column("std")
     private Double std;
 
-    @Column("cnt")
+    @Column("count")
     private Long count;
 
     @Column("last_updated")

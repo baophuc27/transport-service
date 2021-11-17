@@ -30,8 +30,6 @@ public class ImportDataService {
     @Autowired
     NumericalTsByOrgRepository numericalTsByOrgRepository;
 
-    @Autowired
-    UserRepo userRepo;
 
     @Autowired
     ParamsByOrgRepository paramsByOrgRepository;
@@ -73,7 +71,7 @@ public class ImportDataService {
                                 ParamsByOrg paramsByOrg = paramsByOrgRepository.findByPartitionKeyOrganizationIdAndPartitionKeyParamId(orgId,parameterDto.getParameterId())
                                         .orElseThrow(()->new Exception("Invalid Param!"));
                                 Indicator indicator = indicatorInfoRepository.findByPartitionKeyIndicatorId(paramsByOrg.getIndicatorId())
-                                        .orElseThrow(()->new Exception("Invalid Params"));
+                                        .orElseThrow(()->new Exception("Invalid Indicator"));
                                 parameterDto.setIndicatorType(indicator.getValueType());
                                 parameterDto.setConnectionId(paramsByOrg.getConnectionId());
                                 parameterDto.setParameterName(paramsByOrg.getParamName());
@@ -107,11 +105,12 @@ public class ImportDataService {
                             }
                             if(parameterDtos.get(i-1).getIndicatorType().equals("number")) {
                                 NumericalTsByOrg.Key nkey = new NumericalTsByOrg.Key(
-                                        orgId, date, event_time, parameterDtos.get(i - 1).getParameterId()
+                                        orgId,  event_time, parameterDtos.get(i - 1).getParameterId()
                                 );
     //                        Optional<NumericalTsByOrg> numericalTsByOrgOld = numericalTsByOrgRepository.findByPartitionKey(nkey);
                                 NumericalTsByOrg numericalTsByOrg = new NumericalTsByOrg(
-                                        nkey, parameterDtos.get(i-1).getIndicatorName(),parameterDtos.get(i-1).getParameterName(),  stationId, 0L,
+                                        nkey, parameterDtos.get(i-1).getIndicatorName(),parameterDtos.get(i-1).getParameterName(),
+                                        date,stationId, 0L,
                                         Double.parseDouble(listLine[i]), event_time, lat, lon
                                 );
     //                    numericalTsByOrgRepository.save(numericalTsByOrg);
@@ -127,12 +126,12 @@ public class ImportDataService {
                                 numericalTsByOrgs.add(numericalTsByOrg);
                             }else {
                                 CategoricalTsByOrg.Key nkey = new CategoricalTsByOrg.Key(
-                                        orgId, date, event_time, parameterDtos.get(i - 1).getParameterId(), listLine[i]
+                                        orgId,  event_time, parameterDtos.get(i - 1).getParameterId(), listLine[i]
                                 );
     //
                                 CategoricalTsByOrg categoricalTsByOrg = new CategoricalTsByOrg(
-                                        nkey,  parameterDtos.get(i-1).getIndicatorName(), parameterDtos.get(i-1).getParameterName(), stationId, 0L,
-                                         event_time, lat, lon
+                                        nkey,  parameterDtos.get(i-1).getIndicatorName(), parameterDtos.get(i-1).getParameterName(),
+                                        date,stationId, 0L, event_time, lat, lon
                                 );
     //                    numericalTsByOrgRepository.save(numericalTsByOrg);
     //                    break;

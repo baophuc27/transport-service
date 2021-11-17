@@ -15,10 +15,10 @@ spring:
         timeout: 15s
       connection:
         init-query-timeout: 15s
-  datasource:
-    username: ari
-    password: password
-    url: jdbc:postgresql://118.69.53.93:8081/postgres
+#  datasource:
+#    username: ari
+#    password: password
+#    url: jdbc:postgresql://118.69.53.93:8081/postgres
 
   servlet:
     multipart:

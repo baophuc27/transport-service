@@ -31,17 +31,22 @@ public class ParamsByOrg {
     @Column("indicator_id")
     private Long indicatorId;
 
-    @Column("indicator_name")
-    private String indicatorName;
+//    @Column("indicator_name")
+//    private String indicatorName;
 
     @Column("param_name")
     private String paramName;
 
+    @Column("station_id")
     private Long stationId;
 
+    @Column("connection_id")
     private Long connectionId;
 
-    @Column("updated_at")
-    private LocalDateTime updatedAt;
+    @Column("unit")
+    private String unit;
+
+//    @Column("updated_at")
+//    private LocalDateTime updatedAt;
 
 }

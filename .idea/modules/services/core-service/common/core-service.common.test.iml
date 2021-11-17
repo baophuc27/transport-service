@@ -20,4 +20,5 @@
     <orderEntry type="library" name="Gradle: org.springframework:spring-core:5.3.2" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-jcl:5.3.2" level="project" />
   </component>
+  <component name="TestModuleProperties" production-module="core-service.common.main" />
 </module>

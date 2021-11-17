@@ -11,7 +11,7 @@
       <configuration />
     </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_11">
     <output url="file://$MODULE_DIR$/../../../../services/ingestion-service/build/classes/java/main" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../../../services/ingestion-service/src/main">
@@ -28,6 +28,7 @@
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-webflux:2.5.2" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-actuator:2.5.2" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-data-cassandra-reactive:2.5.4" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.guava:guava:14.0" level="project" />
     <orderEntry type="library" name="Gradle: org.mapstruct:mapstruct:1.4.2.Final" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-json:2.5.2" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter:2.5.2" level="project" />
