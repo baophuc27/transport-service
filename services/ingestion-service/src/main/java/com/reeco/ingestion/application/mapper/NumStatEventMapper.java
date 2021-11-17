@@ -14,6 +14,7 @@ public interface NumStatEventMapper extends DomainEntityMapper<NumericalStatEven
             @Mapping(source = "max", target = "max"),
             @Mapping(source = "mean", target = "mean"),
             @Mapping(source = "acc", target = "acc"),
+            @Mapping(source = "median", target = "median"),
             @Mapping(source = "count", target = "count"),
             @Mapping(source = "std", target = "std"),
             @Mapping(source = "lastUpdated", target = "lastUpdated")
@@ -30,6 +31,7 @@ public interface NumStatEventMapper extends DomainEntityMapper<NumericalStatEven
             @Mapping(source = "mean", target = "mean"),
             @Mapping(source = "acc", target = "acc"),
             @Mapping(source = "count", target = "count"),
+            @Mapping(source = "median", target = "median"),
             @Mapping(source = "std", target = "std"),
             @Mapping(source = "lastUpdated", target = "lastUpdated")
     })
