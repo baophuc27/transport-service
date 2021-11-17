@@ -17,7 +17,7 @@ spring:
 
 
 kafka:
-  bootstrap-servers: localhost:29092 #118.69.53.93:29092
+  bootstrap-servers: 118.69.53.93:29092
 
   consumer:
     event:
