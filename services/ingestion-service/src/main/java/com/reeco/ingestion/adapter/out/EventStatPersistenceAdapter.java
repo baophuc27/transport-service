@@ -11,6 +11,7 @@ import com.reeco.ingestion.domain.NumericalStatEvent;
 import com.reeco.ingestion.domain.NumericalTsEvent;
 import com.reeco.ingestion.domain.OrgAndParam;
 import com.reeco.ingestion.domain.Parameter;
+import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.NumericalStatByOrg;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.NumericalStatByOrgRepository;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.NumericalTsByOrgRepository;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.ParamsByOrgRepository;
@@ -102,8 +103,9 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
 //        LocalDateTime startTime = endTime.minusDays(2);
 //        Timestamp timestampEnd = Timestamp.valueOf(endTime);
 //        Timestamp timestampStart = Timestamp.valueOf(startTime);
-        numericalStatByOrgRepository.saveAll(aggEventByOrgAndParams(startTime, endTime)
-                .map(v-> numStatEventMapper.toPort(v))).subscribe(log::info);
+        Flux<NumericalStatByOrg> statEvents =  aggEventByOrgAndParams(startTime, endTime)
+                .map(v-> numStatEventMapper.toPort(v));
+        numericalStatByOrgRepository.saveAll(statEvents).map(v->numStatEventMapper.toDomain(v)).subscribe(log::info);
 
     }
 
