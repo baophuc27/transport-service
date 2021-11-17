@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Random;
 
 @Slf4j
 @Controller
@@ -43,13 +44,31 @@ public class EventStatisticController {
         updateStatEventUseCase.updateNumStatEvent(timestampStart, timestampEnd);
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 30000)
     public void kafkaProducerMessage() {
-        System.out.println("Implement this!");
-        // send message to kafka topic
-        // payload: IncomingTsEvent
-        // random data send to kafka topic: reeco_time_series_event
-        // kafkaProducerEventTemplate.send();
+        LocalDateTime currTime = LocalDateTime.now();
+        IncomingTsEvent msg = new IncomingTsEvent();
+
+        msg.setOrganizationId(generateRandomLong(1L, 6L));
+        msg.setStationId(generateRandomLong(1L, 3L));
+        msg.setConnectionId(generateRandomLong(1L, 3L));
+        msg.setParamId(generateRandomLong(1L, 2L));
+        msg.setEventTime(currTime);
+        msg.setIndicatorId(generateRandomLong(1L, 2L));
+        msg.setIndicatorName("temp");
+        msg.setParamName("nhiet do");
+        msg.setValue("30.00");
+        msg.setReceivedAt(currTime);
+        msg.setSentAt(currTime);
+        msg.setLat(new Random().nextDouble());
+        msg.setLon(new Random().nextDouble());
+
+        log.info(String.valueOf(msg));
+        kafkaProducerEventTemplate.send("reeco_time_series_event", msg);
+    }
+
+    public Long generateRandomLong(Long leftLimit, Long rightLimit) {
+        return leftLimit + (long) (Math.random() * (rightLimit - leftLimit));
     }
 
     @Scheduled(cron = "0 * * * * ?")
