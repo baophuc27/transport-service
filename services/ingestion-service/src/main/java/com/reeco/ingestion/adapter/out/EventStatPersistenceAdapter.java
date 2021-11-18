@@ -12,6 +12,8 @@ import com.reeco.ingestion.domain.NumericalTsEvent;
 import com.reeco.ingestion.domain.OrgAndParam;
 import com.reeco.ingestion.domain.Parameter;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.NumericalStatByOrg;
+import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.NumericalTsByOrg;
+import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.ParamsByOrg;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.NumericalStatByOrgRepository;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.NumericalTsByOrgRepository;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.ParamsByOrgRepository;
@@ -25,6 +27,7 @@ import java.sql.Timestamp;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Adapter
 @Log4j2
@@ -52,39 +55,38 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
 
     @Override
     public Flux<NumericalStatEvent> aggEventByOrgAndParams(Timestamp startTime, Timestamp endTime) {
-        return findAllParamsGroupByOrg()
+        return findAllParams()
                 .log()
                 .flatMap(v -> numericalTsByOrgRepository.finAllEventByOrg(
                             v.getOrganizationId(),
-                            v.getParamsIds(),
+                            v.getParamId(),
                             startTime,
-                            endTime))
-                .map(v -> numericEventMapper.toDomain(v))
-                .groupBy(v -> new OrgAndParam(v.getOrganizationId(),
-                        v.getParamId(),
-                        Utils.convertDateTimeToDate(v.getEventTime())))
-                .flatMap(
-                        group -> group
-                                .map(NumericalTsEvent::getValue)
-                                .collectList()
-                                .map(v -> {
-                                    Collections.sort(v);
-                                    StatsAccumulator statsAccumulator = new StatsAccumulator();
-                                    statsAccumulator.addAll(v);
-                                    return new NumericalStatEvent(
-                                            group.key().getOrganizationId(),
-                                            group.key().getParamId(),
-                                            group.key().getDate(),
-                                            statsAccumulator.min(),
-                                            statsAccumulator.max(),
-                                            statsAccumulator.mean(),
-                                            statsAccumulator.sum(),
-                                            median(v),
-                                            statsAccumulator.count(),
-                                            statsAccumulator.populationStandardDeviation(),
-                                            LocalDateTime.now()
-                                    );
-                                })
+                            endTime)
+                        .groupBy(e->new OrgAndParam(e.getPartitionKey().getOrganizationId(),
+                                e.getPartitionKey().getParamId(), e.getDate()))
+                        .flatMap(gr -> gr
+                                .map(NumericalTsByOrg::getValue)
+                                .buffer()
+                                .map(k-> {
+                                        Collections.sort(k);
+                                        log.info(gr.key() + " - " + k.size());
+                                        StatsAccumulator statsAccumulator = new StatsAccumulator();
+                                        statsAccumulator.addAll(k);
+                                        return new NumericalStatEvent(
+                                                gr.key().getOrganizationId(),
+                                                gr.key().getParamId(),
+                                                gr.key().getDate(),
+                                                statsAccumulator.min(),
+                                                statsAccumulator.max(),
+                                                statsAccumulator.mean(),
+                                                statsAccumulator.sum(),
+                                                median(k),
+                                                statsAccumulator.count(),
+                                                statsAccumulator.populationStandardDeviation(),
+                                                LocalDateTime.now()
+                                        );
+                                    })
+                                )
                 );
     }
 
@@ -103,9 +105,10 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
 //        LocalDateTime startTime = endTime.minusDays(2);
 //        Timestamp timestampEnd = Timestamp.valueOf(endTime);
 //        Timestamp timestampStart = Timestamp.valueOf(startTime);
-        Flux<NumericalStatByOrg> statEvents =  aggEventByOrgAndParams(startTime, endTime)
-                .map(v-> numStatEventMapper.toPort(v));
-        numericalStatByOrgRepository.saveAll(statEvents).map(v->numStatEventMapper.toDomain(v)).subscribe(log::info);
+        aggEventByOrgAndParams(startTime, endTime)
+                .map(v-> numStatEventMapper.toPort(v))
+                .flatMap(v->numericalStatByOrgRepository.save(v))
+                .subscribe(v->log.info("SAVED: "+v.toString()));
 
     }
 
@@ -123,4 +126,9 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
                 );
     }
 
+    public Flux<Parameter> findAllParams() {
+        return paramsByOrgRepository
+                .findAll()
+                .map(v -> parameterMapper.toDomain(v));
+    }
 }

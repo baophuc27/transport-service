@@ -27,7 +27,7 @@ public class IncomingTsEventService implements StoreTsEventUseCase {
                     log.error("No Indicator found with Id [{}]", event.getIndicatorId());
                     return Mono.empty();}))
                 .flatMap(v -> {
-                    if (v.getValueType() == Indicator.ValueType.DOUBLE) {
+                    if (v.getValueType() == Indicator.ValueType.NUMBER) {
                         // TODO : Implement event mapper
                         NumericalTsEvent numTsEvent = new NumericalTsEvent(
                                 event.getOrganizationId(),

@@ -10,7 +10,7 @@ import java.io.Serializable;
 public class Indicator {
 
     public enum ValueType{
-        DOUBLE, STRING
+        NUMBER, STRING
     }
 
     Long indicatorId;
