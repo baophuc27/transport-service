@@ -24,7 +24,7 @@ public class EntityManagementController {
     private final ObjectMapper objectMapper;
 
 //    @KafkaListener(topics = "reeco_config_event",containerFactory = "timeSeriesEventListener")
-    public void listen(Map<String, byte[]> header, ConsumerRecord<String, byte[]> message) {
-        // implement this
-    }
+//    public void listen(Map<String, byte[]> header, ConsumerRecord<String, byte[]> message) {
+//        // implement this
+//    }
 }

@@ -19,12 +19,12 @@ public class CategoricalTsEvent extends BaseEvent {
                               LocalDateTime eventTime,
                               String indicatorName,
                               String paramName,
-                              Long deviceId,
+                              Long connectionId,
                               LocalDateTime receivedAt,
                               Double lat,
                               Double lon,
                               String value) {
-        super(organizationId, stationId, paramId, eventTime, indicatorName, paramName, deviceId, receivedAt, lat, lon);
+        super(organizationId, stationId, paramId, eventTime, indicatorName, paramName, connectionId, receivedAt, lat, lon);
         this.value = value;
     }
 }

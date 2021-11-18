@@ -1,9 +1,6 @@
 package com.reeco.ingestion.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@ToString
 public class Parameter {
     private Long organizationId;
     private Long paramId;
@@ -23,7 +21,6 @@ public class Parameter {
     private String paramName;
     private String indicatorName;
     private LocalDateTime updatedAt;
-    private LocalDateTime lastAggTime;
 
     @AllArgsConstructor
     @Getter

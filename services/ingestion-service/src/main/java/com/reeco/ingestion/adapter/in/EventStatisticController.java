@@ -31,12 +31,12 @@ public class EventStatisticController {
 
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    @Scheduled(fixedRate = 12000)
+    @Scheduled(fixedRate = 300000)
     public void aggStatisticEvent() {
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.MIN;
         LocalDateTime endTime = LocalDateTime.of(date, time).atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime();
-        LocalDateTime startTime = endTime.minusDays(40);
+        LocalDateTime startTime = endTime.minusDays(100);
         Timestamp timestampEnd = Timestamp.valueOf(endTime);
         Timestamp timestampStart = Timestamp.valueOf(startTime);
         log.info("Start aggregation job with time range from {} to {}", startTime.toString(), endTime.toString());
@@ -45,16 +45,39 @@ public class EventStatisticController {
 
     @Scheduled(fixedRate = 60000)
     public void kafkaProducerMessage() {
-        System.out.println("Implement this!");
-        // send message to kafka topic
-        // payload: IncomingTsEvent
-        // random data send to kafka topic: reeco_time_series_event
-        // kafkaProducerEventTemplate.send();
+        LocalDateTime currTime = LocalDateTime.now();
+        IncomingTsEvent msg = new IncomingTsEvent();
+
+        msg.setOrganizationId(generateRandomLong(1L, 4L));
+        msg.setStationId(generateRandomLong(1L, 3L));
+        msg.setConnectionId(generateRandomLong(1L, 3L));
+        msg.setParamId(generateRandomLong(1L, 11L));
+        msg.setEventTime(currTime);
+        msg.setIndicatorId(generateRandomLong(1L, 2L));
+        msg.setIndicatorName("temp");
+        msg.setParamName("nhiet do");
+        msg.setValue(randomDouble(30L, 40L).toString());
+        msg.setReceivedAt(currTime);
+        msg.setSentAt(currTime);
+        msg.setLat(new Random().nextDouble());
+        msg.setLon(new Random().nextDouble());
+
+        log.info(msg.toString());
+        kafkaProducerEventTemplate.send("reeco_time_series_event", msg);
     }
 
-    @Scheduled(cron = "0 * * * * ?")
-    public void scheduleTaskWithCronExpression() {
-        log.info("Cron Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
+    public Long generateRandomLong(Long leftLimit, Long rightLimit) {
+        return leftLimit + (long) (Math.random() * (rightLimit - leftLimit));
     }
+
+    public Double randomDouble(Long leftLimit, Long rightLimit){
+        Random r = new Random();
+        return leftLimit + (rightLimit - leftLimit) * r.nextDouble();
+    }
+//
+//    @Scheduled(cron = "0 * * * * ?")
+//    public void scheduleTaskWithCronExpression() {
+//        log.info("Cron Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
+//    }
 
 }

@@ -14,7 +14,13 @@ spring:
       contact-points: localhost
       port: 9042
       local-datacenter: datacenter1
-
+      request:
+        timeout: PT40S
+      connection:
+        connect-timeout: PT20S
+        init-query-timeout: PT20S
+      controlconnection:
+        timeout: PT10S
 
 kafka:
   bootstrap-servers: localhost:29092 #118.69.53.93:29092
