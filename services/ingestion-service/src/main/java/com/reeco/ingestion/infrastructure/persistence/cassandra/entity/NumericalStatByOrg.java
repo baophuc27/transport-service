@@ -43,6 +43,9 @@ public class NumericalStatByOrg {
     @Column("mean")
     private Double mean;
 
+    @Column("median")
+    private Double median;
+
     @Column("acc")
     private Double acc;
 

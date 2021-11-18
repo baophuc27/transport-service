@@ -89,6 +89,12 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
                 );
     }
 
+    private Double median(List<Double> sortedArr){
+        int middle = sortedArr.size() / 2;
+        middle = middle > 0 && middle % 2 == 0 ? middle - 1 : middle;
+        return sortedArr.get(middle);
+    }
+
     @Override
     public void insert(Timestamp startTime, Timestamp endTime) {
 //        String strStart = "2021-10-11 21:04:23.344";
