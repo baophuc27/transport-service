@@ -60,6 +60,7 @@ public class ImportDataService {
             List<ParameterDto> parameterDtos =new ArrayList<>();
             HashMap<String, List<Double>> numHasSet = new HashMap<>();
             HashMap<String, List<String>> cateHasSet = new HashMap<>();
+
             while ((line = br.readLine()) != null) {
                 String[] listLine = line.split(",");
 
@@ -76,6 +77,7 @@ public class ImportDataService {
                                 parameterDto.setConnectionId(paramsByOrg.getConnectionId());
                                 parameterDto.setParameterName(paramsByOrg.getParamName());
                                 parameterDto.setIndicatorName(indicator.getIndicatorName());
+                                parameterDto.setStationId(paramsByOrg.getStationId());
                                 parameterDtos.add(parameterDto);
                             }
                         }
@@ -110,7 +112,7 @@ public class ImportDataService {
     //                        Optional<NumericalTsByOrg> numericalTsByOrgOld = numericalTsByOrgRepository.findByPartitionKey(nkey);
                                 NumericalTsByOrg numericalTsByOrg = new NumericalTsByOrg(
                                         nkey, parameterDtos.get(i-1).getIndicatorName(),parameterDtos.get(i-1).getParameterName(),
-                                        date,stationId, 0L,
+                                        date,parameterDtos.get(i-1).getStationId(), parameterDtos.get(i-1).getConnectionId(),
                                         Double.parseDouble(listLine[i]), event_time, lat, lon
                                 );
     //                    numericalTsByOrgRepository.save(numericalTsByOrg);
@@ -131,7 +133,7 @@ public class ImportDataService {
     //
                                 CategoricalTsByOrg categoricalTsByOrg = new CategoricalTsByOrg(
                                         nkey,  parameterDtos.get(i-1).getIndicatorName(), parameterDtos.get(i-1).getParameterName(),
-                                        date,stationId, 0L, event_time, lat, lon
+                                        date,parameterDtos.get(i-1).getStationId(), parameterDtos.get(i-1).getConnectionId(), event_time, lat, lon
                                 );
     //                    numericalTsByOrgRepository.save(numericalTsByOrg);
     //                    break;
@@ -163,7 +165,7 @@ public class ImportDataService {
                 NumericalStatByOrg.Key numericalStatByOrgKey = new NumericalStatByOrg.Key(orgId,numDate,paramId);
                 NumericalStatByOrg numericalStatByOrg = new NumericalStatByOrg(numericalStatByOrgKey, stats.getMin(),stats.getMax(),
                         Comparison.roundNum(Comparison.median(entry.getValue()),2),
-                        Comparison.roundNum(stats.getAverage(),2),0d,
+                        Comparison.roundNum(stats.getAverage(),2),stats.getSum(),
                         Comparison.roundNum(Comparison.std(entry.getValue(), stats.getAverage()),2),
                         stats.getCount(),LocalDateTime.now());
                 numericalStatByOrgs.add(numericalStatByOrg);

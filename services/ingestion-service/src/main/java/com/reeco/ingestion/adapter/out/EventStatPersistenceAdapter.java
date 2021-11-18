@@ -1,6 +1,5 @@
 package com.reeco.ingestion.adapter.out;
 
-import com.datastax.oss.driver.shaded.guava.common.math.Quantiles;
 import com.datastax.oss.driver.shaded.guava.common.math.StatsAccumulator;
 import com.reeco.ingestion.application.mapper.NumStatEventMapper;
 import com.reeco.ingestion.application.mapper.NumericEventMapper;
@@ -90,12 +89,6 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
                 );
     }
 
-    private Double median(List<Double> sortedArr){
-        int middle = sortedArr.size() / 2;
-        middle = middle > 0 && middle % 2 == 0 ? middle - 1 : middle;
-        return sortedArr.get(middle);
-    }
-
     @Override
     public void insert(Timestamp startTime, Timestamp endTime) {
 //        String strStart = "2021-10-11 21:04:23.344";
@@ -122,7 +115,11 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
                         group -> group
                                 .map(Parameter::getParamId)
                                 .collectList()
-                                .map(list -> new Parameter.ParamsByOrg(group.key(), list))
+                                .map(list -> {
+                                    Map<Long, List<Long>> mapper = new HashMap<>();
+                                    mapper.put(group.key(), list);
+                                    return new Parameter.ParamsByOrg(group.key(), list);
+                                })
                 );
     }
 

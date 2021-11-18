@@ -23,7 +23,7 @@ logging:
 
 kafka:
   settings:
-    bootstrapServers: 118.69.53.93:29092
+    bootstrapServers: "localhost:29092"
     acks: "1"
     batchSize: 16384
     linger: 1

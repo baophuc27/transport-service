@@ -16,18 +16,18 @@ public class ParametersRequestMsg extends BaseApiRequestMsg implements Parameter
     private final Long connectionId;
 
     @Getter
-    private final Parameter parameter;
+    private final Parameter attribute;
 
     public ParametersRequestMsg(long createdTime,
                                 Long orgId,
                                 Long connectionId,
                                 ActionType eventAction,
                                 EntityType entityType,
-                                Parameter parameter){
+                                Parameter attribute){
 
         super(orgId, createdTime, eventAction, entityType);
         this.connectionId = connectionId;
-        this.parameter = parameter;
+        this.attribute = attribute;
     }
 
     public byte[] toByteArray(){
@@ -36,7 +36,7 @@ public class ParametersRequestMsg extends BaseApiRequestMsg implements Parameter
 
     @Override
     public ParamType getParameterType() {
-        return parameter.getParameterType();
+        return attribute.getParameterType();
     }
 
     @Override
@@ -44,7 +44,7 @@ public class ParametersRequestMsg extends BaseApiRequestMsg implements Parameter
         DefaultMsgHeaders headers = new DefaultMsgHeaders();
         headers.put("actionType", Utils.getBytes(getActionType()));
         headers.put("entityType", Utils.getBytes(getEntityType()));
-        headers.put("paramType", Utils.getBytes(getParameterType()));
+        headers.put("attributeType", Utils.getBytes(getParameterType()));
         return headers;
     }
 

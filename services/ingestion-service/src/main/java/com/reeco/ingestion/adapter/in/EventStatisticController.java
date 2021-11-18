@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Random;
 
 @Slf4j
 @Controller
@@ -44,7 +43,7 @@ public class EventStatisticController {
         updateStatEventUseCase.updateNumStatEvent(timestampStart, timestampEnd);
     }
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 60000)
     public void kafkaProducerMessage() {
         LocalDateTime currTime = LocalDateTime.now();
         IncomingTsEvent msg = new IncomingTsEvent();

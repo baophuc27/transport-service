@@ -11,7 +11,7 @@ spring:
       keyspace-name: reecotech
       username: cassandra
       password: cassandra
-      contact-points: 118.69.53.93
+      contact-points: localhost
       port: 9042
       local-datacenter: datacenter1
       request:
@@ -23,7 +23,7 @@ spring:
         timeout: PT10S
 
 kafka:
-  bootstrap-servers: 118.69.53.93:29092
+  bootstrap-servers: localhost:29092 #118.69.53.93:29092
 
   consumer:
     event:

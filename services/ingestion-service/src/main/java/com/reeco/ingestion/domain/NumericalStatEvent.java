@@ -33,8 +33,6 @@ public class NumericalStatEvent {
 
     private Double acc;
 
-    private Double median;
-
     private Long count;
 
     private Double std;

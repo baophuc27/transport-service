@@ -9,10 +9,8 @@ services:
       dockerfile: Dockerfile
       args:
         VERSION: 0.1.0
-    ports:
-      - "8986:8986"
-    cpus: 1
     restart: always
+    network_mode: host
 
   ingestionservice:
     build:
@@ -20,7 +18,5 @@ services:
       dockerfile: Dockerfile
       args:
         VERSION: 0.1.0
-    ports:
-      - "8086:8086"
-    cpus: 2
     restart: always
+    network_mode: host
