@@ -59,7 +59,7 @@ public class ImportDataService {
             List<CategoricalStatByOrg> categoricalStatByOrgs = new ArrayList<>();
             List<ParameterDto> parameterDtos =new ArrayList<>();
             HashMap<String, List<Double>> numHasSet = new HashMap<>();
-            HashMap<String, List<String>> cateHasSet = new HashMap<>();
+            HashMap<String, Integer> cateHasSet = new HashMap<>();
 
             while ((line = br.readLine()) != null) {
                 String[] listLine = line.split(",");
@@ -105,7 +105,7 @@ public class ImportDataService {
                             if(listLine[i].equals("null")){
                                 continue;
                             }
-                            if(parameterDtos.get(i-1).getIndicatorType().equals("number")) {
+                            if(parameterDtos.get(i-1).getIndicatorType().equals(ConfigData.NUMBER.toString())) {
                                 NumericalTsByOrg.Key nkey = new NumericalTsByOrg.Key(
                                         orgId,  event_time, parameterDtos.get(i - 1).getParameterId()
                                 );
@@ -137,13 +137,15 @@ public class ImportDataService {
                                 );
     //                    numericalTsByOrgRepository.save(numericalTsByOrg);
     //                    break;
-                                String key =date.toString()+","+categoricalTsByOrg.getPartitionKey().getParamId().toString();
+                                String key =date.toString()+","+categoricalTsByOrg.getPartitionKey().getParamId().toString() + "," +
+                                        categoricalTsByOrg.getPartitionKey().getValue();
                                 if(!cateHasSet.containsKey(key)){
-                                    List<String> tempList = new ArrayList<>();
-                                    tempList.add(categoricalTsByOrg.getPartitionKey().getValue());
-                                    cateHasSet.put(key, tempList);
+                                    Integer cnt = 1;
+//                                    List<String> tempList = new ArrayList<>();
+//                                    tempList.add(categoricalTsByOrg.getPartitionKey().getValue());
+                                    cateHasSet.put(key, cnt);
                                 }else{
-                                    cateHasSet.get(key).add(categoricalTsByOrg.getPartitionKey().getValue());
+                                    cateHasSet.put(key, cateHasSet.get(key) + 1);
                                 }
                                 categoricalTsByOrgs.add(categoricalTsByOrg);
                             }
@@ -153,26 +155,46 @@ public class ImportDataService {
                 }
             }
             br.close();
-            for (Map.Entry<String, List<Double>> entry: numHasSet.entrySet()){
-                DoubleSummaryStatistics stats = entry.getValue().stream()
-                        .mapToDouble((x) -> x)
-                        .summaryStatistics();
-                String key = entry.getKey();
-                String[] dp = key.split(",");
-                DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                LocalDate numDate = LocalDate.parse(dp[0].split(" ")[0], df);
-                Long paramId = Long.parseLong(dp[1]);
-                NumericalStatByOrg.Key numericalStatByOrgKey = new NumericalStatByOrg.Key(orgId,numDate,paramId);
-                NumericalStatByOrg numericalStatByOrg = new NumericalStatByOrg(numericalStatByOrgKey, stats.getMin(),stats.getMax(),
-                        Comparison.roundNum(Comparison.median(entry.getValue()),2),
-                        Comparison.roundNum(stats.getAverage(),2),stats.getSum(),
-                        Comparison.roundNum(Comparison.std(entry.getValue(), stats.getAverage()),2),
-                        stats.getCount(),LocalDateTime.now());
-                numericalStatByOrgs.add(numericalStatByOrg);
+            if(numHasSet.size()>0) {
+                for (Map.Entry<String, List<Double>> entry : numHasSet.entrySet()) {
+                    DoubleSummaryStatistics stats = entry.getValue().stream()
+                            .mapToDouble((x) -> x)
+                            .summaryStatistics();
+                    String key = entry.getKey();
+                    String[] dp = key.split(",");
+                    DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                    LocalDate numDate = LocalDate.parse(dp[0].split(" ")[0], df);
+                    Long paramId = Long.parseLong(dp[1]);
+                    NumericalStatByOrg.Key numericalStatByOrgKey = new NumericalStatByOrg.Key(orgId, numDate, paramId);
+                    NumericalStatByOrg numericalStatByOrg = new NumericalStatByOrg(numericalStatByOrgKey, stats.getMin(), stats.getMax(),
+                            Comparison.roundNum(Comparison.median(entry.getValue()), 2),
+                            Comparison.roundNum(stats.getAverage(), 2), stats.getSum(),
+                            Comparison.roundNum(Comparison.std(entry.getValue(), stats.getAverage()), 2),
+                            stats.getCount(), LocalDateTime.now());
+                    numericalStatByOrgs.add(numericalStatByOrg);
+                }
             }
-            numericalTsByOrgRepository.saveAll(numericalTsByOrgs);
-            categoricalTsByOrgRepository.saveAll(categoricalTsByOrgs);
-            numericalStatByOrgRepository.saveAll(numericalStatByOrgs);
+            if(cateHasSet.size()>0){
+                for (Map.Entry<String, Integer> entry: cateHasSet.entrySet()){
+                    String key = entry.getKey();
+                    String[] dp = key.split(",");
+                    DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                    LocalDate cateDate = LocalDate.parse(dp[0].split(" ")[0], df);
+                    Long paramId = Long.parseLong(dp[1]);
+                    String value = dp[2];
+                    CategoricalStatByOrg.Key  cateKey= new CategoricalStatByOrg.Key(
+                            orgId,cateDate,paramId,value
+                    );
+                    CategoricalStatByOrg categoricalStatByOrg = new CategoricalStatByOrg(
+                            cateKey, entry.getValue().longValue(),LocalDateTime.now()
+                    );
+                    categoricalStatByOrgs.add(categoricalStatByOrg);
+
+                }
+            }
+//            numericalTsByOrgRepository.saveAll(numericalTsByOrgs);
+//            categoricalTsByOrgRepository.saveAll(categoricalTsByOrgs);
+//            numericalStatByOrgRepository.saveAll(numericalStatByOrgs);
             categoricalStatByOrgRepository.saveAll(categoricalStatByOrgs);
 //                numHasSet
 //            cateHasSet

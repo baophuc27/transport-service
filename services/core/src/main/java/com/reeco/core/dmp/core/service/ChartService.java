@@ -120,7 +120,7 @@ public class ChartService {
             parameterDto.setParameterName(indicator.getIndicatorName());
             parameterDataDto.setParameterDto(parameterDto);
             List<DataPointDto> dataPointDtos = new ArrayList<>();
-            if (indicator.getValueType().equals("number")){
+            if (indicator.getValueType().equals(ConfigData.NUMBER.toString())){
 
                 if(chartDto.getStartTime().equals(chartDto.getEndTime())){
                     List<NumericalTsByOrg> numericalTsByOrgs = numericalTsByOrgRepository.find2LatestRow(parameterDto.getOrganizationId(), parameterDto.getParameterId());

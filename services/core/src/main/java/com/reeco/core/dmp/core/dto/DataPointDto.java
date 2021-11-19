@@ -17,7 +17,7 @@ public class DataPointDto {
 
     private LocalDateTime eventTime;
 
-    private String etime;
+//    private String etime;
 
 //    private Long connectionId;
 
@@ -30,7 +30,7 @@ public class DataPointDto {
     public DataPointDto(NumericalTsByOrg num){
         this.value = num.getValue().toString();
         this.eventTime = num.getPartitionKey().getEventTime();
-        this.etime = num.getPartitionKey().getEventTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+//        this.etime = num.getPartitionKey().getEventTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
         if (num.getLat() != null){
             this.lat = num.getLat();
         }

@@ -1,6 +1,7 @@
 package com.reeco.core.dmp.core.model;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.cassandra.core.cql.Ordering;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
@@ -12,9 +13,11 @@ import java.time.LocalDateTime;
 
 @Table("categorical_stats_by_organization")
 @Data
+@AllArgsConstructor
 public class CategoricalStatByOrg {
     @PrimaryKeyClass
     @Data
+    @AllArgsConstructor
     public static class Key implements Serializable {
 
         @PrimaryKeyColumn(name = "organization_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
@@ -33,7 +36,7 @@ public class CategoricalStatByOrg {
     @PrimaryKey
     private CategoricalStatByOrg.Key partitionKey;
 
-    @Column("value_count")
+    @Column("count")
     private Long valueCount;
 
     @Column("last_updated")
