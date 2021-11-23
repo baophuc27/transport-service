@@ -21,20 +21,19 @@ CREATE TABLE IF NOT EXISTS reecotech.alarm(
   organization_id BIGINT,
   param_id BIGINT,
   alarm_id BIGINT,
-  compare_type TEXT,
-  equal_value DOUBLE,
+  alarm_type TEXT,
   min_value DOUBLE,
   max_value DOUBLE,
   updated_at TIMESTAMP,
-  PRIMARY KEY((organization_id), alarm_id)
-)WITH CLUSTERING ORDER BY (alarm_id ASC);
+  PRIMARY KEY((organization_id), param_id, alarm_id)
+)WITH CLUSTERING ORDER BY (param_id ASC, alarm_id ASC);
 
 CREATE TABLE IF NOT EXISTS reecotech.params_by_organization(
   organization_id BIGINT,
   param_id BIGINT,
   indicator_id BIGINT,
   station_id BIGINT,
-  param_name      TEXT,
+  param_name TEXT,
   unit TEXT,
   connection_id BIGINT,
   PRIMARY KEY((organization_id), param_id)
@@ -51,6 +50,11 @@ CREATE TABLE IF NOT EXISTS reecotech.numeric_series_by_organization(
   connection_id BIGINT,
   value DOUBLE,
   received_at TIMESTAMP,
+  is_alarm BOOLEAN,
+  min_value DOUBLE,
+  max_value DOUBLE,
+  alarm_type TEXT,
+  alarm_id BIGINT,
   event_time TIMESTAMP,
   lat DOUBLE,
   lon DOUBLE,

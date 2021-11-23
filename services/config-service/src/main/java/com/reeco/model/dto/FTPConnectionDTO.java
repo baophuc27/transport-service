@@ -55,8 +55,8 @@ public class FTPConnectionDTO extends BaseConnectionDTO {
         super(id);
     }
 
-    public FTPConnectionDTO(Long id, String englishName, String vietnameseName, Protocol protocol, String userName, String hostName, String port, String password, Boolean useSSL, String key, List<String> ipWhiteList, String fileType, Integer templateFormat, Integer maximumTimeout, Integer maximumAttachment, String notificationType, Long removeAfterDays) {
-        super(id, englishName, vietnameseName, protocol);
+    public FTPConnectionDTO(Long id, String englishName, String vietnameseName, Protocol protocol, String userName, String hostName, String port, String password, Boolean useSSL, String key, List<String> ipWhiteList, String fileType, Integer templateFormat, Integer maximumTimeout, Integer maximumAttachment, String notificationType, Long removeAfterDays, Boolean active) {
+        super(id, englishName, vietnameseName, protocol, active);
         this.userName = userName;
         this.hostName = hostName;
         this.port = port;

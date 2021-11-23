@@ -16,18 +16,18 @@ public class ParametersRequestMsg extends BaseApiRequestMsg implements Parameter
     private final Long connectionId;
 
     @Getter
-    private final Parameter attribute;
+    private final Parameter parameter;
 
     public ParametersRequestMsg(long createdTime,
                                 Long orgId,
                                 Long connectionId,
                                 ActionType eventAction,
                                 EntityType entityType,
-                                Parameter attribute){
+                                Parameter parameter){
 
         super(orgId, createdTime, eventAction, entityType);
         this.connectionId = connectionId;
-        this.attribute = attribute;
+        this.parameter = parameter;
     }
 
     public byte[] toByteArray(){
@@ -36,7 +36,7 @@ public class ParametersRequestMsg extends BaseApiRequestMsg implements Parameter
 
     @Override
     public ParamType getParameterType() {
-        return attribute.getParameterType();
+        return parameter.getParameterType();
     }
 
     @Override

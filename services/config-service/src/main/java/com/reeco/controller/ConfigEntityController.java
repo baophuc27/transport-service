@@ -137,55 +137,6 @@ class ConfigEntityController {
         return responseWriter;
     }
 
-    @PostMapping("/alarm/{orgId}/{paramId}")
-    private DeferredResult<ResponseEntity<String>> createAlarm(@PathVariable(value = "orgId") Long orgId,
-                                                               @PathVariable(value = "paramId") Long paramId,
-                                                               @RequestBody AlarmDTO alarmDTO) {
-
-        log.info("Alarm payload: {}", alarmDTO);
-        long currentTimestamp = System.currentTimeMillis();
-
-        ReecoRequestParamValidator<AlarmDTO> validator = new ReecoRequestParamValidator<>();
-        DeferredResult<ResponseEntity<String>> responseWriter = validator.getResponseMessage(alarmDTO);
-
-        if (responseWriter.getResult() != null) {
-            return responseWriter;
-        }
-
-        AlarmRequestMsg requestMsg = new AlarmRequestMsg(
-                currentTimestamp,
-                orgId,
-                paramId,
-                ActionType.UPSERT,
-                EntityType.ALARM,
-                alarmDTO);
-
-        sendMessageRequest.sendMessage(requestMsg, new HttpOkCallback(responseWriter));
-
-        return responseWriter;
-    }
-
-    @DeleteMapping("/alarm/{orgId}/{paramId}/{id}")
-    private DeferredResult<ResponseEntity<String>> deleteAlarm(@PathVariable(value = "id") Long id,
-                                                               @PathVariable(value = "paramId") Long paramId,
-                                                               @PathVariable(value = "orgId") Long orgId) {
-
-        DeferredResult<ResponseEntity<String>> responseWriter = new DeferredResult<ResponseEntity<String>>();
-        log.info("Delete Alarm: {} in param: {} and org: {}", id, paramId, orgId);
-        long currentTimestamp = System.currentTimeMillis();
-
-        AlarmRequestMsg requestMsg = new AlarmRequestMsg(
-                currentTimestamp,
-                orgId,
-                paramId,
-                ActionType.DELETE,
-                EntityType.ALARM,
-                new AlarmDTO(id));
-
-        sendMessageRequest.sendMessage(requestMsg, new HttpOkCallback(responseWriter));
-
-        return responseWriter;
-    }
 
     private static class HttpOkCallback implements ListenableFutureCallback<SendResult<String, byte[]>> {
 
