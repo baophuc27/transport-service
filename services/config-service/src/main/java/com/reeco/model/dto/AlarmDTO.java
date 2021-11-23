@@ -2,10 +2,7 @@ package com.reeco.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.reeco.framework.EnumNamePattern;
-import com.reeco.model.AlarmType;
-import com.reeco.model.BaseEntity;
-import com.reeco.model.Entity;
-import com.reeco.model.Protocol;
+import com.reeco.model.*;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
@@ -19,24 +16,28 @@ public class AlarmDTO extends BaseEntity implements Entity {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "englishName must be not NULL")
-    @NotBlank(message = "englishName must be not BLANK")
+    @NotNull(message = "englishName of Alarm must be not NULL")
+    @NotBlank(message = "englishName of Alarm be not BLANK")
     private String englishName;
 
-    @NotNull(message = "vietnameseName must be not NULL")
-    @NotBlank(message = "vietnameseName must be not BLANK")
+    @NotNull(message = "vietnameseName of Alarm must be not NULL")
+    @NotBlank(message = "vietnameseName of Alarm must be not BLANK")
     private String vietnameseName;
 
-    @EnumNamePattern(regexp = "THRESHOLD|RANGE", message = "alarmType must be in {THRESHOLD, RANGE}")
+    @EnumNamePattern(regexp = "THRESHOLD|SQUARE_RANGE|BRACKET_RANGE", message = "alarmType must be in {THRESHOLD,SQUARE_RANGE,BRACKET_RANGE}")
     private AlarmType alarmType;
-
-    private Double eqValue;
 
     private Double minValue;
 
     private Double maxValue;
 
-    private String compareType;
+    private MaintainType maintainType;
+
+    private Integer numOfMatch;
+
+    private Long frequence;
+
+    private FrequenceType frequenceType;
 
     public AlarmDTO() {
         super(-1L);
@@ -49,19 +50,23 @@ public class AlarmDTO extends BaseEntity implements Entity {
     public AlarmDTO(Long id,
                     String englishName,
                     String vietnameseName,
-                    AlarmType alarmType,
-                    Double eqValue,
+                    @EnumNamePattern(regexp = "THRESHOLD|RANGE", message = "alarmType must be in {THRESHOLD, RANGE}") AlarmType alarmType,
                     Double minValue,
                     Double maxValue,
-                    String compareType) {
+                    @EnumNamePattern(regexp = "NONE|FISRTTIME|MAINTAIN", message = "maintainType must be in {NONE, FISRTTIME, MAINTAIN}") MaintainType maintainType,
+                    Integer numOfMatch,
+                    Long frequence,
+                    @EnumNamePattern(regexp = "S|M|H|D", message = "maintainType must be in {S, M, H, D}") FrequenceType frequenceType) {
         super(id);
         this.englishName = englishName;
         this.vietnameseName = vietnameseName;
         this.alarmType = alarmType;
-        this.eqValue = eqValue;
         this.minValue = minValue;
         this.maxValue = maxValue;
-        this.compareType = compareType;
+        this.maintainType = maintainType;
+        this.numOfMatch = numOfMatch;
+        this.frequence = frequence;
+        this.frequenceType = frequenceType;
     }
 
     @Override
@@ -70,10 +75,12 @@ public class AlarmDTO extends BaseEntity implements Entity {
                 "englishName='" + englishName + '\'' +
                 ", vietnameseName='" + vietnameseName + '\'' +
                 ", alarmType=" + alarmType +
-                ", eqValue=" + eqValue +
                 ", minValue=" + minValue +
                 ", maxValue=" + maxValue +
-                ", compareType='" + compareType + '\'' +
+                ", maintainType=" + maintainType +
+                ", numOfMatch=" + numOfMatch +
+                ", frequence=" + frequence +
+                ", frequenceType=" + frequenceType +
                 "} " + super.toString();
     }
 }

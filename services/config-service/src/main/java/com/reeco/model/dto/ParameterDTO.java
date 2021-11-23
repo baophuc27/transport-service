@@ -6,8 +6,10 @@ import com.reeco.framework.EnumNamePattern;
 import com.reeco.model.*;
 import lombok.Getter;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -40,6 +42,9 @@ public class ParameterDTO extends BaseEntity implements Parameter {
 
     private String format;
 
+    @Valid
+    private List<AlarmDTO> alarms;
+
     public ParameterDTO() {
         super(-1L);
     }
@@ -48,7 +53,15 @@ public class ParameterDTO extends BaseEntity implements Parameter {
         super(id);
     }
 
-    public ParameterDTO(Long id, String englishName, String vietnameseName, ParamType parameterType, Long indicatorId, String keyName, String displayType, String unit, String format) {
+    public ParameterDTO(Long id, String englishName,
+                        String vietnameseName,
+                        ParamType parameterType,
+                        Long indicatorId,
+                        String keyName,
+                        String displayType,
+                        String unit,
+                        String format,
+                        List<AlarmDTO> alarms) {
         super(id);
         this.englishName = englishName;
         this.vietnameseName = vietnameseName;
@@ -58,6 +71,7 @@ public class ParameterDTO extends BaseEntity implements Parameter {
         this.displayType = displayType;
         this.unit = unit;
         this.format = format;
+        this.alarms = alarms;
     }
 
     @Override
@@ -71,6 +85,7 @@ public class ParameterDTO extends BaseEntity implements Parameter {
                 ", displayType='" + displayType + '\'' +
                 ", unit='" + unit + '\'' +
                 ", format='" + format + '\'' +
+                ", alarms=" + alarms +
                 "} " + super.toString();
     }
 }

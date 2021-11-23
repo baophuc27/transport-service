@@ -1,5 +1,5 @@
 package com.reeco.model;
 
 public enum AlarmType {
-    THRESHOLD, RANGE
+    THRESHOLD, SQUARE_RANGE, BRACKET_RANGE
 }

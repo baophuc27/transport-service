@@ -37,35 +37,35 @@ public class EventStatisticController {
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.MIN;
         LocalDateTime endTime = LocalDateTime.of(date, time).atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime();
-        LocalDateTime startTime = endTime.minusDays(100);
+        LocalDateTime startTime = endTime.minusDays(10);
         Timestamp timestampEnd = Timestamp.valueOf(endTime);
         Timestamp timestampStart = Timestamp.valueOf(startTime);
         log.info("Start aggregation job with time range from {} to {}", startTime.toString(), endTime.toString());
         updateStatEventUseCase.updateNumStatEvent(timestampStart, timestampEnd);
     }
-
-    @Scheduled(fixedRate = 60000)
-    public void kafkaProducerMessage() {
-        LocalDateTime currTime = LocalDateTime.now();
-        IncomingTsEvent msg = new IncomingTsEvent();
-
-        msg.setOrganizationId(generateRandomLong(1L, 4L));
-        msg.setStationId(generateRandomLong(1L, 3L));
-        msg.setConnectionId(generateRandomLong(1L, 3L));
-        msg.setParamId(generateRandomLong(1L, 11L));
-        msg.setEventTime(currTime);
-        msg.setIndicatorId(generateRandomLong(1L, 2L));
-        msg.setIndicatorName("temp");
-        msg.setParamName("nhiet do");
-        msg.setValue(randomDouble(30L, 40L).toString());
-        msg.setReceivedAt(currTime);
-        msg.setSentAt(currTime);
-        msg.setLat(new Random().nextDouble());
-        msg.setLon(new Random().nextDouble());
-
-        log.info(msg.toString());
-        kafkaProducerEventTemplate.send("reeco_time_series_event", msg);
-    }
+//
+//    @Scheduled(fixedRate = 60000)
+//    public void kafkaProducerMessage() {
+//        LocalDateTime currTime = LocalDateTime.now();
+//        IncomingTsEvent msg = new IncomingTsEvent();
+//
+//        msg.setOrganizationId(generateRandomLong(1L, 4L));
+//        msg.setStationId(generateRandomLong(1L, 3L));
+//        msg.setConnectionId(generateRandomLong(1L, 3L));
+//        msg.setParamId(generateRandomLong(1L, 11L));
+//        msg.setEventTime(currTime);
+//        msg.setIndicatorId(generateRandomLong(1L, 2L));
+//        msg.setIndicatorName("temp");
+//        msg.setParamName("nhiet do");
+//        msg.setValue(randomDouble(30L, 40L).toString());
+//        msg.setReceivedAt(currTime);
+//        msg.setSentAt(currTime);
+//        msg.setLat(new Random().nextDouble());
+//        msg.setLon(new Random().nextDouble());
+//
+//        log.info(msg.toString());
+//        kafkaProducerEventTemplate.send("reeco_time_series_event", msg);
+//    }
 
     public Long generateRandomLong(Long leftLimit, Long rightLimit) {
         return leftLimit + (long) (Math.random() * (rightLimit - leftLimit));
