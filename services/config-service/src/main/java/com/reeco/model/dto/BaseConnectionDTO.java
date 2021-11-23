@@ -25,6 +25,9 @@ public class BaseConnectionDTO extends BaseEntity implements Connection {
     @NotBlank(message = "vietnameseName must be not BLANK")
     private String vietnameseName;
 
+    @NotNull(message = "active must be not NULL")
+    private Boolean active;
+
     @EnumNamePattern(regexp = "FTP|FTPS|HTTP", message = "protocol must be in {FTP, FTPS, HTTP}")
     private Protocol protocol;
 
@@ -32,9 +35,10 @@ public class BaseConnectionDTO extends BaseEntity implements Connection {
         super(id);
     }
 
-    public BaseConnectionDTO(Long id, String englishName, String vietnameseName, Protocol protocol) {
+    public BaseConnectionDTO(Long id, String englishName, String vietnameseName, Protocol protocol, Boolean active) {
         super(id);
         this.englishName = englishName;
+        this.active = active;
         this.vietnameseName = vietnameseName;
         this.protocol = protocol;
     }
