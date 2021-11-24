@@ -8,4 +8,6 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface IndicatorInfoRepository extends ReactiveCassandraRepository<IndicatorInfo, IndicatorInfo.Key> {
     Mono<IndicatorInfo> findById(IndicatorInfo.Key key);
+
+    
 }

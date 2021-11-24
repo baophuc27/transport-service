@@ -6,7 +6,9 @@ import com.reeco.ingestion.adapter.out.TsEventPersistenceAdapter;
 import com.reeco.ingestion.application.port.out.*;
 import com.reeco.ingestion.application.service.EntityManagementService;
 import com.reeco.ingestion.application.service.IncomingTsEventService;
+import com.reeco.ingestion.application.service.StoreConfigService;
 import com.reeco.ingestion.application.usecase.EntityManagementUseCase;
+import com.reeco.ingestion.application.usecase.StoreConfigUseCase;
 import com.reeco.ingestion.application.usecase.StoreTsEventUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +27,11 @@ public class IngestionServiceConfiguration {
     @Bean
     StoreTsEventUseCase storeTsEventUseCase(InsertEventPort tsEventRepository, IndicatorRepository indicatorRepository){
         return new IncomingTsEventService(tsEventRepository, indicatorRepository);
+    }
+
+    @Bean
+    StoreConfigUseCase storeConfigUseCase(){
+        return new StoreConfigService();
     }
 
 //    @Bean
