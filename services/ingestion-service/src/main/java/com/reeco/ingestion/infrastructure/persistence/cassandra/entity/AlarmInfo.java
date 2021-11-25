@@ -6,6 +6,7 @@ import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Table("alarm")
 @AllArgsConstructor
@@ -38,10 +39,19 @@ public class AlarmInfo {
     @Column("max_value")
     private String maxValue;
 
+    @Column("num_of_match")
     private Long numOfMatch;
 
+    @Column("maintain_type")
+    private String maintainType;
+
+    @Column("frequence")
     private Long frequency;
 
+    @Column("frequence_type")
     private String frequencyType;
+
+    @Column("updated_at")
+    private LocalDateTime updatedAt;
 
 }

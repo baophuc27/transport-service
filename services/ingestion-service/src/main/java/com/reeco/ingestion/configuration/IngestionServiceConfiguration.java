@@ -10,6 +10,10 @@ import com.reeco.ingestion.application.service.StoreConfigService;
 import com.reeco.ingestion.application.usecase.EntityManagementUseCase;
 import com.reeco.ingestion.application.usecase.StoreConfigUseCase;
 import com.reeco.ingestion.application.usecase.StoreTsEventUseCase;
+import com.reeco.ingestion.cache.service.AlarmCacheService;
+import com.reeco.ingestion.cache.service.AlarmCacheUseCase;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,9 +34,23 @@ public class IngestionServiceConfiguration {
     }
 
     @Bean
-    StoreConfigUseCase storeConfigUseCase(){
-        return new StoreConfigService();
+    public CacheManager cacheManager() {
+        System.out.println ("Creating cache manager.");
+        return new ConcurrentMapCacheManager("alarm_cache");
     }
+
+    @Bean
+    StoreConfigUseCase storeConfigUseCase(CacheManager cacheManager){
+        return new StoreConfigService(cacheManager);
+    }
+
+    @Bean
+    AlarmCacheUseCase alarmCacheUseCase(CacheManager cacheManager){
+        return new AlarmCacheService(cacheManager);
+    }
+
+
+
 
 //    @Bean
 //    UpdateStatEventUseCase updateStatEventUseCase(AggregateEventsPort aggregateEventsPort){
