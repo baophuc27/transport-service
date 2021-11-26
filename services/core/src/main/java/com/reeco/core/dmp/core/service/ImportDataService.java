@@ -192,9 +192,9 @@ public class ImportDataService {
 
                 }
             }
-//            numericalTsByOrgRepository.saveAll(numericalTsByOrgs);
-//            categoricalTsByOrgRepository.saveAll(categoricalTsByOrgs);
-//            numericalStatByOrgRepository.saveAll(numericalStatByOrgs);
+            numericalTsByOrgRepository.saveAll(numericalTsByOrgs);
+            categoricalTsByOrgRepository.saveAll(categoricalTsByOrgs);
+            numericalStatByOrgRepository.saveAll(numericalStatByOrgs);
             categoricalStatByOrgRepository.saveAll(categoricalStatByOrgs);
 //                numHasSet
 //            cateHasSet

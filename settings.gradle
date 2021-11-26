@@ -1,6 +1,6 @@
 includeBuild('./shares/util')
 includeBuild('./shares/api')
-includeBuild('./services/core-service')
+includeBuild('./services/core')
 includeBuild('./services/config-service')
 includeBuild('./services/transport-service')
 includeBuild('./services/ingestion-service')

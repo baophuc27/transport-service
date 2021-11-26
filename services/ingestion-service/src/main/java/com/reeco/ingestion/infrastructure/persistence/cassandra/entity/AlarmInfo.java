@@ -1,7 +1,6 @@
 package com.reeco.ingestion.infrastructure.persistence.cassandra.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
@@ -9,14 +8,13 @@ import org.springframework.data.cassandra.core.mapping.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Table("params_by_organization")
+@Table("alarm")
 @AllArgsConstructor
 @Getter
-public class ParamsByOrg {
-
+public class AlarmInfo {
     @PrimaryKeyClass
     @AllArgsConstructor
-    @Data
+    @Getter
     public static class Key implements Serializable {
 
         @PrimaryKeyColumn(name = "organization_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
@@ -24,29 +22,36 @@ public class ParamsByOrg {
 
         @PrimaryKeyColumn(name = "param_id", ordinal = 1, type = PrimaryKeyType.CLUSTERED)
         private Long paramId;
+
+        @PrimaryKeyColumn(name = "alarm_id", ordinal = 2, type = PrimaryKeyType.CLUSTERED)
+        private Long alarmId;
     }
 
     @PrimaryKey
-    private ParamsByOrg.Key partitionKey;
+    private AlarmInfo.Key partitionKey;
 
-    @Column("indicator_id")
-    private Long indicatorId;
+    @Column("alarm_type")
+    private String alarmType;
 
-//    @Column("indicator_name")
-//    private String indicatorName;
+    @Column("min_value")
+    private String minValue;
 
-    @Column("param_name")
-    private String paramName;
+    @Column("max_value")
+    private String maxValue;
 
-    @Column("station_id")
-    private Long stationId;
+    @Column("num_of_match")
+    private Long numOfMatch;
 
-    @Column("connection_id")
-    private Long connectionId;
+    @Column("maintain_type")
+    private String maintainType;
 
-    @Column("unit")
-    private String unit;
+    @Column("frequence")
+    private Long frequency;
 
-//    @Column("updated_at")
-//    private LocalDateTime updatedAt;
+    @Column("frequence_type")
+    private String frequencyType;
+
+    @Column("updated_at")
+    private LocalDateTime updatedAt;
+
 }

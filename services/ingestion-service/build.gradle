@@ -31,6 +31,12 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-actuator')
 	implementation('org.springframework.boot:spring-boot-starter-data-cassandra-reactive:2.5.4')
 	implementation('com.google.guava:guava:14.0')
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+//	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//	implementation 'org.flywaydb:flyway-core'
+	implementation("com.hazelcast:hazelcast:4.0.1")
+	implementation("com.hazelcast:hazelcast-spring:4.0.1")
+//	runtimeOnly 'com.h2database:h2'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
