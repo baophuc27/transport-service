@@ -1,0 +1,13 @@
+//rootProject.name = 'services'
+////includeBuild('./services/core')
+////includeBuild('./services/config-service')
+////includeBuild('./services/transport-service')
+////includeBuild('./services/ingestion-service')
+////includeBuild('./services/common')
+//
+//
+//include 'core'
+//include 'config-service'
+//include 'transport-service'
+//include 'ingestion-service'
+//include 'common'
