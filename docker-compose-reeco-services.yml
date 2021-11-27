@@ -1,0 +1,22 @@
+version: '3.9'
+
+# Define services
+services:
+  # App backend service
+  configservice:
+    build:
+      context: .
+      dockerfile: config-service
+      args:
+        VERSION: 0.1.0
+    restart: always
+    ports:
+    - 8986:8986
+
+  ingestionservice:
+    build:
+      context: ingestion-service
+      dockerfile: Dockerfile
+      args:
+        VERSION: 0.1.0
+    restart: always

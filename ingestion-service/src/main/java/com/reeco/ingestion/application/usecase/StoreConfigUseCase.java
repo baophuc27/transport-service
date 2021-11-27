@@ -1,7 +1,10 @@
 package com.reeco.ingestion.application.usecase;
 
-import com.reeco.ingestion.application.port.in.IncomingConfigEvent;
+
+import com.reeco.common.model.dto.Parameter;
 
 public interface StoreConfigUseCase {
-    void storeConfig(IncomingConfigEvent config);
+    void storeParameter(Parameter parameter);
+
+    void deleteParameter(Parameter parameter);
 }

@@ -30,10 +30,18 @@ public class AlarmCacheService implements AlarmCacheUseCase {
         }
     }
 
-    public void putDatatoCache(List<AlarmCache> alarmCaches){
+    public void putDataToCache(List<AlarmCache> alarmCaches){
         for (AlarmCache alarmCache: alarmCaches) {
             if(alarmCache != null)
                 cacheManager.getCache("alarm_cache").put(alarmCache.getKey(), alarmCache);
+        }
+    }
+
+    @Override
+    public void evictDataFromCache(List<AlarmCache> alarmCaches) {
+        for (AlarmCache alarmCache: alarmCaches) {
+            if(alarmCache != null)
+                cacheManager.getCache("alarm_cache").evict(alarmCache.getKey());
         }
     }
 

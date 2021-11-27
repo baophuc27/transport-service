@@ -2,8 +2,10 @@ package com.reeco.ingestion.adapter.in;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.reeco.common.model.dto.Parameter;
+import com.reeco.common.model.enumtype.ActionType;
+import com.reeco.common.model.enumtype.EntityType;
 import com.reeco.ingestion.application.port.in.IncomingTsEvent;
-import com.reeco.ingestion.application.port.in.IncomingConfigEvent;
 import com.reeco.ingestion.application.usecase.StoreConfigUseCase;
 import com.reeco.ingestion.application.usecase.StoreTsEventUseCase;
 import com.reeco.ingestion.cache.service.AlarmCacheUseCase;
@@ -16,6 +18,9 @@ import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 
+import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Slf4j
@@ -29,8 +34,22 @@ public class IncomingTsEventController {
 
     private final AlarmCacheUseCase alarmCacheUseCase;
 
+    private static ObjectMapper objectMapper;
 
 
+    @PostConstruct
+    private void postProcess(){
+        objectMapper = new ObjectMapper();
+    }
+
+    private <T> T parseObject(byte[] message, Class<T> valueType){
+        try {
+            return objectMapper.readValue(message,valueType);
+        } catch (RuntimeException | IOException e) {
+            log.warn("Error when parsing message object: {}",e.getMessage());
+            return null;
+        }
+    }
 
     @KafkaListener(topics = "reeco_time_series_event",containerFactory = "timeSeriesEventListener")
     public void listen(@Headers Map<String,byte[]> header, @Payload IncomingTsEvent message){
@@ -38,40 +57,27 @@ public class IncomingTsEventController {
     }
 
     @KafkaListener(topics = "reeco_config_event", containerFactory = "configEventListener")
-    public void listen(@Headers Map<String, byte[]> header, @Payload String config) throws JsonProcessingException {
+    public void listen(@Headers Map<String, byte[]> header, @Payload String config) {
+        try {
+            EntityType entityType = EntityType.valueOf(new String(header.get("entityType"), StandardCharsets.UTF_8));
+            ActionType actionType = ActionType.valueOf(new String(header.get("actionType"), StandardCharsets.UTF_8));
+            log.info("entityType: {}", entityType);
+            switch (entityType) {
+                case PARAM:
+                    Parameter parameter  = objectMapper.readValue(config, Parameter.class);
+                    log.info("PARAMETER: {}", parameter.toString());
+                    switch (actionType) {
+                        case DELETE: storeConfigUseCase.deleteParameter(parameter);
+                        case UPSERT: storeConfigUseCase.storeParameter(parameter);
+                    }
+                case CONNECTION:
+                    break;
 
-
-
-        ObjectMapper mapper = new ObjectMapper();
-        IncomingConfigEvent incomingConfigEvent  = mapper.readValue(config, IncomingConfigEvent.class);
-//        try {
-//
-//            JSONObject jsonObject = new JSONObject(config);
-//            JSONObject param = jsonObject.getJSONObject("parameter");
-//            JSONArray alarm = param.getJSONArray("alarms");
-////            List<IncomingAlarm> alarmList = new ArrayList<>();
-////            for (int i =0; i< alarm.length();i++){
-////                alarmList.add(new IncomingAlarm(alarm.getJSONObject(i).getLong("id"),
-////                        alarm.getJSONObject(i).getString("englishName"),
-////                        alarm.getJSONObject(i).getString("vietnameseName"),
-////                        alarm.getJSONObject(i).getString("alarmType"),
-////                        alarm.getJSONObject(i).getString("minValue"),
-////                        alarm.getJSONObject(i).getString("maxValue"),
-////                        alarm.getJSONObject(i).getString("maintainType"),
-////                        alarm.getJSONObject(i).getLong("numOfMatch"),
-////                        alarm.getJSONObject(i).getLong("frequence"),
-////                        alarm.getJSONObject(i).getString("frequenceType")));
-////            }
-////            Parameter parameter = new Parameter(
-////                    param.getLong("id"), param.getLong("indicatorId"), param.getString("englishName"),
-////                    param.getString("parameterType"), alarmList
-////            );
-////            incomingConfigEvent = new IncomingConfigEvent(jsonObject.getLong("orgId"),jsonObject.getLong("connectionId"),
-////                    jsonObject.getString("actionType"), jsonObject.getString("entityType"), parameter);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-        storeConfigUseCase.storeConfig(incomingConfigEvent);
+            }
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @EventListener(ApplicationReadyEvent.class)

@@ -1,21 +1,30 @@
 package com.reeco.common.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.reeco.common.framework.EnumNamePattern;
 import com.reeco.common.model.enumtype.AlarmType;
 import com.reeco.common.model.enumtype.FrequenceType;
 import com.reeco.common.model.enumtype.MaintainType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 
-@Getter
+@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
+@AllArgsConstructor
 public class Alarm implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -41,13 +50,13 @@ public class Alarm implements Serializable {
             message = "alarmType must be in {THRESHOLD,SQUARE_RANGE,BRACKET_RANGE}")
     private AlarmType alarmType;
 
-    private Double minValue;
+    private String minValue;
 
-    private Double maxValue;
+    private String maxValue;
 
     private MaintainType maintainType;
 
-    private Integer numOfMatch;
+    private Long numOfMatch;
 
     private Long frequence;
 
@@ -55,7 +64,11 @@ public class Alarm implements Serializable {
 
     @Getter
     @Setter
-    private Long receivedAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+    private String receivedAt;
+
+    public Alarm() {
+    }
 
     public Alarm(@NotNull(message = "alarmId must be note NULL") Long id) {
         this.id = id;
@@ -66,10 +79,10 @@ public class Alarm implements Serializable {
                  String englishName,
                  String vietnameseName,
                  AlarmType alarmType,
-                 Double minValue,
-                 Double maxValue,
+                 String minValue,
+                 String maxValue,
                  MaintainType maintainType,
-                 Integer numOfMatch,
+                 Long numOfMatch,
                  Long frequence,
                  FrequenceType frequenceType) {
 

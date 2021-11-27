@@ -34,7 +34,7 @@ public interface CatEventMapper extends DomainEntityMapper<CategoricalTsEvent, C
             @Mapping(source = "lat", target = "lat"),
             @Mapping(source = "lon", target = "lon")
     })
-    CategoricalTsByOrg toPort(CategoricalTsEvent eventEntity);
+    CategoricalTsByOrg toPersistence(CategoricalTsEvent eventEntity);
 
     @GetEventDate
     default LocalDate getEventDate(LocalDateTime dateTime){

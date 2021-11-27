@@ -1,25 +1,27 @@
 package com.reeco.common.model.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.reeco.common.framework.EnumNamePattern;
 import com.reeco.common.model.enumtype.ParamType;
-import com.reeco.common.utils.Utils;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.HashMap;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 
+@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Getter
 public class Parameter implements Serializable {
 
     @NotNull(message = "id must be not NULL")
@@ -60,13 +62,12 @@ public class Parameter implements Serializable {
     @Valid
     private List<Alarm> alarms;
 
-    @Getter
-    @Setter
-    private Long receivedAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+    private String receivedAt;
 
-    public Parameter(@NotNull(message = "id must be not NULL") Long id) {
-        this.id = id;
+    public Parameter() {
     }
+
 
     public Parameter(Long id,
                      Long connectionId,

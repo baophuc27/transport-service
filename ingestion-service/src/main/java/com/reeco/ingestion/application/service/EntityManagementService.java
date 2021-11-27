@@ -13,7 +13,6 @@ public class EntityManagementService implements EntityManagementUseCase {
 
     private final IndicatorRepository indicatorRepository;
 
-    private final
     @Override
     public void registerAlarm() {
 

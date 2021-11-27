@@ -8,7 +8,9 @@ import java.util.List;
 public interface AlarmCacheUseCase {
     void loadDataToCache();
 
-    void putDatatoCache(List<AlarmCache> alarmCaches);
+    void putDataToCache(List<AlarmCache> alarmCaches);
+
+    void evictDataFromCache(List<AlarmCache> alarmCaches);
 
     Cache getCache();
 }

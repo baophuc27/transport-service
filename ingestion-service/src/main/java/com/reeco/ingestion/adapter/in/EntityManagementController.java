@@ -15,22 +15,4 @@ import java.io.IOException;
 @Controller
 public class EntityManagementController {
 
-    private ObjectMapper objectMapper;
-
-    @KafkaListener(topics = "reeco_config_event",containerFactory = "configEventListener")
-    public void listen(byte[] header, ConsumerRecord<String, byte[]> message) {
-
-        System.out.println(message);
-        System.out.println(header);
-    }
-
-
-    private <T> T parseObject(byte[] message, Class<T> valueType){
-        try {
-            return objectMapper.readValue(message,valueType);
-        } catch (RuntimeException | IOException e) {
-            log.warn("Error when parsing message object: {}",e.getMessage());
-            return null;
-        }
-    }
 }
