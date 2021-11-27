@@ -30,7 +30,7 @@ import java.util.Map;
 
 @RequestMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin(value = {"*"})
-@RestController
+@RestController()
 @RequiredArgsConstructor
 @Slf4j
 class ConfigEntityController {
@@ -45,7 +45,7 @@ class ConfigEntityController {
 
     private final String TOPIC_NAME = "reeco_config_event";
 
-    @PostMapping("/parameter")
+    @PostMapping("config/parameter")
     private DeferredResult<ResponseEntity<String>> createParams(@RequestBody Parameter parameterDTO) {
 
         log.info("parameter payload: {}", parameterDTO);
@@ -66,7 +66,7 @@ class ConfigEntityController {
         return responseWriter;
     }
 
-    @DeleteMapping("/parameter/{orgId}/{connectionId}/{id}")
+    @DeleteMapping("config/parameter/{orgId}/{connectionId}/{id}")
     private DeferredResult<ResponseEntity<String>> deleteParams(@PathVariable("id") Long id,
                                                                 @PathVariable(value = "connectionId") Long connectionId,
                                                                 @PathVariable(value = "orgId") Long orgId) {
@@ -88,7 +88,7 @@ class ConfigEntityController {
         return responseWriter;
     }
 
-    @PostMapping("/connection/{protocol}")
+    @PostMapping("config/connection/{protocol}")
     private DeferredResult<ResponseEntity<String>> createConnection(
             @PathVariable("protocol") String protocol,
             @RequestBody Map<String, Object> connectionPayload) {
@@ -125,7 +125,7 @@ class ConfigEntityController {
         return responseWriter;
     }
 
-    @DeleteMapping("/connection/{protocol}/{orgId}/{id}")
+    @DeleteMapping("config/connection/{protocol}/{orgId}/{id}")
     private DeferredResult<ResponseEntity<String>> deleteConnection(@PathVariable(value = "id") Long id,
                                                                     @PathVariable(value = "protocol") String protocol,
                                                                     @PathVariable(value = "orgId") Long orgId) {
