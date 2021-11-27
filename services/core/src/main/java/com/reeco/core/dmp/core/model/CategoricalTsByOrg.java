@@ -51,6 +51,15 @@ public class CategoricalTsByOrg {
     @Column("station_id")
     private Long stationId;
 
+    @Column("is_alarm")
+    private Boolean isAlarm;
+
+    @Column("alarm_type")
+    private String alarmType;
+
+    @Column("alarm_id")
+    private Long alarmId;
+
     @Column("connection_id")
     private Long connectionId;
 

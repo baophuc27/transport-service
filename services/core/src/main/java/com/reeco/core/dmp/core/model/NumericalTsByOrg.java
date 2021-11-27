@@ -67,6 +67,15 @@ public class NumericalTsByOrg {
     @Column("received_at")
     private LocalDateTime receivedAt;
 
+    @Column("is_alarm")
+    private Boolean isAlarm;
+
+    @Column("alarm_type")
+    private String alarmType;
+
+    @Column("alarm_id")
+    private Long alarmId;
+
     @Column("lat")
     private Double lat;
 

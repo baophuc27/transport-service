@@ -17,6 +17,10 @@ public class DataPointDto {
 
     private LocalDateTime eventTime;
 
+    private Boolean isAlarm = Boolean.FALSE;
+
+    private String alarmType;
+
 //    private String etime;
 
 //    private Long connectionId;
@@ -37,17 +41,28 @@ public class DataPointDto {
         if (num.getLon()!=null){
             this.lon = num.getLon();
         }
+        if(num.getIsAlarm()!=null){
+            this.isAlarm = num.getIsAlarm();
+        }
+        if(num.getAlarmType()!=null){
+            this.alarmType = num.getAlarmType();
+        }
     }
 
     public DataPointDto(CategoricalTsByOrg categoricalTsByOrg){
         this.value = categoricalTsByOrg.getPartitionKey().getValue();
         this.eventTime = categoricalTsByOrg.getPartitionKey().getEventTime();
-
+        if(categoricalTsByOrg.getIsAlarm()!=null) {
+            this.isAlarm = categoricalTsByOrg.getIsAlarm();
+        }
         if (categoricalTsByOrg.getLat() != null){
             this.lat = categoricalTsByOrg.getLat();
         }
         if (categoricalTsByOrg.getLon()!=null){
             this.lon = categoricalTsByOrg.getLon();
+        }
+        if(categoricalTsByOrg.getAlarmType()!=null){
+            this.alarmType = categoricalTsByOrg.getAlarmType();
         }
     }
 

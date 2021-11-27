@@ -55,40 +55,12 @@ public class IncomingTsEventController {
 
         ObjectMapper mapper = new ObjectMapper();
         IncomingConfigEvent incomingConfigEvent  = mapper.readValue(config, IncomingConfigEvent.class);
-//        try {
-//
-//            JSONObject jsonObject = new JSONObject(config);
-//            JSONObject param = jsonObject.getJSONObject("parameter");
-//            JSONArray alarm = param.getJSONArray("alarms");
-////            List<IncomingAlarm> alarmList = new ArrayList<>();
-////            for (int i =0; i< alarm.length();i++){
-////                alarmList.add(new IncomingAlarm(alarm.getJSONObject(i).getLong("id"),
-////                        alarm.getJSONObject(i).getString("englishName"),
-////                        alarm.getJSONObject(i).getString("vietnameseName"),
-////                        alarm.getJSONObject(i).getString("alarmType"),
-////                        alarm.getJSONObject(i).getString("minValue"),
-////                        alarm.getJSONObject(i).getString("maxValue"),
-////                        alarm.getJSONObject(i).getString("maintainType"),
-////                        alarm.getJSONObject(i).getLong("numOfMatch"),
-////                        alarm.getJSONObject(i).getLong("frequence"),
-////                        alarm.getJSONObject(i).getString("frequenceType")));
-////            }
-////            Parameter parameter = new Parameter(
-////                    param.getLong("id"), param.getLong("indicatorId"), param.getString("englishName"),
-////                    param.getString("parameterType"), alarmList
-////            );
-////            incomingConfigEvent = new IncomingConfigEvent(jsonObject.getLong("orgId"),jsonObject.getLong("connectionId"),
-////                    jsonObject.getString("actionType"), jsonObject.getString("entityType"), parameter);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
         storeConfigUseCase.storeConfig(incomingConfigEvent);
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup() {
         alarmCacheUseCase.loadDataToCache();
-
-        System.out.println("hello world, I have just started up");
+        log.info("Load some data to Cache!");
     }
 }
