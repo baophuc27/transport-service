@@ -5,7 +5,7 @@ services:
 
 # core services
   core-service:
-    build: core-service/configuration
+    build: ../core-service/configuration
     mem_limit: 350m
     ports:
       - "7001:7001"
