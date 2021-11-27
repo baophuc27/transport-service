@@ -6,7 +6,7 @@ services:
   configservice:
     build:
       context: .
-      dockerfile: config-service
+      dockerfile: dockerfile-config-service
       args:
         VERSION: 0.1.0
     restart: always
@@ -15,8 +15,8 @@ services:
 
   ingestionservice:
     build:
-      context: ingestion-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: dockerfile-ingestion-service
       args:
         VERSION: 0.1.0
     restart: always
