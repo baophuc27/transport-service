@@ -4,5 +4,5 @@ public interface DomainEntityMapper<D, E> {
 
     D toDomain(E port);
 
-    E toPort(D domain);
+    E toPersistence(D domain);
 }

@@ -1,15 +1,12 @@
 package com.reeco.ingestion.domain;
 
+import com.reeco.common.model.enumtype.ValueType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
 public class Indicator {
-
-    public enum ValueType{
-        NUMBER, STRING
-    }
 
     Long indicatorId;
     Long groupId;

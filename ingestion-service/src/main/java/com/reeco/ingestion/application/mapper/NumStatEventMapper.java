@@ -35,5 +35,5 @@ public interface NumStatEventMapper extends DomainEntityMapper<NumericalStatEven
             @Mapping(source = "std", target = "std"),
             @Mapping(source = "lastUpdated", target = "lastUpdated")
     })
-    NumericalStatByOrg toPort(NumericalStatEvent eventEntity);
+    NumericalStatByOrg toPersistence(NumericalStatEvent eventEntity);
 }

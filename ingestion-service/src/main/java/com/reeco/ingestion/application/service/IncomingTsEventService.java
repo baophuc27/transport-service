@@ -1,5 +1,6 @@
 package com.reeco.ingestion.application.service;
 
+import com.reeco.common.model.enumtype.ValueType;
 import com.reeco.ingestion.application.port.in.IncomingTsEvent;
 import com.reeco.ingestion.application.port.out.IndicatorRepository;
 import com.reeco.ingestion.application.port.out.InsertEventPort;
@@ -27,7 +28,7 @@ public class IncomingTsEventService implements StoreTsEventUseCase {
                     log.error("No Indicator found with Id [{}]", event.getIndicatorId());
                     return Mono.empty();}))
                 .flatMap(v -> {
-                    if (v.getValueType() == Indicator.ValueType.NUMBER) {
+                    if (v.getValueType() == ValueType.NUMBER) {
                         // TODO : Implement event mapper
                         NumericalTsEvent numTsEvent = new NumericalTsEvent(
                                 event.getOrganizationId(),

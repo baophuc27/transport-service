@@ -34,7 +34,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
 	implementation("com.hazelcast:hazelcast:4.0.1")
 	implementation("com.hazelcast:hazelcast-spring:4.0.1")
-//	compileOnly project(':common')
+	implementation project(':common')
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation('org.springframework.boot:spring-boot-starter-test')

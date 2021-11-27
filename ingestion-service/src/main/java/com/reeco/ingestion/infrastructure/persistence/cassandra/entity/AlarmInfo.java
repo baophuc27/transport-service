@@ -1,6 +1,10 @@
 package com.reeco.ingestion.infrastructure.persistence.cassandra.entity;
 
+import com.reeco.common.model.enumtype.AlarmType;
+import com.reeco.common.model.enumtype.FrequenceType;
+import com.reeco.common.model.enumtype.MaintainType;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
@@ -10,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Table("alarm")
 @AllArgsConstructor
-@Getter
+@Data
 public class AlarmInfo {
     @PrimaryKeyClass
     @AllArgsConstructor
@@ -31,7 +35,8 @@ public class AlarmInfo {
     private AlarmInfo.Key partitionKey;
 
     @Column("alarm_type")
-    private String alarmType;
+    @CassandraType(type = CassandraType.Name.TEXT)
+    private AlarmType alarmType;
 
     @Column("min_value")
     private String minValue;
@@ -43,13 +48,15 @@ public class AlarmInfo {
     private Long numOfMatch;
 
     @Column("maintain_type")
-    private String maintainType;
+    @CassandraType(type = CassandraType.Name.TEXT)
+    private MaintainType maintainType;
 
     @Column("frequence")
-    private Long frequency;
+    private Long frequence;
 
     @Column("frequence_type")
-    private String frequencyType;
+    @CassandraType(type = CassandraType.Name.TEXT)
+    private FrequenceType frequenceType;
 
     @Column("updated_at")
     private LocalDateTime updatedAt;

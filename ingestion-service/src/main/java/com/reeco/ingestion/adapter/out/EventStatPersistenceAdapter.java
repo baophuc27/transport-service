@@ -8,6 +8,7 @@ import com.reeco.ingestion.application.port.out.NumStatRepository;
 import com.reeco.ingestion.domain.NumericalStatEvent;
 import com.reeco.ingestion.domain.OrgAndParam;
 import com.reeco.ingestion.domain.Parameter;
+import com.reeco.ingestion.domain.ParamsByOrg;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.NumericalTsByOrg;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.NumericalStatByOrgRepository;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.NumericalTsByOrgRepository;
@@ -92,14 +93,14 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
     @Override
     public void insert(Timestamp startTime, Timestamp endTime) {
         aggEventByOrgAndParams(startTime, endTime)
-                .map(v-> numStatEventMapper.toPort(v))
+                .map(v-> numStatEventMapper.toPersistence(v))
                 .flatMap(v->numericalStatByOrgRepository.save(v))
                 .subscribe(v->log.info("SAVED: "+v.toString()));
 
     }
 
 
-    public Flux<Parameter.ParamsByOrg> findAllParamsGroupByOrg() {
+    public Flux<ParamsByOrg> findAllParamsGroupByOrg() {
         return paramsByOrgRepository
                 .findAll()
                 .map(v -> parameterMapper.toDomain(v))
@@ -111,7 +112,7 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
                                 .map(list -> {
                                     Map<Long, List<Long>> mapper = new HashMap<>();
                                     mapper.put(group.key(), list);
-                                    return new Parameter.ParamsByOrg(group.key(), list);
+                                    return new ParamsByOrg(group.key(), list);
                                 })
                 );
     }
