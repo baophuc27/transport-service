@@ -35,6 +35,7 @@ public class AlarmCacheService implements AlarmCacheUseCase {
         for (AlarmCache alarmCache: alarmCaches) {
             if(alarmCache != null)
                 cacheManager.getCache("alarm_cache").put(alarmCache.getKey(), alarmCache);
+                log.info("Put Cache: {}", alarmCache);
         }
     }
 
@@ -43,6 +44,7 @@ public class AlarmCacheService implements AlarmCacheUseCase {
         for (AlarmCache alarmCache: alarmCaches) {
             if(alarmCache != null)
                 cacheManager.getCache("alarm_cache").evict(alarmCache.getKey());
+                log.info("Evict Cache: {}", alarmCache);
         }
 
     }

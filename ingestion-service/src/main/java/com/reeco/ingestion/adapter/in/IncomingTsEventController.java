@@ -61,12 +61,11 @@ public class IncomingTsEventController {
         try {
             EntityType entityType = EntityType.valueOf(new String(header.get("entityType"), StandardCharsets.UTF_8));
             ActionType actionType = ActionType.valueOf(new String(header.get("actionType"), StandardCharsets.UTF_8));
-            log.info("entityType: {}", entityType);
-            log.info("actionType: {}", actionType);
+            log.info("Received entityType: {}, actionType: {}", entityType, actionType);
             switch (entityType) {
                 case PARAM:
                     Parameter parameter  = objectMapper.readValue(config, Parameter.class);
-                    log.info("PARAMETER: {}", parameter.toString());
+                    log.info("Received Param Config: {}", parameter.toString());
                     switch (actionType) {
                         case DELETE: storeConfigUseCase.deleteParameter(parameter); break;
                         case UPSERT: storeConfigUseCase.storeParameter(parameter); break;
