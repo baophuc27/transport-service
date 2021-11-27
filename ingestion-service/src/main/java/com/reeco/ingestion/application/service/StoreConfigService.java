@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,8 +51,10 @@ public class StoreConfigService implements StoreConfigUseCase{
     @Override
     public void storeParameter(Parameter parameter){
         ParamsByOrg.Key paramsByOrgKey = new ParamsByOrg.Key(parameter.getOrganizationId(),parameter.getId());
+
         ParamsByOrg paramsByOrg = new ParamsByOrg(paramsByOrgKey, parameter.getIndicatorId(),
                 parameter.getEnglishName(),100L,parameter.getConnectionId(),parameter.getUnit());
+
         List<AlarmInfo> alarmInfoList = new ArrayList<>();
         List<AlarmCache> alarmCaches = new ArrayList<>();
 
@@ -62,27 +65,33 @@ public class StoreConfigService implements StoreConfigUseCase{
             alarmCaches.add(new AlarmCache(alarm, parameter.getOrganizationId(),parameter.getId()));
         }
 
-        alarmInfoRepository.saveAll(alarmInfoList).subscribe(log::info);
+        alarmInfoRepository.saveAll(alarmInfoList).subscribe(v -> log.info("Saved alarms: {}", v));
         alarmCacheUseCase.putDataToCache(alarmCaches);
-        paramsByOrgRepository.save(paramsByOrg).subscribe(log::info);
-
-        Cache cache = alarmCacheUseCase.getCache();
-
+        paramsByOrgRepository.save(paramsByOrg).subscribe(v -> log.info("Saved param: {}", v));
     }
 
     @Override
     public void deleteParameter(Parameter parameter) {
         ParamsByOrg.Key paramsByOrgKey = new ParamsByOrg.Key(parameter.getOrganizationId(),parameter.getId());
         List<AlarmInfo> alarmInfo =  alarmInfoRepository
-                .findByOrgAndParam(parameter.getOrganizationId(), parameter.getId()).collectList().block();
+                .findByOrgAndParam(parameter.getOrganizationId(), parameter.getId())
+                .switchIfEmpty(Mono.defer(() -> {
+                    log.warn("Alarm not found with: {}", parameter.toString());
+                    return Mono.empty();}))
+                .collectList().block();
 
-        List<AlarmCache> alarmCaches = alarmInfo.stream().map(v->new AlarmCache(alarmMapper.toDomain(v),
-                v.getPartitionKey().getOrganizationId(),
-                v.getPartitionKey().getParamId())).collect(Collectors.toList());
+        if (alarmInfo != null) {
+            if (alarmInfo.size() > 0) {
+                List<AlarmCache> alarmCaches = alarmInfo.stream().map(v -> new AlarmCache(alarmMapper.toDomain(v),
+                        v.getPartitionKey().getOrganizationId(),
+                        v.getPartitionKey().getParamId())).collect(Collectors.toList());
 
-        alarmInfoRepository.deleteAll(alarmInfo).subscribe();
-        alarmCacheUseCase.evictDataFromCache(alarmCaches);
-        paramsByOrgRepository.deleteById(paramsByOrgKey).subscribe();
-
+                alarmInfoRepository.deleteAll(alarmInfo).subscribe();
+                log.info("Deleted alarms: {}", alarmInfo.toString());
+                alarmCacheUseCase.evictDataFromCache(alarmCaches);
+                paramsByOrgRepository.deleteById(paramsByOrgKey).subscribe();
+                log.info("Deleted param: {}", paramsByOrgKey.toString());
+            }
+        }
     }
 }

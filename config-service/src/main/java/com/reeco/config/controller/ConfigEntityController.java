@@ -46,17 +46,17 @@ class ConfigEntityController {
     private final String TOPIC_NAME = "reeco_config_event";
 
     @PostMapping("config/parameter")
-    private DeferredResult<ResponseEntity<String>> createParams(@RequestBody Parameter parameterDTO) {
+    private DeferredResult<ResponseEntity<String>> createParams(@RequestBody Parameter parameter) {
 
-        log.info("parameter payload: {}", parameterDTO);
+        log.info("parameter payload: {}", parameter);
         ReecoRequestParamValidator<Parameter> validator = new ReecoRequestParamValidator<>();
-        DeferredResult<ResponseEntity<String>> responseWriter = validator.getResponseMessage(parameterDTO);
+        DeferredResult<ResponseEntity<String>> responseWriter = validator.getResponseMessage(parameter);
         if (responseWriter.getResult() != null) {
             return responseWriter;
         }
         LocalDateTime currentTimestamp = LocalDateTime.now();
-        parameterDTO.setReceivedAt(currentTimestamp.format(formatter));
-        ProducerRecord<String, byte[]> msg = new ProducerRecord<>(TOPIC_NAME, parameterDTO.getOrganizationId().toString(), Utils.getBytes(parameterDTO));
+        parameter.setReceivedAt(currentTimestamp.format(formatter));
+        ProducerRecord<String, byte[]> msg = new ProducerRecord<>(TOPIC_NAME, parameter.getOrganizationId().toString(), Utils.getBytes(parameter));
         msg.headers()
                 .add("actionType", ActionType.UPSERT.name().getBytes())
                 .add("entityType", EntityType.PARAM.name().getBytes());

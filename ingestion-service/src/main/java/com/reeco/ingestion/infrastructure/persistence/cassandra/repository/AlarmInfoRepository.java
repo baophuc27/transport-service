@@ -9,9 +9,9 @@ import reactor.core.publisher.Mono;
 
 public interface AlarmInfoRepository extends ReactiveCassandraRepository<AlarmInfo, AlarmInfo.Key> {
 
-    @Query("SELECT * FROM alarm WHERE organization_id = ?0 AND paramId = ?1")
+    @Query("SELECT * FROM alarm WHERE organization_id = ?0 AND param_id = ?1")
     Flux<AlarmInfo> findByOrgAndParam(Long orgId, Long paramId);
 
-    @Query("DELETE FROM alarm WHERE organization_id = ?0 AND paramId = ?1")
+    @Query("DELETE FROM alarm WHERE organization_id = ?0 AND para_id = ?1")
     Mono<Void> deleteByOrgAndParam(Long orgId, Long paramId);
 }

@@ -22,18 +22,20 @@ public class AlarmCacheService implements AlarmCacheUseCase {
     AlarmInfoRepository alarmInfoRepository;
 
     public void loadDataToCache(){
-        Flux<AlarmInfo> alarmInfoFlux = alarmInfoRepository.findAll();
-        List<AlarmInfo> alarmInfoList = alarmInfoFlux.collectList().block();
-        for (AlarmInfo alarmInfo: alarmInfoList){
-            AlarmCache alarmCache = new AlarmCache(alarmInfo);
-            cacheManager.getCache("alarm_cache").put(alarmCache.getKey(),alarmCache);
-        }
+        alarmInfoRepository
+                .findAll()
+                .map(v->{
+                    AlarmCache alarmCache = new AlarmCache(v);
+                    cacheManager.getCache("alarm_cache").put(alarmCache.getKey(),alarmCache);
+                    return alarmCache;
+                }).subscribe(v->log.info("Stored Alarm into cache: {}", v));
     }
 
     public void putDataToCache(List<AlarmCache> alarmCaches){
         for (AlarmCache alarmCache: alarmCaches) {
             if(alarmCache != null)
                 cacheManager.getCache("alarm_cache").put(alarmCache.getKey(), alarmCache);
+                log.info("Put Cache: {}", alarmCache);
         }
     }
 
@@ -42,12 +44,15 @@ public class AlarmCacheService implements AlarmCacheUseCase {
         for (AlarmCache alarmCache: alarmCaches) {
             if(alarmCache != null)
                 cacheManager.getCache("alarm_cache").evict(alarmCache.getKey());
+                log.info("Evict Cache: {}", alarmCache);
         }
+
     }
 
     public Cache getCache(){
         return cacheManager.getCache("alarm_cache");
     }
+
 
 //    @Autowired
 //    AlarmInfoRepository alarmInfoRepository;

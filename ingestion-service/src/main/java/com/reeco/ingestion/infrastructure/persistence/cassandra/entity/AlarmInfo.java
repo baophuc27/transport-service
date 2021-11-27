@@ -6,6 +6,7 @@ import com.reeco.common.model.enumtype.MaintainType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
 
@@ -19,6 +20,7 @@ public class AlarmInfo {
     @PrimaryKeyClass
     @AllArgsConstructor
     @Getter
+    @ToString
     public static class Key implements Serializable {
 
         @PrimaryKeyColumn(name = "organization_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
