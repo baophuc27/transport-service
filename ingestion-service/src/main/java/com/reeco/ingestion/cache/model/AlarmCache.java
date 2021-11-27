@@ -5,11 +5,7 @@ import com.reeco.common.model.enumtype.AlarmType;
 import com.reeco.common.model.enumtype.FrequenceType;
 import com.reeco.common.model.enumtype.MaintainType;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.AlarmInfo;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 
 
 //@Entity
@@ -17,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class AlarmCache {
     private String key;
 

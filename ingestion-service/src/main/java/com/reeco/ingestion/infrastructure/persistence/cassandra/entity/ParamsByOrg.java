@@ -3,6 +3,7 @@ package com.reeco.ingestion.infrastructure.persistence.cassandra.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
 
@@ -11,11 +12,13 @@ import java.io.Serializable;
 @Table("params_by_organization")
 @AllArgsConstructor
 @Getter
+@ToString
 public class ParamsByOrg {
 
     @PrimaryKeyClass
     @AllArgsConstructor
     @Data
+    @ToString
     public static class Key implements Serializable {
 
         @PrimaryKeyColumn(name = "organization_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)

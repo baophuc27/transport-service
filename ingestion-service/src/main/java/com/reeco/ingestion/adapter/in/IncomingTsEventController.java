@@ -62,17 +62,18 @@ public class IncomingTsEventController {
             EntityType entityType = EntityType.valueOf(new String(header.get("entityType"), StandardCharsets.UTF_8));
             ActionType actionType = ActionType.valueOf(new String(header.get("actionType"), StandardCharsets.UTF_8));
             log.info("entityType: {}", entityType);
+            log.info("actionType: {}", actionType);
             switch (entityType) {
                 case PARAM:
                     Parameter parameter  = objectMapper.readValue(config, Parameter.class);
                     log.info("PARAMETER: {}", parameter.toString());
                     switch (actionType) {
-                        case DELETE: storeConfigUseCase.deleteParameter(parameter);
-                        case UPSERT: storeConfigUseCase.storeParameter(parameter);
+                        case DELETE: storeConfigUseCase.deleteParameter(parameter); break;
+                        case UPSERT: storeConfigUseCase.storeParameter(parameter); break;
+                        default: break;
                     }
                 case CONNECTION:
-                    break;
-
+                default: break;
             }
         }
         catch (Exception ex){
@@ -83,7 +84,6 @@ public class IncomingTsEventController {
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup() {
         alarmCacheUseCase.loadDataToCache();
-
         System.out.println("hello world, I have just started up");
     }
 }
