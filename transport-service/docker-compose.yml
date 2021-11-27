@@ -1,0 +1,25 @@
+version: '3.0'
+
+services:
+  transport:
+    build: ""
+    image: arihub/transport-service
+    mem_limit: 500m
+    environment:
+      - KAFKA_BOOTSTRAP_SERVER=103.88.122.104:29092
+    ports:
+      - "8080:8080"
+
+    volumes:
+      - $PWD/file:$PWD/file
+
+
+  pure-ftpd:
+    image: crazymax/pure-ftpd
+    container_name: pureftpd
+    networks:
+      - pureftpd
+    ports:
+      - "2100:2100"
+      - "30000-30009:30000-30009"
+    volumes:
