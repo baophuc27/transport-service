@@ -98,13 +98,15 @@ public class RuleEngineService implements RuleEngineUseCase {
                     break;
                 case FIRST_TIME: {
                     if (isOutOfMatch) {
-                        // send alarm message to kafka topic
+                        // TODO: send alarm message to kafka topic
                         break;
                     }
                 }
                 case MAINTAIN: {
                     if (isOutOfTimeRange(alarm, alarmRuleCache, event) && isOutOfMatch) {
-                        // send alarm message to kafka topic
+                        // update Last Matched Time
+                        alarmRuleCache.setLastMatchedTime(event.getEventTime());
+                        // TODO: send alarm message to kafka topic
                         break;
                     }
                 }
