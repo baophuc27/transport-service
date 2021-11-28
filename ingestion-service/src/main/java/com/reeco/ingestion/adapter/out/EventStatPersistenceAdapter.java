@@ -1,13 +1,13 @@
 package com.reeco.ingestion.adapter.out;
 
 import com.datastax.oss.driver.shaded.guava.common.math.StatsAccumulator;
+import com.reeco.common.model.dto.Parameter;
 import com.reeco.ingestion.application.mapper.NumStatEventMapper;
 import com.reeco.ingestion.application.mapper.NumericEventMapper;
 import com.reeco.ingestion.application.mapper.ParameterMapper;
 import com.reeco.ingestion.application.port.out.NumStatRepository;
 import com.reeco.ingestion.domain.NumericalStatEvent;
 import com.reeco.ingestion.domain.OrgAndParam;
-import com.reeco.ingestion.domain.Parameter;
 import com.reeco.ingestion.domain.ParamsByOrg;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.NumericalTsByOrg;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.NumericalStatByOrgRepository;
@@ -53,7 +53,7 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
                 .log()
                 .flatMap(v -> numericalTsByOrgRepository.finAllEventByOrg(
                             v.getOrganizationId(),
-                            v.getParamId(),
+                            v.getId(),
                             startTime,
                             endTime)
                         .groupBy(e->new OrgAndParam(e.getPartitionKey().getOrganizationId(),
@@ -107,7 +107,7 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
                 .groupBy(Parameter::getOrganizationId)
                 .flatMap(
                         group -> group
-                                .map(Parameter::getParamId)
+                                .map(Parameter::getId)
                                 .collectList()
                                 .map(list -> {
                                     Map<Long, List<Long>> mapper = new HashMap<>();

@@ -3,10 +3,7 @@ package com.reeco.ingestion.infrastructure.persistence.cassandra.entity;
 import com.reeco.common.model.enumtype.AlarmType;
 import com.reeco.common.model.enumtype.FrequenceType;
 import com.reeco.common.model.enumtype.MaintainType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
 
@@ -17,10 +14,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 public class AlarmInfo {
+
     @PrimaryKeyClass
     @AllArgsConstructor
-    @Getter
     @ToString
+    @Data
     public static class Key implements Serializable {
 
         @PrimaryKeyColumn(name = "organization_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
@@ -62,5 +60,8 @@ public class AlarmInfo {
 
     @Column("updated_at")
     private LocalDateTime updatedAt;
+
+    @Column("indicator_id")
+    private Long indicatorId;
 
 }

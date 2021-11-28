@@ -1,10 +1,10 @@
 package com.reeco.ingestion.application.usecase;
 
-
-import com.reeco.ingestion.application.port.in.IncomingTsEvent;
+import com.reeco.ingestion.application.port.in.RuleEngineEvent;
+import com.reeco.ingestion.domain.Indicator;
 
 public interface StoreTsEventUseCase {
 
-    void storeEvent(IncomingTsEvent event);
+    void storeEvent(RuleEngineEvent event, Indicator indicator);
 
 }

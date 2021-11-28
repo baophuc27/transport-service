@@ -4,7 +4,10 @@ import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.Numerical
 import com.reeco.ingestion.domain.NumericalStatEvent;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {}, unmappedTargetPolicy = ReportingPolicy.WARN,unmappedSourcePolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring",
+        uses = {},
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface NumStatEventMapper extends DomainEntityMapper<NumericalStatEvent, NumericalStatByOrg> {
     @Mappings({
             @Mapping(source = "partitionKey.organizationId", target = "organizationId"),
