@@ -1,5 +1,6 @@
 package com.reeco.ingestion.domain;
 
+import com.reeco.common.model.enumtype.AlarmType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,18 +12,8 @@ public class CategoricalTsEvent extends BaseEvent {
     @Setter
     String value;
 
-    public CategoricalTsEvent(Long organizationId,
-                              Long stationId,
-                              Long paramId,
-                              LocalDateTime eventTime,
-                              String indicatorName,
-                              String paramName,
-                              Long connectionId,
-                              LocalDateTime receivedAt,
-                              Double lat,
-                              Double lon,
-                              String value) {
-        super(organizationId, stationId, paramId, eventTime, indicatorName, paramName, connectionId, receivedAt, lat, lon);
+    public CategoricalTsEvent(Long organizationId, Long connectionId, Long stationId, Long paramId, LocalDateTime eventTime, Long indicatorId, String indicatorName, String paramName, LocalDateTime receivedAt, LocalDateTime sentAt, Double lat, Double lon, Boolean isAlarm, Long alarmId, AlarmType alarmType, String minValue, String maxValue, String value) {
+        super(organizationId, connectionId, stationId, paramId, eventTime, indicatorId, indicatorName, paramName, receivedAt, sentAt, lat, lon, isAlarm, alarmId, alarmType, minValue, maxValue);
         this.value = value;
     }
 }

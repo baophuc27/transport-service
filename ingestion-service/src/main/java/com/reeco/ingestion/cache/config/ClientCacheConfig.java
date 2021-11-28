@@ -15,14 +15,30 @@ public class ClientCacheConfig {
     @Bean
     ClientConfig config() {
         ClientConfig clientConfig = new ClientConfig();
-        clientConfig.addNearCacheConfig(nearCacheConfig());
+        clientConfig.addNearCacheConfig(alarmNearCacheConfig());
+        clientConfig.addNearCacheConfig(indicatorNearCacheConfig());
+        clientConfig.addNearCacheConfig(alarmRuleNearCacheConfig());
         return clientConfig;
     }
 
-    private NearCacheConfig nearCacheConfig() {
+    private NearCacheConfig alarmNearCacheConfig() {
         NearCacheConfig nearCacheConfig = new NearCacheConfig();
-        nearCacheConfig.setName("alarm_cache");
+        nearCacheConfig.setName("alarm_info_cache");
         nearCacheConfig.setTimeToLiveSeconds(300);
         return nearCacheConfig;
     }
+
+    private NearCacheConfig indicatorNearCacheConfig() {
+        NearCacheConfig nearCacheConfig = new NearCacheConfig();
+        nearCacheConfig.setName("indicator_cache");
+        nearCacheConfig.setTimeToLiveSeconds(300);
+        return nearCacheConfig;
+    }
+
+    private NearCacheConfig alarmRuleNearCacheConfig() {
+        NearCacheConfig nearCacheConfig = new NearCacheConfig();
+        nearCacheConfig.setName("alarm_rule_cache");
+        return nearCacheConfig;
+    }
+
 }

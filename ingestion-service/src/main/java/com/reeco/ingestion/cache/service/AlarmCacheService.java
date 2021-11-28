@@ -1,14 +1,15 @@
 package com.reeco.ingestion.cache.service;
 
-import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.AlarmInfo;
-import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.AlarmInfoRepository;
+import com.reeco.common.model.dto.Alarm;
+import com.reeco.ingestion.application.mapper.AlarmMapper;
 import com.reeco.ingestion.cache.model.AlarmCache;
+import com.reeco.ingestion.domain.ParamAndAlarm;
+import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.AlarmInfoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -16,41 +17,69 @@ import java.util.List;
 @Log4j2
 public class AlarmCacheService implements AlarmCacheUseCase {
 
-    final CacheManager cacheManager;
+    @Autowired
+    CacheManager cacheManager;
 
     @Autowired
     AlarmInfoRepository alarmInfoRepository;
 
+    @Autowired
+    AlarmMapper alarmMapper;
+
+    private final String ALARM_CACHE = "alarm_cache";
+
     public void loadDataToCache(){
         alarmInfoRepository
                 .findAll()
+                .map(v->alarmMapper.toDomain(v))
+                .groupBy(Alarm::getParamId)
+                .flatMap(
+                        gr->gr.collectList()
+                                .map(v->new ParamAndAlarm(gr.key(),v))
+                )
                 .map(v->{
-                    AlarmCache alarmCache = new AlarmCache(v);
-                    cacheManager.getCache("alarm_cache").put(alarmCache.getKey(),alarmCache);
-                    return alarmCache;
-                }).subscribe(v->log.info("Stored Alarm into cache: {}", v));
+                    put(v);
+                    return v;
+                }).subscribe(v->log.info("Stored Alarms into cache: {}", v));
     }
 
-    public void putDataToCache(List<AlarmCache> alarmCaches){
-        for (AlarmCache alarmCache: alarmCaches) {
-            if(alarmCache != null)
-                cacheManager.getCache("alarm_cache").put(alarmCache.getKey(), alarmCache);
-                log.info("Put Cache: {}", alarmCache);
+    public void put(ParamAndAlarm paramAndAlarm) {
+        if (paramAndAlarm != null) {
+            // key: paramId in string type, value: list of alarms
+           getCache().put(paramAndAlarm.getParamId().toString(), paramAndAlarm);
+            log.info("Put Cache: {}", paramAndAlarm);
         }
     }
 
-    @Override
-    public void evictDataFromCache(List<AlarmCache> alarmCaches) {
+    public void put(List<AlarmCache> alarmCaches){
         for (AlarmCache alarmCache: alarmCaches) {
             if(alarmCache != null)
-                cacheManager.getCache("alarm_cache").evict(alarmCache.getKey());
+                getCache().put(alarmCache.getKey(), alarmCache);
+                log.info("Put {} to {}", alarmCache, ALARM_CACHE);
+        }
+    }
+
+    public ParamAndAlarm get(String key){
+        return getCache().get(key, ParamAndAlarm.class);
+    }
+
+    @Override
+    public void evict(String key) {
+        getCache().evict(key);
+    }
+
+    @Override
+    public void evict(List<AlarmCache> alarmCaches) {
+        for (AlarmCache alarmCache: alarmCaches) {
+            if(alarmCache != null)
+                getCache().evict(alarmCache.getKey());
                 log.info("Evict Cache: {}", alarmCache);
         }
 
     }
 
     public Cache getCache(){
-        return cacheManager.getCache("alarm_cache");
+        return cacheManager.getCache(ALARM_CACHE);
     }
 
 

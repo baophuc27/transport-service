@@ -2,13 +2,20 @@ package com.reeco.ingestion.adapter.in;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.reeco.common.model.dto.Alarm;
 import com.reeco.common.model.dto.Parameter;
 import com.reeco.common.model.enumtype.ActionType;
 import com.reeco.common.model.enumtype.EntityType;
 import com.reeco.ingestion.application.port.in.IncomingTsEvent;
+import com.reeco.ingestion.application.port.in.RuleEngineEvent;
+import com.reeco.ingestion.application.usecase.RuleEngineUseCase;
 import com.reeco.ingestion.application.usecase.StoreConfigUseCase;
 import com.reeco.ingestion.application.usecase.StoreTsEventUseCase;
 import com.reeco.ingestion.cache.service.AlarmCacheUseCase;
+import com.reeco.ingestion.cache.service.IndicatorCacheUseCase;
+import com.reeco.ingestion.cache.service.RuleEngineCacheUseCase;
+import com.reeco.ingestion.domain.Indicator;
+import com.reeco.ingestion.domain.ParamAndAlarm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -34,6 +41,12 @@ public class IncomingTsEventController {
 
     private final AlarmCacheUseCase alarmCacheUseCase;
 
+    private final IndicatorCacheUseCase indicatorCacheUseCase;
+
+    private final RuleEngineUseCase ruleEngineUseCase;
+
+    private final RuleEngineCacheUseCase ruleEngineCacheUseCase;
+
     private static ObjectMapper objectMapper;
 
 
@@ -52,8 +65,19 @@ public class IncomingTsEventController {
     }
 
     @KafkaListener(topics = "reeco_time_series_event",containerFactory = "timeSeriesEventListener")
-    public void listen(@Headers Map<String,byte[]> header, @Payload IncomingTsEvent message){
-        storeTsEventUseCase.storeEvent(message);
+    public void listen(@Headers Map<String,byte[]> header, @Payload IncomingTsEvent event){
+        Indicator indicator = indicatorCacheUseCase.get(event.getIndicatorId().toString());
+        if (indicator != null) {
+            ParamAndAlarm paramAndAlarm = alarmCacheUseCase.get(event.getParamId().toString());
+            RuleEngineEvent ruleEngineEvent = null;
+            for (Alarm alarm : paramAndAlarm.getAlarms()) {
+                ruleEngineEvent = ruleEngineUseCase.handleRuleEvent(alarm, event, indicator);
+                if (ruleEngineEvent.getIsAlarm()) break;
+            }
+            storeTsEventUseCase.storeEvent(ruleEngineEvent, indicator);
+        }
+        else log.warn("Indicator Not Found with Id: [{}]", event.getIndicatorId());
+
     }
 
     @KafkaListener(topics = "reeco_config_event", containerFactory = "configEventListener")
@@ -83,6 +107,10 @@ public class IncomingTsEventController {
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup() {
         alarmCacheUseCase.loadDataToCache();
-        System.out.println("hello world, I have just started up");
+        log.info("Load Alarm to cache manager when start up");
+        indicatorCacheUseCase.loadDataToCache();
+        log.info("Load Indicator to cache manager when start up");
+        ruleEngineCacheUseCase.loadDataToCache();
+        log.info("Load Rule Engine to cache manager when start up");
     }
 }

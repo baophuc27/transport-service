@@ -35,7 +35,7 @@ public class TsEventPersistenceAdapter implements InsertEventPort {
     @Override
     public Mono<NumericalTsEvent> insertNumericEvent(NumericalTsEvent event) {
         return numericalTsByOrgRepository
-                .save(numericEventMapper.toPort(event))
+                .save(numericEventMapper.toPersistence(event))
                 .map(v ->numericEventMapper.toDomain(v));
     }
 

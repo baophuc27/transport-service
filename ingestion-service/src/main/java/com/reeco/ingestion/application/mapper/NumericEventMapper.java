@@ -7,7 +7,9 @@ import org.mapstruct.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Mapper(componentModel = "spring", uses = {}, unmappedTargetPolicy = ReportingPolicy.WARN,unmappedSourcePolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", uses = {},
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface NumericEventMapper {
 
     @Mappings({
@@ -35,7 +37,8 @@ public interface NumericEventMapper {
             @Mapping(source = "lat", target = "lat"),
             @Mapping(source = "lon", target = "lon")
     })
-    NumericalTsByOrg toPort(NumericalTsEvent eventEntity);
+    NumericalTsByOrg toPersistence(NumericalTsEvent eventEntity);
+
 
     @GetEventDate
     default LocalDate getEventDate(LocalDateTime dateTime){

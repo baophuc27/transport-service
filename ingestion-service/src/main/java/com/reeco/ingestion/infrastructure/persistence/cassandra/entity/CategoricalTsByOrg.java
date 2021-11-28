@@ -1,6 +1,7 @@
 package com.reeco.ingestion.infrastructure.persistence.cassandra.entity;
 
 
+import com.reeco.common.model.enumtype.AlarmType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.cassandra.core.cql.Ordering;
@@ -8,6 +9,7 @@ import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Table("categorical_series_by_organization")
@@ -31,25 +33,30 @@ public class CategoricalTsByOrg {
         @PrimaryKeyColumn(name = "value", ordinal = 3, type = PrimaryKeyType.CLUSTERED)
         private String value;
 
-
     }
     @PrimaryKey
     private CategoricalTsByOrg.Key partitionKey;
 
+    @Column("indicator_id")
+    Long indicatorId;
+
     @Column("indicator_name")
     private String indicatorName;
 
-    @Column("date")
-    private String date;
-
     @Column("param_name")
     private String paramName;
+
+    @Column("date")
+    private LocalDate date;
 
     @Column("station_id")
     private Long stationId;
 
     @Column("connection_id")
     private Long connectionId;
+
+    @Column("value")
+    private String value;
 
     @Column("received_at")
     private LocalDateTime receivedAt;
@@ -59,5 +66,24 @@ public class CategoricalTsByOrg {
 
     @Column("lon")
     private Double lon;
+
+    @Column("sent_at")
+    LocalDateTime sentAt;
+
+    @Column("is_alarm")
+    Boolean isAlarm;
+
+    @Column("alarm_id")
+    Long alarmId;
+
+    @CassandraType(type = CassandraType.Name.TEXT)
+    @Column("alarm_type")
+    AlarmType alarmType;
+
+    @Column("min_value")
+    String minValue;
+
+    @Column("max_value")
+    String maxValue;
 
 }

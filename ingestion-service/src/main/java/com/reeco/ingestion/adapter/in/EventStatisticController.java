@@ -4,6 +4,8 @@ import com.reeco.ingestion.application.port.in.IncomingTsEvent;
 import com.reeco.ingestion.application.usecase.StatisticEventUseCase;
 import com.reeco.ingestion.cache.model.AlarmCache;
 import com.reeco.ingestion.cache.service.AlarmCacheUseCase;
+import com.reeco.ingestion.cache.service.IndicatorCacheUseCase;
+import com.reeco.ingestion.domain.Indicator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Random;
 
 @Slf4j
@@ -32,11 +35,15 @@ public class EventStatisticController {
     @Autowired
     private final StatisticEventUseCase updateStatEventUseCase;
 
+    @Autowired
     private final AlarmCacheUseCase alarmCacheUseCase;
+
+    @Autowired
+    private final IndicatorCacheUseCase indicatorCacheUseCase;
 
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    @Scheduled(fixedRate = 300000)
+    @Scheduled(fixedRate = 10000)
     public void aggStatisticEvent() {
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.MIN;
@@ -46,7 +53,6 @@ public class EventStatisticController {
         Timestamp timestampStart = Timestamp.valueOf(startTime);
         log.info("Start aggregation job with time range from {} to {}", startTime.toString(), endTime.toString());
         updateStatEventUseCase.updateNumStatEvent(timestampStart, timestampEnd);
-        log.info("CACHE: {}", alarmCacheUseCase.getCache().get("3-27-4", AlarmCache.class));
     }
 
 //    @Scheduled(fixedRate = 60000)

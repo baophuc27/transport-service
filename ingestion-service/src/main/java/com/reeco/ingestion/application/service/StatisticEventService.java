@@ -5,21 +5,17 @@ import com.reeco.ingestion.utils.annotators.UseCase;
 import com.reeco.ingestion.application.port.out.NumStatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Timestamp;
 
-@UseCase
 @RequiredArgsConstructor
 @Log4j2
 public class StatisticEventService implements StatisticEventUseCase {
 
-    private final NumStatRepository numStatRepository;
-//
-//    private final ParameterRepository parameterRepository;
+    @Autowired
+    private NumStatRepository numStatRepository;
 
-//    private final AggregateEventsPort aggregateEventPort;
-//
-//    private final LoadOrgAndParamPort loadOrgAndParamPort;
 
     @Override
     public void updateNumStatEvent(Timestamp startTime, Timestamp endTime) {
