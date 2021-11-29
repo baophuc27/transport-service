@@ -50,7 +50,7 @@ public class RuleEngineService implements RuleEngineUseCase {
                                      AlarmRuleCache alarmRuleCache,
                                      IncomingTsEvent event) {
         long minutes = ChronoUnit.MINUTES.between(event.getEventTime(), alarmRuleCache.getLastMatchedTime());
-        return minutes >= alarm.getFrequence();
+        return minutes >= (alarm.getFrequence()*alarm.getFrequenceType().getValueFromEnum());
     }
 
     private boolean isInSquareRange(Alarm alarm, IncomingTsEvent event) {
@@ -103,7 +103,7 @@ public class RuleEngineService implements RuleEngineUseCase {
                     }
                 }
                 case MAINTAIN: {
-                    if (isOutOfTimeRange(alarm, alarmRuleCache, event) && isOutOfMatch) {
+                    if (isOutOfMatch && isOutOfTimeRange(alarm, alarmRuleCache, event)  ) {
                         // update Last Matched Time
                         alarmRuleCache.setLastMatchedTime(event.getEventTime());
                         // TODO: send alarm message to kafka topic
@@ -114,6 +114,7 @@ public class RuleEngineService implements RuleEngineUseCase {
 
         } else {
             alarmRuleCache.setMatchedCount(0L);
+            alarmRuleCache.setLastMatchedTime(null);
         }
         ruleEngineCacheUseCase.put(alarmRuleCache);
         return new RuleEngineEvent(

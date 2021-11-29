@@ -69,3 +69,6 @@ fabric.properties
 !/.idea/
 
 /.idea/
+/services/config-service
+/services/core
+/services/ingestion-service

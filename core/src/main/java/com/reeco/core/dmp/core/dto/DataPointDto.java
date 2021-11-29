@@ -1,16 +1,20 @@
 package com.reeco.core.dmp.core.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.reeco.core.dmp.core.model.CategoricalStatByOrg;
 import com.reeco.core.dmp.core.model.CategoricalTsByOrg;
 import com.reeco.core.dmp.core.model.NumericalStatByOrg;
 import com.reeco.core.dmp.core.model.NumericalTsByOrg;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
+//@AllArgsConstructor
+//@Getter
+//@Setter
+
 public class DataPointDto {
     private String value;
 
@@ -19,6 +23,16 @@ public class DataPointDto {
     private Boolean isAlarm = Boolean.FALSE;
 
     private String alarmType;
+
+    private Long count;
+
+    private String max;
+
+    private String min;
+
+    private String mean;
+
+    private String median;
 
 //    private String etime;
 
@@ -67,11 +81,16 @@ public class DataPointDto {
 
     public  DataPointDto(NumericalStatByOrg numericalStatByOrg){
         this.value = numericalStatByOrg.getMean().toString();
+        this.max = numericalStatByOrg.getMax().toString();
+        this.min = numericalStatByOrg.getMin().toString();
+        this.median = numericalStatByOrg.getMedian().toString();
+        this.mean = numericalStatByOrg.getMean().toString();
         this.eventTime = numericalStatByOrg.getPartitionKey().getDate().atStartOfDay();
     }
 
     public  DataPointDto(CategoricalStatByOrg categoricalStatByOrg){
         this.value = categoricalStatByOrg.getPartitionKey().getValue();
+        this.count = categoricalStatByOrg.getValueCount();
         this.eventTime = categoricalStatByOrg.getPartitionKey().getDate().atStartOfDay();
     }
 }

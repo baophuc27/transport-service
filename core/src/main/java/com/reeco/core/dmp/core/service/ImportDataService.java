@@ -110,7 +110,7 @@ public class ImportDataService {
                                 NumericalTsByOrg numericalTsByOrg = new NumericalTsByOrg(
                                         nkey, parameterDtos.get(i-1).getIndicatorName(),parameterDtos.get(i-1).getParameterName(),
                                         date,parameterDtos.get(i-1).getStationId(), parameterDtos.get(i-1).getConnectionId(),
-                                        Double.parseDouble(listLine[i]), event_time, lat, lon
+                                        Double.parseDouble(listLine[i]), event_time,false, null, null, lat, lon
                                 );
     //                    numericalTsByOrgRepository.save(numericalTsByOrg);
     //                    break;
@@ -130,7 +130,7 @@ public class ImportDataService {
     //
                                 CategoricalTsByOrg categoricalTsByOrg = new CategoricalTsByOrg(
                                         nkey,  parameterDtos.get(i-1).getIndicatorName(), parameterDtos.get(i-1).getParameterName(),
-                                        date,parameterDtos.get(i-1).getStationId(), parameterDtos.get(i-1).getConnectionId(), event_time, lat, lon
+                                        date,parameterDtos.get(i-1).getStationId(),false, null, null, parameterDtos.get(i-1).getConnectionId(), event_time, lat, lon
                                 );
     //                    numericalTsByOrgRepository.save(numericalTsByOrg);
     //                    break;
