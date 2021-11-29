@@ -24,6 +24,8 @@ public class DataPointDto {
 
     private String alarmType;
 
+    private Long alarmId;
+
     private Long count;
 
     private String max;
@@ -33,6 +35,8 @@ public class DataPointDto {
     private String mean;
 
     private String median;
+
+
 
 //    private String etime;
 
@@ -60,6 +64,9 @@ public class DataPointDto {
         if(num.getAlarmType()!=null){
             this.alarmType = num.getAlarmType();
         }
+        if(num.getAlarmId()!=null){
+            this.alarmId = num.getAlarmId();
+        }
     }
 
     public DataPointDto(CategoricalTsByOrg categoricalTsByOrg){
@@ -76,6 +83,9 @@ public class DataPointDto {
         }
         if(categoricalTsByOrg.getAlarmType()!=null){
             this.alarmType = categoricalTsByOrg.getAlarmType();
+        }
+        if(categoricalTsByOrg.getAlarmId()!=null){
+            this.alarmId = categoricalTsByOrg.getAlarmId();
         }
     }
 
