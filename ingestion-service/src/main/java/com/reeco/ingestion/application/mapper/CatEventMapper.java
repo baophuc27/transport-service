@@ -7,7 +7,10 @@ import org.mapstruct.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Mapper(componentModel = "spring", uses = {}, unmappedTargetPolicy = ReportingPolicy.WARN,unmappedSourcePolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring",
+        uses = {},
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface CatEventMapper extends DomainEntityMapper<CategoricalTsEvent, CategoricalTsByOrg> {
     @Mappings({
             @Mapping(source = "partitionKey.organizationId", target = "organizationId"),
@@ -34,7 +37,7 @@ public interface CatEventMapper extends DomainEntityMapper<CategoricalTsEvent, C
             @Mapping(source = "lat", target = "lat"),
             @Mapping(source = "lon", target = "lon")
     })
-    CategoricalTsByOrg toPort(CategoricalTsEvent eventEntity);
+    CategoricalTsByOrg toPersistence(CategoricalTsEvent eventEntity);
 
     @GetEventDate
     default LocalDate getEventDate(LocalDateTime dateTime){

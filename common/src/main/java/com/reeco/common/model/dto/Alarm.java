@@ -1,21 +1,26 @@
 package com.reeco.common.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.reeco.common.framework.EnumNamePattern;
 import com.reeco.common.model.enumtype.AlarmType;
 import com.reeco.common.model.enumtype.FrequenceType;
 import com.reeco.common.model.enumtype.MaintainType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 
-@Getter
+@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
+@AllArgsConstructor
 public class Alarm implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -23,11 +28,11 @@ public class Alarm implements Serializable {
     @NotNull(message = "alarmId must be note NULL")
     private Long id;
 
-    @NotNull(message = "organizationId must be not NULL")
     private Long organizationId;
 
-    @NotNull(message = "paramId must be not NULL")
     private Long paramId;
+
+    private Long indicatorId;
 
     @NotNull(message = "englishName of Alarm must be not NULL")
     @NotBlank(message = "englishName of Alarm be not BLANK")
@@ -41,13 +46,13 @@ public class Alarm implements Serializable {
             message = "alarmType must be in {THRESHOLD,SQUARE_RANGE,BRACKET_RANGE}")
     private AlarmType alarmType;
 
-    private Double minValue;
+    private String minValue;
 
-    private Double maxValue;
+    private String maxValue;
 
     private MaintainType maintainType;
 
-    private Integer numOfMatch;
+    private Long numOfMatch;
 
     private Long frequence;
 
@@ -55,21 +60,35 @@ public class Alarm implements Serializable {
 
     @Getter
     @Setter
-    private Long receivedAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+    private String receivedAt;
+
+    @Getter
+    @Setter
+    private Integer matchCount = 0;
+
+    @Getter
+    @Setter
+    private LocalDateTime lastMatchTime;
+
+    public Alarm() {
+    }
 
     public Alarm(@NotNull(message = "alarmId must be note NULL") Long id) {
         this.id = id;
     }
 
-    public Alarm(Long organizationId, Long paramId,
+    public Alarm(Long organizationId,
+                 Long paramId,
                  Long id,
+                 Long indicatorId,
                  String englishName,
                  String vietnameseName,
                  AlarmType alarmType,
-                 Double minValue,
-                 Double maxValue,
+                 String minValue,
+                 String maxValue,
                  MaintainType maintainType,
-                 Integer numOfMatch,
+                 Long numOfMatch,
                  Long frequence,
                  FrequenceType frequenceType) {
 
@@ -85,24 +104,7 @@ public class Alarm implements Serializable {
         this.numOfMatch = numOfMatch;
         this.frequence = frequence;
         this.frequenceType = frequenceType;
-    }
-
-    @Override
-    public String toString() {
-        return "Alarm{" +
-                "alarmId=" + id +
-                ", organizationId=" + organizationId +
-                ", paramId=" + paramId +
-                ", englishName='" + englishName + '\'' +
-                ", vietnameseName='" + vietnameseName + '\'' +
-                ", alarmType=" + alarmType +
-                ", minValue=" + minValue +
-                ", maxValue=" + maxValue +
-                ", maintainType=" + maintainType +
-                ", numOfMatch=" + numOfMatch +
-                ", frequence=" + frequence +
-                ", frequenceType=" + frequenceType +
-                '}';
+        this.indicatorId = indicatorId;
     }
 
     @Override
@@ -113,6 +115,7 @@ public class Alarm implements Serializable {
         return Objects.equals(getId(), alarm.getId()) &&
                 Objects.equals(getOrganizationId(), alarm.getOrganizationId()) &&
                 Objects.equals(getParamId(), alarm.getParamId()) &&
+                Objects.equals(getIndicatorId(), alarm.getIndicatorId()) &&
                 Objects.equals(getEnglishName(), alarm.getEnglishName()) &&
                 Objects.equals(getVietnameseName(), alarm.getVietnameseName()) &&
                 getAlarmType() == alarm.getAlarmType() &&
@@ -121,11 +124,32 @@ public class Alarm implements Serializable {
                 getMaintainType() == alarm.getMaintainType() &&
                 Objects.equals(getNumOfMatch(), alarm.getNumOfMatch()) &&
                 Objects.equals(getFrequence(), alarm.getFrequence()) &&
-                getFrequenceType() == alarm.getFrequenceType();
+                getFrequenceType() == alarm.getFrequenceType() &&
+                Objects.equals(getReceivedAt(), alarm.getReceivedAt());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getOrganizationId(), getParamId(), getEnglishName(), getVietnameseName(), getAlarmType(), getMinValue(), getMaxValue(), getMaintainType(), getNumOfMatch(), getFrequence(), getFrequenceType());
+        return Objects.hash(getId(), getOrganizationId(), getParamId(), getIndicatorId(), getEnglishName(), getVietnameseName(), getAlarmType(), getMinValue(), getMaxValue(), getMaintainType(), getNumOfMatch(), getFrequence(), getFrequenceType(), getReceivedAt());
+    }
+
+    @Override
+    public String toString() {
+        return "Alarm{" +
+                "id=" + id +
+                ", organizationId=" + organizationId +
+                ", paramId=" + paramId +
+                ", indicatorId=" + indicatorId +
+                ", englishName='" + englishName + '\'' +
+                ", vietnameseName='" + vietnameseName + '\'' +
+                ", alarmType=" + alarmType +
+                ", minValue='" + minValue + '\'' +
+                ", maxValue='" + maxValue + '\'' +
+                ", maintainType=" + maintainType +
+                ", numOfMatch=" + numOfMatch +
+                ", frequence=" + frequence +
+                ", frequenceType=" + frequenceType +
+                ", receivedAt='" + receivedAt + '\'' +
+                '}';
     }
 }

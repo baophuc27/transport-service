@@ -1,13 +1,14 @@
 package com.reeco.ingestion.adapter.out;
 
 import com.datastax.oss.driver.shaded.guava.common.math.StatsAccumulator;
+import com.reeco.common.model.dto.Parameter;
 import com.reeco.ingestion.application.mapper.NumStatEventMapper;
 import com.reeco.ingestion.application.mapper.NumericEventMapper;
 import com.reeco.ingestion.application.mapper.ParameterMapper;
 import com.reeco.ingestion.application.port.out.NumStatRepository;
 import com.reeco.ingestion.domain.NumericalStatEvent;
 import com.reeco.ingestion.domain.OrgAndParam;
-import com.reeco.ingestion.domain.Parameter;
+import com.reeco.ingestion.domain.ParamsByOrg;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.NumericalTsByOrg;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.NumericalStatByOrgRepository;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.NumericalTsByOrgRepository;
@@ -52,7 +53,7 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
                 .log()
                 .flatMap(v -> numericalTsByOrgRepository.finAllEventByOrg(
                             v.getOrganizationId(),
-                            v.getParamId(),
+                            v.getId(),
                             startTime,
                             endTime)
                         .groupBy(e->new OrgAndParam(e.getPartitionKey().getOrganizationId(),
@@ -92,26 +93,26 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
     @Override
     public void insert(Timestamp startTime, Timestamp endTime) {
         aggEventByOrgAndParams(startTime, endTime)
-                .map(v-> numStatEventMapper.toPort(v))
+                .map(v-> numStatEventMapper.toPersistence(v))
                 .flatMap(v->numericalStatByOrgRepository.save(v))
                 .subscribe(v->log.info("SAVED: "+v.toString()));
 
     }
 
 
-    public Flux<Parameter.ParamsByOrg> findAllParamsGroupByOrg() {
+    public Flux<ParamsByOrg> findAllParamsGroupByOrg() {
         return paramsByOrgRepository
                 .findAll()
                 .map(v -> parameterMapper.toDomain(v))
                 .groupBy(Parameter::getOrganizationId)
                 .flatMap(
                         group -> group
-                                .map(Parameter::getParamId)
+                                .map(Parameter::getId)
                                 .collectList()
                                 .map(list -> {
                                     Map<Long, List<Long>> mapper = new HashMap<>();
                                     mapper.put(group.key(), list);
-                                    return new Parameter.ParamsByOrg(group.key(), list);
+                                    return new ParamsByOrg(group.key(), list);
                                 })
                 );
     }

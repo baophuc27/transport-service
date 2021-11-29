@@ -1,5 +1,5 @@
 package com.reeco.common.model.enumtype;
 
 public enum MaintainType {
-    NONE, FISRTTIME, MAINTAIN
+    NONE, FIRST_TIME, MAINTAIN
 }

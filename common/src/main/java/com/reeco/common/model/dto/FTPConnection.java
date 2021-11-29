@@ -2,6 +2,7 @@ package com.reeco.common.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.reeco.common.model.enumtype.Protocol;
+import lombok.Data;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 
-@Getter
+@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FTPConnection extends BaseConnection {
 
@@ -47,12 +48,11 @@ public class FTPConnection extends BaseConnection {
 
     private Long removeAfterDays;
 
-    public FTPConnection(Long id){
-        super(id);
+    public FTPConnection() {
     }
 
-    public FTPConnection(Long connectionId, Long organizationId, String englishName, String vietnameseName, Boolean active, Protocol protocol, String userName, @NotNull(message = "hostName must be not NULL") @NotBlank(message = "hostName must be not BLANK") String hostName, @NotNull(message = "port must be not NULL") @NotBlank(message = "port must be not BLANK") String port, String password, Boolean useSSL, String key, List<String> ipWhiteList, String fileType, @NotNull(message = "templateFormat must be not NULL") Integer templateFormat, Integer maximumTimeout, Integer maximumAttachment, String notificationType, Long removeAfterDays) {
-        super(connectionId, organizationId, englishName, vietnameseName, active, protocol);
+    public FTPConnection(Long id, Long organizationId, String englishName, String vietnameseName, Boolean active, Protocol protocol, String userName, @NotNull(message = "hostName must be not NULL") @NotBlank(message = "hostName must be not BLANK") String hostName, @NotNull(message = "port must be not NULL") @NotBlank(message = "port must be not BLANK") String port, String password, Boolean useSSL, String key, List<String> ipWhiteList, String fileType, @NotNull(message = "templateFormat must be not NULL") Integer templateFormat, Integer maximumTimeout, Integer maximumAttachment, String notificationType, Long removeAfterDays) {
+        super(id, organizationId, englishName, vietnameseName, active, protocol);
         this.userName = userName;
         this.hostName = hostName;
         this.port = port;

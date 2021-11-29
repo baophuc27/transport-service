@@ -16,10 +16,13 @@ public class EmbeddedCacheConfig {
     Config config() {
         Config config = new Config();
 
-        MapConfig mapConfig = new MapConfig();
-        mapConfig.setTimeToLiveSeconds(300);
-        config.getMapConfigs().put("alarm_cache", mapConfig);
-
+        MapConfig alarmConfig = new MapConfig();
+        MapConfig indicatorConfig = new MapConfig();
+        MapConfig alarmRuleConfig = new MapConfig();
+        alarmConfig.setTimeToLiveSeconds(300);
+        config.getMapConfigs().put("alarm_info_cache", alarmConfig);
+        config.getMapConfigs().put("indicator_cache", indicatorConfig);
+        config.getMapConfigs().put("alarm_rule_cache", alarmRuleConfig);
         return config;
     }
 

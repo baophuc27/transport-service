@@ -1,11 +1,16 @@
 package com.reeco.ingestion.adapter.in;
 
 import com.reeco.ingestion.application.port.in.IncomingTsEvent;
-//import com.reeco.ingestion.application.usecase.UpdateStatEventUseCase;
 import com.reeco.ingestion.application.usecase.StatisticEventUseCase;
+import com.reeco.ingestion.cache.model.AlarmCache;
+import com.reeco.ingestion.cache.service.AlarmCacheUseCase;
+import com.reeco.ingestion.cache.service.IndicatorCacheUseCase;
+import com.reeco.ingestion.domain.Indicator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
@@ -16,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Random;
 
 @Slf4j
@@ -29,20 +35,26 @@ public class EventStatisticController {
     @Autowired
     private final StatisticEventUseCase updateStatEventUseCase;
 
+    @Autowired
+    private final AlarmCacheUseCase alarmCacheUseCase;
+
+    @Autowired
+    private final IndicatorCacheUseCase indicatorCacheUseCase;
+
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    @Scheduled(fixedRate = 300000)
+    @Scheduled(fixedRate = 10000)
     public void aggStatisticEvent() {
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.MIN;
         LocalDateTime endTime = LocalDateTime.of(date, time).atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime();
-        LocalDateTime startTime = endTime.minusDays(10);
+        LocalDateTime startTime = endTime.minusDays(5);
         Timestamp timestampEnd = Timestamp.valueOf(endTime);
         Timestamp timestampStart = Timestamp.valueOf(startTime);
         log.info("Start aggregation job with time range from {} to {}", startTime.toString(), endTime.toString());
         updateStatEventUseCase.updateNumStatEvent(timestampStart, timestampEnd);
     }
-//
+
 //    @Scheduled(fixedRate = 60000)
 //    public void kafkaProducerMessage() {
 //        LocalDateTime currTime = LocalDateTime.now();

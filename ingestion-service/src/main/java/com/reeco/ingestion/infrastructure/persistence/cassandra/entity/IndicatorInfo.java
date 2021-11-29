@@ -33,6 +33,9 @@ public class IndicatorInfo {
     @Column("indicator_name")
     private String indicatorName;
 
+    @Column("indicator_name_vi")
+    private String indicatorNameVi;
+
     @Column("value_type")
     private String valueType;
 

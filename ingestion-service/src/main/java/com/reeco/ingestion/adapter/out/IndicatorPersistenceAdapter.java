@@ -27,4 +27,9 @@ public class IndicatorPersistenceAdapter implements IndicatorRepository {
                 .map(v -> indicatorMapper.toDomain(v));
     }
 
+    @Override
+    public Mono<Indicator> save(Indicator indicator) {
+        return null;
+    }
+
 }

@@ -6,14 +6,10 @@ import com.reeco.ingestion.application.port.out.IndicatorRepository;
 import com.reeco.ingestion.adapter.out.EventStatPersistenceAdapter;
 import com.reeco.ingestion.adapter.out.IndicatorPersistenceAdapter;
 import com.reeco.ingestion.application.port.out.InsertEventPort;
-import com.reeco.ingestion.application.service.EntityManagementService;
-import com.reeco.ingestion.application.service.IncomingTsEventService;
-import com.reeco.ingestion.application.service.StoreConfigService;
-import com.reeco.ingestion.application.usecase.EntityManagementUseCase;
-import com.reeco.ingestion.application.usecase.StoreConfigUseCase;
-import com.reeco.ingestion.application.usecase.StoreTsEventUseCase;
-import com.reeco.ingestion.cache.service.AlarmCacheService;
-import com.reeco.ingestion.cache.service.AlarmCacheUseCase;
+import com.reeco.ingestion.application.port.out.NumStatRepository;
+import com.reeco.ingestion.application.service.*;
+import com.reeco.ingestion.application.usecase.*;
+import com.reeco.ingestion.cache.service.*;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
@@ -23,44 +19,57 @@ import org.springframework.context.annotation.Configuration;
 public class IngestionServiceConfiguration {
 
     /* *
-     * Use case Configuration
-     * */
+    * Use case Configuration
+    * */
     @Bean
-    EntityManagementUseCase entityManagementUseCase(IndicatorRepository indicatorRepository) {
+    EntityManagementUseCase entityManagementUseCase(IndicatorRepository indicatorRepository){
         return new EntityManagementService(indicatorRepository);
     }
 
     @Bean
-    StoreTsEventUseCase storeTsEventUseCase(InsertEventPort tsEventRepository, IndicatorRepository indicatorRepository) {
-        return new IncomingTsEventService(tsEventRepository, indicatorRepository);
+    StoreTsEventUseCase storeTsEventUseCase(){
+        return new IncomingTsEventService();
     }
 
     @Bean
     public CacheManager cacheManager() {
-        System.out.println("Creating cache manager.");
-        return new ConcurrentMapCacheManager("alarm_cache");
+        String[] cacheNames = {
+                "alarm_cache", "indicator_cache", "alarm_rule_cache"
+        };
+        return new ConcurrentMapCacheManager(cacheNames);
     }
 
     @Bean
-    StoreConfigUseCase storeConfigUseCase(CacheManager cacheManager) {
-        return new StoreConfigService(cacheManager);
+    StoreConfigUseCase storeConfigUseCase(CacheManager cacheManager){
+        return new StoreConfigService();
     }
 
     @Bean
-    AlarmCacheUseCase alarmCacheUseCase(CacheManager cacheManager) {
-        return new AlarmCacheService(cacheManager);
+    RuleEngineCacheUseCase ruleEngineCacheUseCase(CacheManager cacheManager){
+        return new RuleEngineCacheService();
     }
 
-
-
-
-//    @Bean
-//    UpdateStatEventUseCase updateStatEventUseCase(AggregateEventsPort aggregateEventsPort){
-//        return new StatisticEventService(aggregateEventsPort);
-//    }
+    @Bean
+    RuleEngineUseCase ruleEngineUseCase(){
+        return new RuleEngineService();
+    }
+    @Bean
+    AlarmCacheUseCase alarmCacheUseCase(CacheManager cacheManager){
+        return new AlarmCacheService();
+    }
 
     @Bean
-    InsertEventPort tsEventRepository() {
+    StatisticEventUseCase statisticEventUseCase() {
+        return new StatisticEventService();
+    }
+
+    @Bean
+    IndicatorCacheUseCase indicatorCacheUseCase() {
+        return new IndicatorCacheService();
+    }
+
+    @Bean
+    InsertEventPort tsEventRepository(){
         return new TsEventPersistenceAdapter();
     }
 
@@ -71,8 +80,7 @@ public class IngestionServiceConfiguration {
 
 
     @Bean
-    AggregateEventsPort aggregateEventsPort() {
-        return new EventStatPersistenceAdapter();
+    AggregateEventsPort aggregateEventsPort() {return new EventStatPersistenceAdapter();
     }
 
 }

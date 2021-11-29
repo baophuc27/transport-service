@@ -1,4 +1,5 @@
 package com.reeco.ingestion.infrastructure.persistence.cassandra.entity;
+import com.reeco.common.model.enumtype.AlarmType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.cassandra.core.cql.Ordering;
@@ -41,6 +42,9 @@ public class NumericalTsByOrg {
     @PrimaryKey
     private NumericalTsKey partitionKey;
 
+    @Column("indicator_id")
+    Long indicatorId;
+
     @Column("indicator_name")
     private String indicatorName;
 
@@ -68,18 +72,27 @@ public class NumericalTsByOrg {
     @Column("lon")
     private Double lon;
 
-    @Override
-    public String toString() {
-        return "NumericalTsByOrg{" +
-                "partitionKey=" + partitionKey.toString() +
-                ", indicatorName='" + indicatorName + '\'' +
-                ", paramName='" + paramName + '\'' +
-                ", stationId=" + stationId +
-                ", connectionId=" + connectionId +
-                ", value=" + value +
-                ", receivedAt=" + receivedAt +
-                ", lat=" + lat +
-                ", lon=" + lon +
-                '}';
-    }
+    @Column("sent_at")
+    LocalDateTime sentAt;
+
+    @Column("is_alarm")
+    Boolean isAlarm;
+
+    @Column("alarm_id")
+    Long alarmId;
+
+    @CassandraType(type = CassandraType.Name.TEXT)
+    @Column("alarm_type")
+    AlarmType alarmType;
+
+    @Column("min_value")
+    String minValue;
+
+    @Column("max_value")
+    String maxValue;
 }
+
+
+
+
+

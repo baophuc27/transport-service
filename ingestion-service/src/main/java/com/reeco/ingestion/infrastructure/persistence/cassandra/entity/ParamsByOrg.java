@@ -1,21 +1,28 @@
 package com.reeco.ingestion.infrastructure.persistence.cassandra.entity;
 
+import com.reeco.common.framework.EnumNamePattern;
+import com.reeco.common.model.enumtype.ParamType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Table("params_by_organization")
 @AllArgsConstructor
 @Getter
+@ToString
 public class ParamsByOrg {
 
     @PrimaryKeyClass
     @AllArgsConstructor
     @Data
+    @ToString
     public static class Key implements Serializable {
 
         @PrimaryKeyColumn(name = "organization_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
@@ -31,9 +38,6 @@ public class ParamsByOrg {
     @Column("indicator_id")
     private Long indicatorId;
 
-//    @Column("indicator_name")
-//    private String indicatorName;
-
     @Column("param_name")
     private String paramName;
 
@@ -45,6 +49,22 @@ public class ParamsByOrg {
 
     @Column("unit")
     private String unit;
+
+    @Column("english_name")
+    private String englishName;
+
+    @Column("vietnamese_name")
+    private String vietnameseName;
+
+    @Column("parameter_type")
+    @CassandraType(type = CassandraType.Name.TEXT)
+    private ParamType parameterType;
+
+    @Column("format")
+    private String format;
+
+    @Column("display_type")
+    private String displayType;
 
 //    @Column("updated_at")
 //    private LocalDateTime updatedAt;

@@ -12,9 +12,6 @@ import java.util.List;
 @Setter
 @ToString
 public class Parameter {
-    public enum ParamType {
-        CONFIGURE, COMPUTED
-    }
     private Long organizationId;
     private Long paramId;
     private Long indicatorId;
@@ -24,28 +21,4 @@ public class Parameter {
     private String paramName;
     private String indicatorName;
     private LocalDateTime updatedAt;
-    private
-    @AllArgsConstructor
-    @Getter
-    public static class ParamsByOrg{
-        private Long organizationId;
-        private List<Long> paramsIds;
-
-        @Setter
-        private Long maxDate;
-
-        public ParamsByOrg(Long organizationId, List<Long> paramsId) {
-            this.organizationId = organizationId;
-            this.paramsIds = paramsId;
-        }
-
-        @Override
-        public String toString() {
-            return "ParamsByOrg{" +
-                    "organizationId=" + organizationId +
-                    ", paramsId=" + paramsIds +
-                    '}';
-        }
-    }
-
 }
