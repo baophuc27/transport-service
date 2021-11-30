@@ -1,5 +1,6 @@
 package com.reeco.core.dmp.core.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.reeco.core.dmp.core.model.CategoricalStatByOrg;
 import com.reeco.core.dmp.core.model.CategoricalTsByOrg;
@@ -9,12 +10,12 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
+//@Data
 @NoArgsConstructor
 //@AllArgsConstructor
-//@Getter
-//@Setter
-
+@Getter
+@Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DataPointDto {
     private String value;
 

@@ -111,6 +111,8 @@ public class ChartService {
         if (chartDto.getStartTime().isAfter(chartDto.getEndTime())) {
             throw new Exception("Invalid Time Range");
         }
+        chartResponse.setStartTime(chartDto.getStartTime());
+        chartResponse.setEndTime(chartDto.getEndTime());
         List<ParameterDataDto> parameterDataDtos = new ArrayList<>();
         for (ParameterDto parameterDto : chartDto.getParameterDtos()) {
             ParamsByOrg paramsByOrg = paramsByOrgRepository.findByPartitionKeyOrganizationIdAndPartitionKeyParamId(parameterDto.getOrganizationId(),parameterDto.getParameterId())

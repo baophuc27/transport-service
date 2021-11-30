@@ -41,6 +41,7 @@ dependencies {
 //    implementation('io.springfox:springfox-boot-starter:3.0.0')
     implementation('org.springframework.boot:spring-boot-starter-data-cassandra:2.5.4')
     implementation ('org.springframework.boot:spring-boot-starter-parent:2.1.12.RELEASE')
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 //    implementation ('org.springframework.boot:spring-boot-starter-data-jdbc')
 //    implementation ('org.springframework.boot:spring-boot-starter-data-jpa')
 //    implementation ('org.springframework.boot:spring-boot-starter-jdbc')

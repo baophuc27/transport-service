@@ -1,10 +1,16 @@
 package com.reeco.core.dmp.core.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+//@Data
 @NoArgsConstructor
+@Getter
+@Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ParameterDto {
     private Long organizationId;
 
