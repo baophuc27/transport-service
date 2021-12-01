@@ -6,6 +6,7 @@ import com.reeco.common.model.enumtype.MaintainType;
 import com.reeco.common.model.enumtype.ValueType;
 import com.reeco.ingestion.application.port.in.IncomingTsEvent;
 import com.reeco.ingestion.application.port.in.RuleEngineEvent;
+import com.reeco.ingestion.application.port.out.AlarmEvent;
 import com.reeco.ingestion.application.usecase.RuleEngineUseCase;
 import com.reeco.ingestion.cache.model.AlarmRuleCache;
 import com.reeco.ingestion.cache.service.AlarmCacheUseCase;
@@ -16,7 +17,9 @@ import com.reeco.ingestion.domain.ParamAndAlarm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 @RequiredArgsConstructor
@@ -32,6 +35,10 @@ public class RuleEngineService implements RuleEngineUseCase {
     @Autowired
     RuleEngineCacheUseCase ruleEngineCacheUseCase;
 
+    @Autowired
+    KafkaTemplate<String, AlarmEvent> alarmEventTemplate;
+
+    private final String ALARM_TOPIC = "reeco_alarm_noti_event";
     @Override
     public boolean checkThreshold(IncomingTsEvent event) {
         return true;
@@ -93,22 +100,32 @@ public class RuleEngineService implements RuleEngineUseCase {
             isAlarmEvent = true;
             alarmRuleCache.setMatchedCount(alarmRuleCache.getMatchedCount() + 1);
             boolean isOutOfMatch = isOutOfMatchCount(alarm, alarmRuleCache);
+            AlarmEvent alarmEvent = new AlarmEvent(
+                    event.getOrganizationId(),
+                    event.getParamId(),
+                    alarm.getId(),
+                    event.getEventTime(),
+                    LocalDateTime.now(),
+                    event.getValue()
+            );
             switch (maintainType) {
                 case NONE:
                     break;
                 case FIRST_TIME: {
                     if (isOutOfMatch) {
-                        // TODO: send alarm message to kafka topic
-                        break;
+                        alarmEventTemplate.send(ALARM_TOPIC, alarmEvent);
+                        log.info("Sent Alarm {} as matched rule {}", alarmEvent, maintainType.name());
                     }
+                    break;
                 }
                 case MAINTAIN: {
                     if (isOutOfMatch && isOutOfTimeRange(alarm, alarmRuleCache, event)  ) {
                         // update Last Matched Time
                         alarmRuleCache.setLastMatchedTime(event.getEventTime());
-                        // TODO: send alarm message to kafka topic
-                        break;
+                        alarmEventTemplate.send(ALARM_TOPIC, alarmEvent);
+                        log.info("Sent Alarm {} as matched rule {}", alarmEvent, maintainType.name());
                     }
+                    break;
                 }
             }
 
@@ -119,6 +136,7 @@ public class RuleEngineService implements RuleEngineUseCase {
         ruleEngineCacheUseCase.put(alarmRuleCache);
         return new RuleEngineEvent(
                 event.getOrganizationId(),
+                event.getWorkspaceId(),
                 event.getStationId(),
                 event.getConnectionId(),
                 event.getParamId(),

@@ -13,6 +13,7 @@ import java.util.List;
 @ToString
 public class Parameter {
     private Long organizationId;
+    private Long workspaceId;
     private Long paramId;
     private Long indicatorId;
     private Long stationId;
