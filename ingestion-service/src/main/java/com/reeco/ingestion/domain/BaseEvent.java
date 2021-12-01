@@ -2,6 +2,7 @@ package com.reeco.ingestion.domain;
 
 import com.reeco.common.model.enumtype.AlarmType;
 import lombok.*;
+import org.springframework.data.cassandra.core.mapping.Column;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +12,8 @@ import java.time.LocalDateTime;
 @ToString
 public class BaseEvent {
     private Long organizationId;
+
+    private Long workspaceId;
 
     private Long connectionId;
 

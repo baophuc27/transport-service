@@ -38,6 +38,9 @@ public class ParamsByOrg {
     @Column("indicator_id")
     private Long indicatorId;
 
+    @Column("workspace_id")
+    private Long workspaceId;
+
     @Column("param_name")
     private String paramName;
 

@@ -26,6 +26,9 @@ public class BaseConnection implements Serializable, Connection {
     @NotNull(message = "organizationId must be not NULL")
     private Long organizationId;
 
+    @NotNull(message = "workspaceId must be not NULL")
+    private Long workspaceId;
+
     @NotNull(message = "englishName must be not NULL")
     @NotBlank(message = "englishName must be not BLANK")
     private String englishName;
@@ -49,6 +52,7 @@ public class BaseConnection implements Serializable, Connection {
 
     public BaseConnection(Long id,
                           Long organizationId,
+                          Long workspaceId,
                           String englishName,
                           String vietnameseName,
                           Boolean active,
@@ -58,6 +62,7 @@ public class BaseConnection implements Serializable, Connection {
         this.organizationId = organizationId;
         this.englishName = englishName;
         this.vietnameseName = vietnameseName;
+        this.workspaceId = workspaceId;
         this.active = active;
         this.protocol = protocol;
     }
@@ -67,10 +72,12 @@ public class BaseConnection implements Serializable, Connection {
         return "BaseConnection{" +
                 "id=" + id +
                 ", organizationId=" + organizationId +
+                ", workspaceId=" + workspaceId +
                 ", englishName='" + englishName + '\'' +
                 ", vietnameseName='" + vietnameseName + '\'' +
                 ", active=" + active +
                 ", protocol=" + protocol +
+                ", receivedAt='" + receivedAt + '\'' +
                 '}';
     }
 }
