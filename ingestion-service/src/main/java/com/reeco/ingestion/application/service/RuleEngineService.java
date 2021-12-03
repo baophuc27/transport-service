@@ -96,7 +96,7 @@ public class RuleEngineService implements RuleEngineUseCase {
             switch (maintainType) {
                 case NONE:
                     break;
-                case FIRST_TIME: {
+                case FIRST_TIME_ONLY: {
                     if (isOutOfMatch) {
                         // TODO: send alarm message to kafka topic
                         break;
