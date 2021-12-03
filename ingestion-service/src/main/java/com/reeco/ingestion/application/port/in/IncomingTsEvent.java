@@ -3,6 +3,7 @@ package com.reeco.ingestion.application.port.in;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.data.cassandra.core.mapping.Column;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +15,8 @@ public class IncomingTsEvent {
     }
 
     Long organizationId;
+
+    Long workspaceId;
 
     Long stationId;
 

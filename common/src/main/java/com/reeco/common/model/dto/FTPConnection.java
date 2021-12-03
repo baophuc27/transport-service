@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.reeco.common.model.enumtype.Protocol;
 import lombok.Data;
 import lombok.Getter;
+import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -12,6 +13,7 @@ import java.util.Objects;
 
 
 @Data
+@ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FTPConnection extends BaseConnection {
 
@@ -51,8 +53,8 @@ public class FTPConnection extends BaseConnection {
     public FTPConnection() {
     }
 
-    public FTPConnection(Long id, Long organizationId, String englishName, String vietnameseName, Boolean active, Protocol protocol, String userName, @NotNull(message = "hostName must be not NULL") @NotBlank(message = "hostName must be not BLANK") String hostName, @NotNull(message = "port must be not NULL") @NotBlank(message = "port must be not BLANK") String port, String password, Boolean useSSL, String key, List<String> ipWhiteList, String fileType, @NotNull(message = "templateFormat must be not NULL") Integer templateFormat, Integer maximumTimeout, Integer maximumAttachment, String notificationType, Long removeAfterDays) {
-        super(id, organizationId, englishName, vietnameseName, active, protocol);
+    public FTPConnection(Long id, Long organizationId,  Long workspaceId, String englishName, String vietnameseName, Boolean active, Protocol protocol, String userName, @NotNull(message = "hostName must be not NULL") @NotBlank(message = "hostName must be not BLANK") String hostName, @NotNull(message = "port must be not NULL") @NotBlank(message = "port must be not BLANK") String port, String password, Boolean useSSL, String key, List<String> ipWhiteList, String fileType, @NotNull(message = "templateFormat must be not NULL") Integer templateFormat, Integer maximumTimeout, Integer maximumAttachment, String notificationType, Long removeAfterDays) {
+        super(id, organizationId, workspaceId, englishName, vietnameseName, active, protocol);
         this.userName = userName;
         this.hostName = hostName;
         this.port = port;
@@ -69,28 +71,10 @@ public class FTPConnection extends BaseConnection {
     }
 
     @Override
-    public String toString() {
-        return "FTPConnection{" +
-                "userName='" + userName + '\'' +
-                ", hostName='" + hostName + '\'' +
-                ", port='" + port + '\'' +
-                ", password='" + password + '\'' +
-                ", useSSL=" + useSSL +
-                ", key='" + key + '\'' +
-                ", ipWhiteList=" + ipWhiteList +
-                ", fileType='" + fileType + '\'' +
-                ", templateFormat=" + templateFormat +
-                ", maximumTimeout=" + maximumTimeout +
-                ", maximumAttachment=" + maximumAttachment +
-                ", notificationType='" + notificationType + '\'' +
-                ", removeAfterDays=" + removeAfterDays +
-                "} " + super.toString();
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof FTPConnection)) return false;
+        if (!super.equals(o)) return false;
         FTPConnection that = (FTPConnection) o;
         return Objects.equals(getUserName(), that.getUserName()) &&
                 Objects.equals(getHostName(), that.getHostName()) &&
@@ -109,6 +93,6 @@ public class FTPConnection extends BaseConnection {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUserName(), getHostName(), getPort(), getPassword(), getUseSSL(), getKey(), getIpWhiteList(), getFileType(), getTemplateFormat(), getMaximumTimeout(), getMaximumAttachment(), getNotificationType(), getRemoveAfterDays());
+        return Objects.hash(super.hashCode(), getUserName(), getHostName(), getPort(), getPassword(), getUseSSL(), getKey(), getIpWhiteList(), getFileType(), getTemplateFormat(), getMaximumTimeout(), getMaximumAttachment(), getNotificationType(), getRemoveAfterDays());
     }
 }

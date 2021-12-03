@@ -13,6 +13,8 @@ public class RuleEngineEvent {
 
     Long organizationId;
 
+    Long workspaceId;
+
     Long stationId;
 
     Long connectionId;

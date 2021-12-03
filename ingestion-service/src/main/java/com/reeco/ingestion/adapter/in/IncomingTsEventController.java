@@ -70,11 +70,13 @@ public class IncomingTsEventController {
         if (indicator != null) {
             ParamAndAlarm paramAndAlarm = alarmCacheUseCase.get(event.getParamId().toString());
             RuleEngineEvent ruleEngineEvent = null;
-            for (Alarm alarm : paramAndAlarm.getAlarms()) {
-                ruleEngineEvent = ruleEngineUseCase.handleRuleEvent(alarm, event, indicator);
-                if (ruleEngineEvent.getIsAlarm()) break;
+            if (paramAndAlarm != null) {
+                for (Alarm alarm : paramAndAlarm.getAlarms()) {
+                    ruleEngineEvent = ruleEngineUseCase.handleRuleEvent(alarm, event, indicator);
+                    if (ruleEngineEvent.getIsAlarm()) break;
+                }
+                storeTsEventUseCase.storeEvent(ruleEngineEvent, indicator);
             }
-            storeTsEventUseCase.storeEvent(ruleEngineEvent, indicator);
         }
         else log.warn("Indicator Not Found with Id: [{}]", event.getIndicatorId());
 

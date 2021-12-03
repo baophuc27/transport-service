@@ -54,6 +54,9 @@ public class NumericalTsByOrg {
     @Column("date")
     private LocalDate date;
 
+    @Column("workspace_id")
+    private Long workspaceId;
+
     @Column("station_id")
     private Long stationId;
 

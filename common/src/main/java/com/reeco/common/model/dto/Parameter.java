@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.reeco.common.framework.EnumNamePattern;
 import com.reeco.common.model.enumtype.ParamType;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -16,6 +17,7 @@ import java.util.Objects;
 
 
 @Data
+@ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Parameter implements Serializable {
 
@@ -24,6 +26,9 @@ public class Parameter implements Serializable {
 
     @NotNull(message = "connectionId must be not NULL")
     private Long connectionId;
+
+    @NotNull(message = "workspaceId must be not NULL")
+    private Long workspaceId;
 
     @NotNull(message = "organizationId must be not NULL")
     private Long organizationId;
@@ -79,9 +84,11 @@ public class Parameter implements Serializable {
                      String keyName,
                      String displayType,
                      String unit, String format,
+                     Long workspaceId,
                      @Valid List<Alarm> alarms,
                      String receivedAt) {
         this.id = id;
+        this.workspaceId = workspaceId;
         this.connectionId = connectionId;
         this.organizationId = organizationId;
         this.stationId = stationId;
@@ -98,32 +105,13 @@ public class Parameter implements Serializable {
     }
 
     @Override
-    public String toString() {
-        return "Parameter{" +
-                "id=" + id +
-                ", connectionId=" + connectionId +
-                ", organizationId=" + organizationId +
-                ", stationId=" + stationId +
-                ", englishName='" + englishName + '\'' +
-                ", vietnameseName='" + vietnameseName + '\'' +
-                ", parameterType=" + parameterType +
-                ", indicatorId=" + indicatorId +
-                ", keyName='" + keyName + '\'' +
-                ", displayType='" + displayType + '\'' +
-                ", unit='" + unit + '\'' +
-                ", format='" + format + '\'' +
-                ", alarms=" + alarms +
-                ", receivedAt='" + receivedAt + '\'' +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Parameter)) return false;
         Parameter parameter = (Parameter) o;
         return Objects.equals(getId(), parameter.getId()) &&
                 Objects.equals(getConnectionId(), parameter.getConnectionId()) &&
+                Objects.equals(getWorkspaceId(), parameter.getWorkspaceId()) &&
                 Objects.equals(getOrganizationId(), parameter.getOrganizationId()) &&
                 Objects.equals(getStationId(), parameter.getStationId()) &&
                 Objects.equals(getEnglishName(), parameter.getEnglishName()) &&
@@ -135,11 +123,12 @@ public class Parameter implements Serializable {
                 Objects.equals(getUnit(), parameter.getUnit()) &&
                 Objects.equals(getFormat(), parameter.getFormat()) &&
                 Objects.equals(getAlarms(), parameter.getAlarms()) &&
-                Objects.equals(getReceivedAt(), parameter.getReceivedAt());
+                Objects.equals(getReceivedAt(), parameter.getReceivedAt()) &&
+                Objects.equals(getUpdatedAt(), parameter.getUpdatedAt());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getConnectionId(), getOrganizationId(), getStationId(), getEnglishName(), getVietnameseName(), getParameterType(), getIndicatorId(), getKeyName(), getDisplayType(), getUnit(), getFormat(), getAlarms(), getReceivedAt());
+        return Objects.hash(getId(), getConnectionId(), getWorkspaceId(), getOrganizationId(), getStationId(), getEnglishName(), getVietnameseName(), getParameterType(), getIndicatorId(), getKeyName(), getDisplayType(), getUnit(), getFormat(), getAlarms(), getReceivedAt(), getUpdatedAt());
     }
 }
