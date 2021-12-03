@@ -2,7 +2,9 @@ package com.reeco.core.dmp.core.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reeco.core.dmp.core.dto.*;
-import com.reeco.core.dmp.core.service.ImportDataService;
+import com.reeco.core.dmp.core.service.ChartService;
+import com.reeco.core.dmp.core.service.DataService;
+import com.reeco.core.dmp.core.until.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +16,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/data")
-public class importDataController {
+public class DataController {
     @Autowired
-    ImportDataService importDataService;
+    DataService dataService;
+
+    @Autowired
+    ChartService chartService;
 
     @PostMapping("/import-csv")
     public ResponseEntity<ResponseMessage> importDataCsv(@ModelAttribute ImportData importData) throws Exception{
@@ -36,14 +41,14 @@ public class importDataController {
             parameterDtoList.add(parameterDto);
             i=i+1;
         }
-        importDataService.recieveDataCsv(importData.getCsvFile(), importData.getOrganizationId(), importData.getStationId(),parameterDtoList);
+        dataService.recieveDataCsv(importData.getCsvFile(), importData.getOrganizationId(), importData.getStationId(),parameterDtoList);
 //        file.flatMap(filee-> importDataService.recieveDataCsv(filee, orgId));
         return ResponseEntity.ok().body(new ResponseMessage("Import data successful!"));
     }
 
     @GetMapping("/export-csv")
     public ResponseEntity exportDataCsv(@RequestBody ChartDto chartDto) throws Exception{
-        String template = importDataService.exportDataCsv(chartDto);
+        String template = dataService.exportDataCsv(chartDto);
         String csvFileName = "data-export.csv";
 
         HttpHeaders headers = new HttpHeaders();
@@ -52,5 +57,17 @@ public class importDataController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(new ResponseMessage(template));
+    }
+
+    @GetMapping("/connection/latest-data")
+    public ResponseEntity<ApiResponse> getLatestDataConnection(@RequestParam Long orgId,@RequestParam List<Long> connectionIds) throws Exception{
+        ApiResponse apiResponse = dataService.getLatestDataConnection(orgId,connectionIds);
+        return new ResponseEntity<>(apiResponse, apiResponse.getStatus());
+    }
+
+    @PostMapping("/dataAlarm")
+    public ResponseEntity<ApiResponse> getAlarmData(@RequestBody ChartDto chartDto) throws Exception{
+        ApiResponse apiResponse = chartService.getAlarmData(chartDto);
+        return new ResponseEntity<>(apiResponse,apiResponse.getStatus());
     }
 }

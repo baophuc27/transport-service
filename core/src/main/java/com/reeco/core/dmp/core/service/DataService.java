@@ -1,10 +1,9 @@
 package com.reeco.core.dmp.core.service;
 
-import com.reeco.core.dmp.core.dto.ChartDto;
-import com.reeco.core.dmp.core.dto.ParameterDto;
-import com.reeco.core.dmp.core.dto.ResponseMessage;
+import com.reeco.core.dmp.core.dto.*;
 import com.reeco.core.dmp.core.model.*;
 import com.reeco.core.dmp.core.repo.*;
+import com.reeco.core.dmp.core.until.ApiResponse;
 import com.reeco.core.dmp.core.until.Comparison;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -18,11 +17,13 @@ import java.io.*;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
-public class ImportDataService {
+public class DataService {
 
     @Autowired
     NumericalTsByOrgRepository numericalTsByOrgRepository;
@@ -86,8 +87,12 @@ public class ImportDataService {
                     System.out.println(listLine);
                     DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                    LocalDate date = LocalDate.parse(listLine[0].split(" ")[0], df);
-                    LocalDateTime event_time = LocalDateTime.parse(listLine[0].substring(0,19), dtf);
+                    ZoneId timeZone = ZoneId.of("Asia/Ho_Chi_Minh");
+                    ZonedDateTime eTime = LocalDateTime.parse(listLine[0].substring(0,19), dtf).atZone(timeZone);
+
+                    ZonedDateTime vnTime = eTime.withZoneSameInstant(ZoneId.of("UTC"));
+                    LocalDateTime event_time = vnTime.toLocalDateTime();
+                    LocalDate date = event_time.toLocalDate();
                     Double lat = null;
                     Double lon = null;
                     if((listLine.length-2) == parameterDtos.size()){
@@ -253,5 +258,36 @@ public class ImportDataService {
         return encodedString;
 
     }
+
+    public ApiResponse getLatestDataConnection(Long orgId, List<Long> connectionIds) throws Exception{
+        ApiResponse apiResponse = ApiResponse.getSuccessResponse();
+        LatestData latestData = new LatestData();
+        latestData.setOrganizationId(orgId);
+        List<LatestDataConnection> latestDataConnections = new ArrayList<>();
+        for (Long id: connectionIds){
+            LatestDataConnection latestDataConnection = new LatestDataConnection();
+            latestDataConnection.setConnectionId(id);
+            List<ParamsByOrg> paramsByOrgs = paramsByOrgRepository.findParamByConnection(orgId, id);
+            for (ParamsByOrg paramsByOrg: paramsByOrgs){
+                NumericalTsByOrg numericalTsByOrg = numericalTsByOrgRepository.find1LatestRow(orgId,paramsByOrg.getPartitionKey().getParamId())
+                        .orElseThrow(()-> new Exception("invalid connectionId!"));
+                if (latestDataConnection.getLatestTime() == null){
+                    latestDataConnection.setLatestTime(numericalTsByOrg.getPartitionKey().getEventTime());
+                }else{
+                    if(latestDataConnection.getLatestTime().isBefore(numericalTsByOrg.getPartitionKey().getEventTime())){
+                        latestDataConnection.setLatestTime(numericalTsByOrg.getPartitionKey().getEventTime());
+                    }
+                }
+
+            }
+            latestDataConnections.add(latestDataConnection);
+        }
+        latestData.setConnectionList(latestDataConnections);
+        apiResponse.setData(latestData);
+        apiResponse.setMessage("Successful!");
+        return apiResponse;
+    }
+
+
 
 }
