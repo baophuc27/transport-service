@@ -8,14 +8,14 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
-public class ParamsByOrg{
+public class ParamsAndOrg {
     private Long organizationId;
     private List<Long> paramsIds;
 
     @Setter
     private Long maxDate;
 
-    public ParamsByOrg(Long organizationId, List<Long> paramsId) {
+    public ParamsAndOrg(Long organizationId, List<Long> paramsId) {
         this.organizationId = organizationId;
         this.paramsIds = paramsId;
     }

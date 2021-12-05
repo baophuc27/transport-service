@@ -1,5 +1,8 @@
 package com.reeco.ingestion.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.reeco.ingestion.adapter.out.TsEventPersistenceAdapter;
 import com.reeco.ingestion.application.port.out.AggregateEventsPort;
 import com.reeco.ingestion.application.port.out.IndicatorRepository;
@@ -82,5 +85,4 @@ public class IngestionServiceConfiguration {
     @Bean
     AggregateEventsPort aggregateEventsPort() {return new EventStatPersistenceAdapter();
     }
-
 }

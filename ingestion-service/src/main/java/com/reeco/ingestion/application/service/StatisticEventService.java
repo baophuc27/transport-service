@@ -8,6 +8,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @Log4j2
@@ -18,8 +19,8 @@ public class StatisticEventService implements StatisticEventUseCase {
 
 
     @Override
-    public void updateNumStatEvent(Timestamp startTime, Timestamp endTime) {
-        numStatRepository.insert(startTime, endTime);
+    public void updateNumStatEvent(LocalDateTime endTime) {
+        numStatRepository.insert(endTime);
     }
 
     @Override

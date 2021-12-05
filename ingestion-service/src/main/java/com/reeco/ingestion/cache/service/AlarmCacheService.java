@@ -40,7 +40,7 @@ public class AlarmCacheService implements AlarmCacheUseCase {
                 .map(v->{
                     put(v);
                     return v;
-                }).subscribe(v->log.info("Stored Alarms into cache: {}", v));
+                }).subscribe();
     }
 
     public void put(ParamAndAlarm paramAndAlarm) {

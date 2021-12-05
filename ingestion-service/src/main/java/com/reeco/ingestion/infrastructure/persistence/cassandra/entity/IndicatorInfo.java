@@ -1,5 +1,6 @@
 package com.reeco.ingestion.infrastructure.persistence.cassandra.entity;
 
+import com.reeco.common.model.enumtype.ValueType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
@@ -37,7 +38,8 @@ public class IndicatorInfo {
     private String indicatorNameVi;
 
     @Column("value_type")
-    private String valueType;
+    @CassandraType(type = CassandraType.Name.TEXT)
+    private ValueType valueType;
 
     @Column("created_at")
     private LocalDateTime createdAt;

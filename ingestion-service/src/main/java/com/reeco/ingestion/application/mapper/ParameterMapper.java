@@ -34,6 +34,7 @@ public interface ParameterMapper extends DomainEntityMapper<Parameter, ParamsByO
             @Mapping(source = "organizationId", target = "partitionKey.organizationId"),
             @Mapping(source = "id", target = "partitionKey.paramId"),
             @Mapping(source = "indicatorId", target = "indicatorId"),
+            @Mapping(source = "workspaceId", target = "workspaceId"),
             @Mapping(source = "keyName", target = "paramName"),
             @Mapping(source = "connectionId", target = "connectionId"),
             @Mapping(source = "stationId", target = "stationId"),

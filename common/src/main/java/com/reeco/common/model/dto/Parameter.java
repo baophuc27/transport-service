@@ -3,6 +3,10 @@ package com.reeco.common.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.reeco.common.framework.EnumNamePattern;
 import com.reeco.common.model.enumtype.ParamType;
 import lombok.Data;
@@ -12,6 +16,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,7 +24,7 @@ import java.util.Objects;
 @Data
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Parameter implements Serializable {
+public class Parameter {
 
     @NotNull(message = "id must be not NULL")
     private Long id;
@@ -64,11 +69,15 @@ public class Parameter implements Serializable {
     @Valid
     private List<Alarm> alarms;
 
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-    private String receivedAt;
+    private LocalDateTime receivedAt;
 
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-    private String updatedAt;
+    private LocalDateTime updatedAt;
 
     public Parameter() {
     }
@@ -83,10 +92,11 @@ public class Parameter implements Serializable {
                      Long indicatorId,
                      String keyName,
                      String displayType,
-                     String unit, String format,
+                     String unit,
+                     String format,
                      Long workspaceId,
                      @Valid List<Alarm> alarms,
-                     String receivedAt) {
+                     LocalDateTime receivedAt) {
         this.id = id;
         this.workspaceId = workspaceId;
         this.connectionId = connectionId;

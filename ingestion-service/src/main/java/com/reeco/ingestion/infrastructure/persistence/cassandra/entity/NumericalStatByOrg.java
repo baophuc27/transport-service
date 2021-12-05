@@ -1,5 +1,6 @@
 package com.reeco.ingestion.infrastructure.persistence.cassandra.entity;
 
+import com.reeco.common.model.enumtype.AlarmType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.cassandra.core.cql.Ordering;
@@ -53,6 +54,22 @@ public class NumericalStatByOrg {
 
     @Column("std")
     private Double std;
+
+    @Column("is_alarm")
+    private Boolean isAlarm;
+
+    @Column("alarm_id")
+    private Long alarmId;
+
+    @Column("alarm_type")
+    @CassandraType(type = CassandraType.Name.TEXT)
+    private AlarmType alarmType;
+
+    @Column("min_value")
+    private String minValue;
+
+    @Column("max_value")
+    private String maxValue;
 
     @Column("last_updated")
     LocalDateTime lastUpdated;

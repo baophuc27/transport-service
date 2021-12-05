@@ -32,9 +32,9 @@ public class IndicatorCacheService implements IndicatorCacheUseCase {
                 .findAll()
                 .map(v->{
                     Indicator indicator = indicatorMapper.toDomain(v);
-                    getCache().put(indicator.getIndicatorId().toString(), indicator);
+                    put(indicator);
                     return indicator;
-                }).subscribe(v->log.info("Stored Indicator into cache: {}", v));
+                }).subscribe();
     }
 
     public void putDataToCache(List<Indicator> indicators){
@@ -43,6 +43,11 @@ public class IndicatorCacheService implements IndicatorCacheUseCase {
                 getCache().put(indicator.getIndicatorId(), indicator);
                 log.info("Put {} to {}", indicator, INDICATOR_CACHE);
         }
+    }
+
+    public void put(Indicator indicator){
+        getCache().put(indicator.getIndicatorId().toString(), indicator);
+        log.info("Put {} to {}", indicator, INDICATOR_CACHE);
     }
 
     @Override

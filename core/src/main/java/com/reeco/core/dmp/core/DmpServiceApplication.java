@@ -7,8 +7,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
+import javax.annotation.PostConstruct;
+import java.util.TimeZone;
+
 @SpringBootApplication
-@ComponentScan("com.reeco")
+@ComponentScan({"com.reeco"})
 public class DmpServiceApplication {
 
     private static final Logger LOG = LoggerFactory.getLogger(DmpServiceApplication.class);
@@ -16,6 +19,11 @@ public class DmpServiceApplication {
     public static void main(String[] args) {
 
         ConfigurableApplicationContext ctx = SpringApplication.run(DmpServiceApplication.class, args);
+    }
+    @PostConstruct
+    public void init(){
+        // Setting Spring Boot SetTimeZone
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     }
 // export PATH=$PATH:/opt/gradle/gradle-6.4.1/bin
 }

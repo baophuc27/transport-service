@@ -11,6 +11,8 @@ public interface IndicatorCacheUseCase {
 
     void putDataToCache(List<Indicator> indicators);
 
+    void put(Indicator indicator);
+
     Indicator get(String key);
 
     Cache getCache();

@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 
 
 @Data
-public class BaseConnection implements Serializable, Connection {
+public class BaseConnection implements Connection {
 
     private static final long serialVersionUID = 1L;
 
@@ -44,8 +44,10 @@ public class BaseConnection implements Serializable, Connection {
     private Protocol protocol;
 
 
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-    private String receivedAt;
+    private LocalDateTime receivedAt;
 
     public BaseConnection() {
     }

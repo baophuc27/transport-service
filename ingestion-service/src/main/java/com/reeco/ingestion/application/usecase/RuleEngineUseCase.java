@@ -15,4 +15,7 @@ public interface RuleEngineUseCase {
 
     RuleEngineEvent handleRuleEvent(Alarm alarm, IncomingTsEvent event, Indicator indicator);
 
+    boolean checkMatchingAlarmCondition(Alarm alarm, Double value);
+
+    boolean checkMatchingAlarmCondition(Alarm alarm, String value);
 }
