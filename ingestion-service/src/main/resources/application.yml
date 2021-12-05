@@ -15,12 +15,12 @@ spring:
       port: 9042
       local-datacenter: datacenter1
       request:
-        timeout: PT40S
+        timeout: PT50S
       connection:
         connect-timeout: PT20S
         init-query-timeout: PT20S
       controlconnection:
-        timeout: PT10S
+        timeout: PT20S
 
   jackson:
     serialization:
