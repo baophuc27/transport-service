@@ -44,7 +44,7 @@ public class EventStatisticController {
 
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 500000)
     public void aggStatisticEvent() {
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.MIN;
@@ -56,7 +56,7 @@ public class EventStatisticController {
         updateStatEventUseCase.updateNumStatEvent(endTime);
     }
 
-    @Scheduled(fixedRate = 6000)
+    @Scheduled(fixedRate = 60000)
     public void kafkaProducerMessage() {
         Random rand = new Random();
         LocalDateTime currTime = LocalDateTime.now();
