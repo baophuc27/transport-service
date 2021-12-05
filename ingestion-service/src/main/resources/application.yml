@@ -4,7 +4,7 @@ server.error.include-message: always
 
 spring:
   profile:
-    active: dev
+    active: prod
 
   data:
     cassandra:
@@ -21,6 +21,10 @@ spring:
         init-query-timeout: PT20S
       controlconnection:
         timeout: PT10S
+
+  jackson:
+    serialization:
+      write_dates_as_timestamps: false
 
 kafka:
   bootstrap-servers: 118.69.53.93:29092 #118.69.53.93:29092

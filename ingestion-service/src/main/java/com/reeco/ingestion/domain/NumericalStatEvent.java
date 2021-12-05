@@ -1,10 +1,7 @@
 package com.reeco.ingestion.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
+import com.reeco.common.model.enumtype.AlarmType;
+import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -34,6 +31,16 @@ public class NumericalStatEvent {
     private Long count;
 
     private Double std;
+
+    private Boolean isAlarm;
+
+    private Long alarmId;
+
+    private AlarmType alarmType;
+
+    private String minValue;
+
+    private String maxValue;
 
     LocalDateTime lastUpdated;
 

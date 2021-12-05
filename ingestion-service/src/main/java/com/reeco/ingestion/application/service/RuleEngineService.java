@@ -13,7 +13,6 @@ import com.reeco.ingestion.cache.service.AlarmCacheUseCase;
 import com.reeco.ingestion.cache.service.IndicatorCacheUseCase;
 import com.reeco.ingestion.cache.service.RuleEngineCacheUseCase;
 import com.reeco.ingestion.domain.Indicator;
-import com.reeco.ingestion.domain.ParamAndAlarm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +37,9 @@ public class RuleEngineService implements RuleEngineUseCase {
     @Autowired
     KafkaTemplate<String, AlarmEvent> alarmEventTemplate;
 
-    private final String ALARM_TOPIC = "reeco_alarm_noti_event";
+    private final String ALARM_RULE_TOPIC = "reeco_alarm_noti_event";
+
+    private final String ALARM_TOPIC = "reeco_alarm_event";
     @Override
     public boolean checkThreshold(IncomingTsEvent event) {
         return true;
@@ -60,33 +61,52 @@ public class RuleEngineService implements RuleEngineUseCase {
         return minutes >= (alarm.getFrequence()*alarm.getFrequenceType().getValueFromEnum());
     }
 
-    private boolean isInSquareRange(Alarm alarm, IncomingTsEvent event) {
-        return Double.parseDouble(event.getValue()) >= Double.parseDouble(alarm.getMinValue())
-                && Double.parseDouble(event.getValue()) <= Double.parseDouble(alarm.getMaxValue());
+    private boolean isInSquareRange(Alarm alarm, Double value) {
+        return value >= Double.parseDouble(alarm.getMinValue())
+                && value <= Double.parseDouble(alarm.getMaxValue());
     }
 
-    private boolean isInBracketRange(Alarm alarm, IncomingTsEvent event) {
-        return Double.parseDouble(event.getValue()) > Double.parseDouble(alarm.getMinValue())
-                && Double.parseDouble(event.getValue()) < Double.parseDouble(alarm.getMaxValue());
+    private boolean isInBracketRange(Alarm alarm, Double value) {
+        return value > Double.parseDouble(alarm.getMinValue())
+                && value < Double.parseDouble(alarm.getMaxValue());
     }
 
-    private boolean isExactEqualNumber(Alarm alarm, IncomingTsEvent event) {
-        return Double.valueOf(event.getValue()).equals(Double.valueOf(alarm.getMinValue()));
+    private boolean isExactEqualNumber(Alarm alarm, Double value) {
+        return value.equals(Double.valueOf(alarm.getMinValue()));
     }
 
-    private boolean isExactEqualCategorical(Alarm alarm, IncomingTsEvent event) {
-        return event.getValue().equals(alarm.getMinValue());
+    private boolean isExactEqualCategorical(Alarm alarm, String value) {
+        return value.equals(alarm.getMinValue());
     }
 
     public boolean checkMatchingAlarmCondition(Alarm alarm, IncomingTsEvent event, ValueType valueType) {
         if (alarm.getAlarmType() == AlarmType.THRESHOLD) {
             if (valueType == ValueType.NUMBER) {
-                return isExactEqualNumber(alarm, event);
-            } else return isExactEqualCategorical(alarm, event);
+                return isExactEqualNumber(alarm, Double.valueOf(event.getValue()));
+            } else return isExactEqualCategorical(alarm, event.getValue());
         } else if (alarm.getAlarmType() == AlarmType.SQUARE_RANGE) {
-            return isInSquareRange(alarm, event);
+            return isInSquareRange(alarm, Double.valueOf(event.getValue()));
         } else if (alarm.getAlarmType() == AlarmType.BRACKET_RANGE) {
-            return isInBracketRange(alarm, event);
+            return isInBracketRange(alarm, Double.valueOf(event.getValue()));
+        }
+        return false;
+    }
+
+
+    public boolean checkMatchingAlarmCondition(Alarm alarm, Double value) {
+        if (alarm.getAlarmType() == AlarmType.THRESHOLD) {
+            return isExactEqualNumber(alarm, value);
+        } else if (alarm.getAlarmType() == AlarmType.SQUARE_RANGE) {
+            return isInSquareRange(alarm, value);
+        } else if (alarm.getAlarmType() == AlarmType.BRACKET_RANGE) {
+            return isInBracketRange(alarm, value);
+        }
+        return false;
+    }
+
+    public boolean checkMatchingAlarmCondition(Alarm alarm, String value) {
+        if (alarm.getAlarmType() == AlarmType.THRESHOLD) {
+            return isExactEqualCategorical(alarm, value);
         }
         return false;
     }
@@ -113,7 +133,7 @@ public class RuleEngineService implements RuleEngineUseCase {
                     break;
                 case FIRST_TIME_ONLY: {
                     if (isOutOfMatch) {
-                        alarmEventTemplate.send(ALARM_TOPIC, alarmEvent);
+                        alarmEventTemplate.send(ALARM_RULE_TOPIC, alarmEvent);
                         log.info("Sent Alarm {} as matched rule {}", alarmEvent, maintainType.name());
                     }
                     break;
@@ -122,16 +142,17 @@ public class RuleEngineService implements RuleEngineUseCase {
                     if (isOutOfMatch && isOutOfTimeRange(alarm, alarmRuleCache, event)  ) {
                         // update Last Matched Time
                         alarmRuleCache.setLastMatchedTime(event.getEventTime());
-                        alarmEventTemplate.send(ALARM_TOPIC, alarmEvent);
+                        alarmEventTemplate.send(ALARM_RULE_TOPIC, alarmEvent);
                         log.info("Sent Alarm {} as matched rule {}", alarmEvent, maintainType.name());
                     }
                     break;
                 }
             }
-
+            alarmEventTemplate.send(ALARM_TOPIC, alarmEvent);
+            log.info("Sent Alarm {} as matched condition", alarmEvent);
         } else {
             alarmRuleCache.setMatchedCount(0L);
-            alarmRuleCache.setLastMatchedTime(null);
+            alarmRuleCache.setLastMatchedTime(LocalDateTime.now());
         }
         ruleEngineCacheUseCase.put(alarmRuleCache);
         return new RuleEngineEvent(

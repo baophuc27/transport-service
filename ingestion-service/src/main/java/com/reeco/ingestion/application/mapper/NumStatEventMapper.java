@@ -1,5 +1,6 @@
 package com.reeco.ingestion.application.mapper;
 
+import com.reeco.common.model.enumtype.AlarmType;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.NumericalStatByOrg;
 import com.reeco.ingestion.domain.NumericalStatEvent;
 import org.mapstruct.*;
@@ -20,6 +21,11 @@ public interface NumStatEventMapper extends DomainEntityMapper<NumericalStatEven
             @Mapping(source = "median", target = "median"),
             @Mapping(source = "count", target = "count"),
             @Mapping(source = "std", target = "std"),
+            @Mapping(source = "isAlarm", target = "isAlarm"),
+            @Mapping(source = "alarmId", target = "alarmId"),
+            @Mapping(source = "alarmType", target = "alarmType"),
+            @Mapping(source = "minValue", target = "minValue"),
+            @Mapping(source = "maxValue", target = "maxValue"),
             @Mapping(source = "lastUpdated", target = "lastUpdated")
 
     })
@@ -36,6 +42,11 @@ public interface NumStatEventMapper extends DomainEntityMapper<NumericalStatEven
             @Mapping(source = "count", target = "count"),
             @Mapping(source = "median", target = "median"),
             @Mapping(source = "std", target = "std"),
+            @Mapping(source = "isAlarm", target = "isAlarm"),
+            @Mapping(source = "alarmId", target = "alarmId"),
+            @Mapping(source = "alarmType", target = "alarmType"),
+            @Mapping(source = "minValue", target = "minValue"),
+            @Mapping(source = "maxValue", target = "maxValue"),
             @Mapping(source = "lastUpdated", target = "lastUpdated")
     })
     NumericalStatByOrg toPersistence(NumericalStatEvent eventEntity);

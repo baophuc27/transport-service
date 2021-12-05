@@ -6,6 +6,10 @@ server:
 #spring:
 #  application:
 #    name: devices-service
+spring:
+  jackson:
+    serialization:
+      write_dates_as_timestamps: false
 
 logging:
   pattern:

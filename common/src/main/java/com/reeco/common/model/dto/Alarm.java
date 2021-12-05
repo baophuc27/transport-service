@@ -2,6 +2,10 @@ package com.reeco.common.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.reeco.common.framework.EnumNamePattern;
 import com.reeco.common.model.enumtype.AlarmType;
 import com.reeco.common.model.enumtype.FrequenceType;
@@ -21,7 +25,7 @@ import java.util.Objects;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
-public class Alarm implements Serializable {
+public class Alarm {
 
     private static final long serialVersionUID = 1L;
 
@@ -60,8 +64,10 @@ public class Alarm implements Serializable {
 
     @Getter
     @Setter
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-    private String receivedAt;
+    private LocalDateTime receivedAt;
 
     @Getter
     @Setter
@@ -69,6 +75,9 @@ public class Alarm implements Serializable {
 
     @Getter
     @Setter
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
     private LocalDateTime lastMatchTime;
 
     public Alarm() {

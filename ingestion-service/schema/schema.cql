@@ -111,3 +111,11 @@ CREATE TABLE IF NOT EXISTS reecotech.categorical_stats_by_organization(
 ) WITH CLUSTERING ORDER BY (date DESC, param_id ASC, value ASC);
 
 
+CREATE TABLE IF NOT EXISTS reecotech.event_statistics_meta_info(
+organization_id BIGINT,
+last_agg_time TIMESTAMP,
+value_type TEXT
+param_id BIGINT,
+created_at TIMESTAMP
+PRIMARY KEY((organization_id), value_type, param_id)
+) WITH CLUSTERING ORDER BY (value_type DESC, param_id ASC);

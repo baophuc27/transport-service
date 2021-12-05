@@ -38,7 +38,7 @@ public class RuleEngineCacheService implements RuleEngineCacheUseCase {
                             LocalDateTime.now(), 0L);
                     put(alarmRuleCache);
                     return alarmRuleCache;
-                }).subscribe(v->log.info("Stored Alarm Rule into cache: {}", v));
+                }).subscribe();
     }
 
     public void put(AlarmRuleCache ruleCache) {

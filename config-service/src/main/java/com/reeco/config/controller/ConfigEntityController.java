@@ -1,5 +1,6 @@
 package com.reeco.config.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reeco.common.model.dto.BaseConnection;
 import com.reeco.common.model.dto.Connection;
@@ -39,7 +40,6 @@ class ConfigEntityController {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-
     @Autowired
     private KafkaTemplate<String, byte[]> producerTemplate;
 
@@ -55,13 +55,20 @@ class ConfigEntityController {
             return responseWriter;
         }
         LocalDateTime currentTimestamp = LocalDateTime.now();
-        parameter.setReceivedAt(currentTimestamp.format(formatter));
-        ProducerRecord<String, byte[]> msg = new ProducerRecord<>(TOPIC_NAME, parameter.getOrganizationId().toString(), Utils.getBytes(parameter));
-        msg.headers()
-                .add("actionType", ActionType.UPSERT.name().getBytes())
-                .add("entityType", EntityType.PARAM.name().getBytes());
+        parameter.setReceivedAt(currentTimestamp);
+        ProducerRecord<String, byte[]> msg = null;
+        try {
+            msg = new ProducerRecord<>(TOPIC_NAME, parameter.getOrganizationId().toString(),
+                    objectMapper.writeValueAsString(parameter).getBytes());
+            msg.headers()
+                    .add("actionType", ActionType.UPSERT.name().getBytes())
+                    .add("entityType", EntityType.PARAM.name().getBytes());
 
-        producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
+            producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            responseWriter.setResult(new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST));
+        }
 
         return responseWriter;
     }
@@ -77,13 +84,19 @@ class ConfigEntityController {
         parameter.setId(id);
         parameter.setConnectionId(connectionId);
         parameter.setOrganizationId(orgId);
-        parameter.setReceivedAt(currentTimestamp.format(formatter));
-        ProducerRecord<String, byte[]> msg = new ProducerRecord<>(TOPIC_NAME, orgId.toString(), Utils.getBytes(parameter));
-        msg.headers()
-                .add("actionType", ActionType.DELETE.name().getBytes())
-                .add("entityType", EntityType.PARAM.name().getBytes());
+        parameter.setReceivedAt(currentTimestamp);
+        ProducerRecord<String, byte[]> msg = null;
+        try {
+            msg = new ProducerRecord<>(TOPIC_NAME, orgId.toString(), objectMapper.writeValueAsString(parameter).getBytes());
+            msg.headers()
+                    .add("actionType", ActionType.DELETE.name().getBytes())
+                    .add("entityType", EntityType.PARAM.name().getBytes());
 
-        producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
+            producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
+
+        } catch (JsonProcessingException e) {
+            responseWriter.setResult(new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST));
+        }
 
         return responseWriter;
     }
@@ -103,14 +116,15 @@ class ConfigEntityController {
                 return responseWriter;
             }
             FTPConnection connection = objectMapper.convertValue(connectionPayload, FTPConnection.class);
-            connection.setReceivedAt(currentTimestamp.format(formatter));
+            connection.setReceivedAt(currentTimestamp);
             ReecoRequestParamValidator<Connection> validator = new ReecoRequestParamValidator<>();
             responseWriter = validator.getResponseMessage(connection);
             if (responseWriter.getResult() != null) {
                 return responseWriter;
             }
 
-            ProducerRecord<String, byte[]> msg = new ProducerRecord<>(TOPIC_NAME, connection.getOrganizationId().toString(), Utils.getBytes(connection));
+            ProducerRecord<String, byte[]> msg = new ProducerRecord<>(TOPIC_NAME, connection.getOrganizationId().toString(),
+                    objectMapper.writeValueAsString(connection).getBytes());
             msg.headers()
                     .add("actionType", ActionType.UPSERT.name().getBytes())
                     .add("entityType", EntityType.CONNECTION.name().getBytes())
@@ -119,7 +133,8 @@ class ConfigEntityController {
             producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
 
 
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException|JsonProcessingException ex) {
+            ex.printStackTrace();
             responseWriter.setResult(new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST));
         }
         return responseWriter;
@@ -135,12 +150,19 @@ class ConfigEntityController {
             FTPConnection connection = new FTPConnection();
             connection.setOrganizationId(orgId);
             connection.setId(id);
-            ProducerRecord<String, byte[]> msg = new ProducerRecord<>(TOPIC_NAME, orgId.toString(), Utils.getBytes(connection));
-            msg.headers()
-                    .add("actionType", ActionType.DELETE.name().getBytes())
-                    .add("entityType", EntityType.CONNECTION.name().getBytes())
-                    .add("protocol",Protocol.FTP.name().getBytes());
-            producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
+            ProducerRecord<String, byte[]> msg = null;
+            try {
+                msg = new ProducerRecord<>(TOPIC_NAME, orgId.toString(), objectMapper.writeValueAsString(connection).getBytes());
+                msg.headers()
+                        .add("actionType", ActionType.DELETE.name().getBytes())
+                        .add("entityType", EntityType.CONNECTION.name().getBytes())
+                        .add("protocol",Protocol.FTP.name().getBytes());
+                producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+                responseWriter.setResult(new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST));
+            }
+
         }
         else {
             responseWriter.setResult(new ResponseEntity<>("Unsupported protocol " + protocol, HttpStatus.BAD_REQUEST));

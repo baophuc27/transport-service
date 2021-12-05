@@ -22,6 +22,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 @Slf4j
@@ -52,24 +53,42 @@ public class EventStatisticController {
         Timestamp timestampEnd = Timestamp.valueOf(endTime);
         Timestamp timestampStart = Timestamp.valueOf(startTime);
         log.info("Start aggregation job with time range from {} to {}", startTime.toString(), endTime.toString());
-        updateStatEventUseCase.updateNumStatEvent(timestampStart, timestampEnd);
+        updateStatEventUseCase.updateNumStatEvent(endTime);
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 6000)
     public void kafkaProducerMessage() {
+        Random rand = new Random();
         LocalDateTime currTime = LocalDateTime.now();
+        List<Long> paramIdTest = Arrays.asList(24L,25L,28L);
+        List<String> indicatorName = Arrays.asList("Temperature", "Wind Direction", "Salinity");
+        List<Long> indicatorTest = Arrays.asList(1L,255L,223L);
+        List<String> paramNames = Arrays.asList("nhiet do test-data",
+                "do man test-data",
+                "huong-gio test-data");
+        List<String> windDirectionValues = Arrays.asList("N", "N/NE","NE","E/NE","E",
+                "E/SE","SE","S/SE","S","S/SW",
+                "SW","W/SW","W","W/NW","NW","N/NW");
+        int idx = rand.nextInt(3);
+
         IncomingTsEvent msg = new IncomingTsEvent();
 
-        msg.setOrganizationId(generateRandomLong(1L, 4L));
-        msg.setWorkspaceId(generateRandomLong(1L, 4L));
-        msg.setStationId(generateRandomLong(1L, 3L));
-        msg.setConnectionId(generateRandomLong(1L, 3L));
-        msg.setParamId(generateRandomLong(1L, 11L));
+        msg.setOrganizationId(3L);
+        msg.setWorkspaceId(9L);
+        msg.setStationId(8L);
+        msg.setConnectionId(21L);
+        msg.setParamId(paramIdTest.get(idx));
         msg.setEventTime(currTime);
-        msg.setIndicatorId(generateRandomLong(1L, 2L));
-        msg.setIndicatorName("temp");
-        msg.setParamName("nhiet do");
-        msg.setValue(randomDouble(30L, 40L).toString());
+        msg.setIndicatorId(indicatorTest.get(idx));
+        msg.setIndicatorName(indicatorName.get(idx));
+        msg.setParamName(paramNames.get(idx));
+        if (paramIdTest.get(idx) == 24L){
+            msg.setValue(randomDouble(20L, 30L).toString());
+        }
+        else if (paramIdTest.get(idx) == 25L){
+            msg.setValue(randomDouble(0.05, 0.09).toString());
+        }
+        else msg.setValue(windDirectionValues.get(rand.nextInt(windDirectionValues.size())));
         msg.setReceivedAt(currTime);
         msg.setSentAt(currTime);
         msg.setLat(new Random().nextDouble());
@@ -83,7 +102,7 @@ public class EventStatisticController {
         return leftLimit + (long) (Math.random() * (rightLimit - leftLimit));
     }
 
-    public Double randomDouble(Long leftLimit, Long rightLimit){
+    public Double randomDouble(double leftLimit, double rightLimit){
         Random r = new Random();
         return leftLimit + (rightLimit - leftLimit) * r.nextDouble();
     }
