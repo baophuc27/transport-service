@@ -227,7 +227,7 @@ public class ChartService {
             dataPointDto.setEventTime((LocalDateTime)entry.getKey());
             dataPointDto.setValue(mean.toString());
             for (Alarm alarm: alarms){
-                if(checkMatchingAlarmCondition(alarm,mean)){
+                if(Comparison.checkMatchingAlarmCondition(alarm,mean)){
                     dataPointDto.setIsAlarm(Boolean.TRUE);
                     dataPointDto.setAlarmType(alarm.getAlarmType().toString());
                     dataPointDto.setAlarmId(alarm.getPartitionKey().getAlarmId());
@@ -303,7 +303,7 @@ public class ChartService {
             dataPointDto.setEventTime(sDate.plusDays(Math.round((Double)entry.getKey() * (chartResolution.getValueFromEnum()/24))).atStartOfDay());
             dataPointDto.setValue(Comparison.roundNum(sum/cnt,2).toString());
             for (Alarm alarm: alarms){
-                if(checkMatchingAlarmCondition(alarm,Comparison.roundNum(sum/cnt,2))){
+                if(Comparison.checkMatchingAlarmCondition(alarm,Comparison.roundNum(sum/cnt,2))){
                     dataPointDto.setIsAlarm(Boolean.TRUE);
                     dataPointDto.setAlarmType(alarm.getAlarmType().toString());
                     dataPointDto.setAlarmId(alarm.getPartitionKey().getAlarmId());
@@ -549,31 +549,5 @@ public class ChartService {
         return apiResponse;
     }
 
-    private boolean isInBracketRange(Alarm alarm, Double value) {
-        return value > Double.parseDouble(alarm.getMinValue())
-                && value < Double.parseDouble(alarm.getMaxValue());
-    }
-    private boolean isInSquareRange(Alarm alarm, Double value) {
-        return value >= Double.parseDouble(alarm.getMinValue())
-                && value <= Double.parseDouble(alarm.getMaxValue());
-    }
 
-    private boolean isExactEqualNumber(Alarm alarm, Double value) {
-        return value.equals(Double.valueOf(alarm.getMinValue()));
-    }
-
-    private boolean isExactEqualCategorical(Alarm alarm, String value) {
-        return value.equals(alarm.getMinValue());
-    }
-
-    public boolean checkMatchingAlarmCondition(Alarm alarm, Double value) {
-        if (alarm.getAlarmType() == AlarmType.THRESHOLD) {
-                return isExactEqualNumber(alarm, value);
-        } else if (alarm.getAlarmType() == AlarmType.SQUARE_RANGE) {
-            return isInSquareRange(alarm, value);
-        } else if (alarm.getAlarmType() == AlarmType.BRACKET_RANGE) {
-            return isInBracketRange(alarm, value);
-        }
-        return false;
-    }
 }

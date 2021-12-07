@@ -33,6 +33,9 @@ public class DataService {
     ParamsByOrgRepository paramsByOrgRepository;
 
     @Autowired
+    AlarmRepository alarmRepository;
+
+    @Autowired
     CategoricalTsByOrgRepository categoricalTsByOrgRepository;
 
     @Autowired
@@ -51,6 +54,7 @@ public class DataService {
             ByteArrayInputStream inputFilestream = new ByteArrayInputStream(bytes);
             BufferedReader br = new BufferedReader(new InputStreamReader(inputFilestream ));
             String line = "";
+            Map<Long,List<Alarm>> alarms = new HashMap<>();
             List<NumericalTsByOrg> numericalTsByOrgs = new ArrayList<>();
             List<CategoricalTsByOrg> categoricalTsByOrgs = new ArrayList<>();
             List<NumericalStatByOrg> numericalStatByOrgs = new ArrayList<>();
@@ -71,6 +75,8 @@ public class DataService {
                                         .orElseThrow(()->new Exception("Invalid Param!"));
                                 Indicator indicator = indicatorInfoRepository.findByPartitionKeyIndicatorId(paramsByOrg.getIndicatorId())
                                         .orElseThrow(()->new Exception("Invalid Indicator"));
+                                List<Alarm> alarmList = alarmRepository.findByPartitionKeyOrganizationIdAndPartitionKeyParamId(orgId,paramsByOrg.getPartitionKey().getParamId());
+                                alarms.put(paramsByOrg.getPartitionKey().getParamId(), alarmList);
                                 parameterDto.setIndicatorType(indicator.getValueType());
                                 parameterDto.setConnectionId(paramsByOrg.getConnectionId());
                                 parameterDto.setParameterName(paramsByOrg.getParamName());
@@ -84,14 +90,14 @@ public class DataService {
                         throw new Exception("Column not match param!");
                     }
                 }else{
-                    System.out.println(listLine);
+//                    System.out.println(listLine);
                     DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                    ZoneId timeZone = ZoneId.of("Asia/Ho_Chi_Minh");
-                    ZonedDateTime eTime = LocalDateTime.parse(listLine[0].substring(0,19), dtf).atZone(timeZone);
+//                    ZoneId timeZone = ZoneId.of("Asia/Ho_Chi_Minh");
+//                    ZonedDateTime eTime = LocalDateTime.parse(listLine[0].substring(0,19), dtf).atZone(timeZone);
 
-                    ZonedDateTime vnTime = eTime.withZoneSameInstant(ZoneId.of("UTC"));
-                    LocalDateTime event_time = vnTime.toLocalDateTime();
+//                    ZonedDateTime vnTime = eTime.withZoneSameInstant(ZoneId.of("UTC"));
+                    LocalDateTime event_time = LocalDateTime.parse(listLine[0].substring(0,19), dtf);
                     LocalDate date = event_time.toLocalDate();
                     Double lat = null;
                     Double lon = null;
@@ -112,10 +118,22 @@ public class DataService {
                                         orgId,  event_time, parameterDtos.get(i - 1).getParameterId()
                                 );
     //                        Optional<NumericalTsByOrg> numericalTsByOrgOld = numericalTsByOrgRepository.findByPartitionKey(nkey);
+                                Double value = Double.parseDouble(listLine[i]);
+                                Boolean isAlarm = Boolean.FALSE;
+                                String alarmType = null;
+                                Long alarmId = null;
+                                for (Alarm alarm: alarms.get(parameterDtos.get(i - 1).getParameterId())){
+                                    if(Comparison.checkMatchingAlarmCondition(alarm,value)){
+                                        isAlarm = Boolean.TRUE;
+                                        alarmType = alarm.getAlarmType().toString();
+                                        alarmId = alarm.getPartitionKey().getAlarmId();
+                                        break;
+                                    }
+                                }
                                 NumericalTsByOrg numericalTsByOrg = new NumericalTsByOrg(
                                         nkey, parameterDtos.get(i-1).getIndicatorName(),parameterDtos.get(i-1).getParameterName(),
                                         date,parameterDtos.get(i-1).getStationId(), parameterDtos.get(i-1).getConnectionId(),
-                                        Double.parseDouble(listLine[i]), event_time,false, null, null, lat, lon
+                                        Double.parseDouble(listLine[i]), event_time,isAlarm, alarmType, alarmId, lat, lon
                                 );
     //                    numericalTsByOrgRepository.save(numericalTsByOrg);
     //                    break;
