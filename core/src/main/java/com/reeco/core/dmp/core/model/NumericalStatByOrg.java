@@ -1,5 +1,6 @@
 package com.reeco.core.dmp.core.model;
 
+import com.reeco.common.model.enumtype.AlarmType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.cassandra.core.cql.Ordering;
@@ -55,4 +56,13 @@ public class NumericalStatByOrg {
 
     @Column("last_updated")
     LocalDateTime lastUpdated;
+
+    @Column("is_alarm")
+    private Boolean isAlarm;
+
+    @Column("alarm_id")
+    private Long alarmId;
+
+    @Column("alarm_type")
+    private String alarmType;
 }

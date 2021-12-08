@@ -186,11 +186,23 @@ public class DataService {
                     LocalDate numDate = LocalDate.parse(dp[0].split(" ")[0], df);
                     Long paramId = Long.parseLong(dp[1]);
                     NumericalStatByOrg.Key numericalStatByOrgKey = new NumericalStatByOrg.Key(orgId, numDate, paramId);
+                    Double value = stats.getAverage();
+                    Boolean isAlarm = Boolean.FALSE;
+                    String alarmType = null;
+                    Long alarmId = null;
+                    for (Alarm alarm: alarms.get(paramId)){
+                        if(Comparison.checkMatchingAlarmCondition(alarm,value)){
+                            isAlarm = Boolean.TRUE;
+                            alarmType = alarm.getAlarmType().toString();
+                            alarmId = alarm.getPartitionKey().getAlarmId();
+                            break;
+                        }
+                    }
                     NumericalStatByOrg numericalStatByOrg = new NumericalStatByOrg(numericalStatByOrgKey, stats.getMin(), stats.getMax(),
                             Comparison.roundNum(Comparison.median(entry.getValue()), 2),
                             Comparison.roundNum(stats.getAverage(), 2), stats.getSum(),
                             Comparison.roundNum(Comparison.std(entry.getValue(), stats.getAverage()), 2),
-                            stats.getCount(), LocalDateTime.now());
+                            stats.getCount(), LocalDateTime.now(),isAlarm,  alarmId, alarmType);
                     numericalStatByOrgs.add(numericalStatByOrg);
                 }
             }
