@@ -1,7 +1,9 @@
-package ez24.crawler.config;
+package com.reeco.http.configuration;
 
+import com.reeco.http.cache.ConnectionCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -13,8 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 
 public class PreInterceptor extends HandlerInterceptorAdapter {
     private static Logger log = LoggerFactory.getLogger(PreInterceptor.class);
-    @Value("${secret_key_authen}")
-    private String secret_key;
+    @Autowired
+    ConnectionCache connectionCache;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
@@ -23,8 +26,19 @@ public class PreInterceptor extends HandlerInterceptorAdapter {
         System.out.println("Request URL: " + request.getRequestURL());
 //        System.out.println("Start Time: " + secret_key);
 //        System.out.println("request header " + request.getHeader("secret_key"));
-        if(!request.getHeader("secret_key").equals(secret_key)){
-            throw new Exception("Invalid secret_key");
+
+        if(request.getHeader("access_key") == null){
+            response.getWriter().write("Not specified access key");
+            response.setStatus(403);
+            return false;
+
+        }
+        String accessKey = request.getHeader("access_key");
+        String connectionId = accessKey.split("%")[0];
+        if (connectionCache.get(connectionId) == null || !request.getHeader("access_key").equals(connectionCache.get(connectionId).getAccessToken())){
+            response.getWriter().write("Invalid access key");
+            response.setStatus(403);
+            return false;
         }
         request.setAttribute("startTime", startTime);
         return true;

@@ -20,3 +20,13 @@ services:
       args:
         VERSION: 0.1.0
     restart: always
+
+  coreservice:
+    build:
+      context: .
+      dockerfile: dockerfile-core-service
+      args:
+        VERSION: 0.1.0
+    restart: always
+    ports:
+      - 7001:7001

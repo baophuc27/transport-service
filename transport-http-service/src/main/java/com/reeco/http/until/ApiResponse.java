@@ -1,4 +1,4 @@
-package com.reeco.core.dmp.core.until;
+package com.reeco.http.until;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;

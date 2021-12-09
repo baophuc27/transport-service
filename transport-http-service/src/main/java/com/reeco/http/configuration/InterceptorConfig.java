@@ -1,4 +1,4 @@
-package ez24.crawler.config;
+package com.reeco.http.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
