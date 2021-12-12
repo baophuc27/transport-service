@@ -20,7 +20,7 @@ public interface NumericalTsByOrgRepository extends ReactiveCassandraRepository<
     <S extends NumericalTsByOrg> Mono<S> save(S entity);
 
     @Query(value = "SELECT * FROM numeric_series_by_organization WHERE organization_id = ?0 AND param_id = ?1 AND event_time >= ?2 AND event_time <= ?3")
-    Flux<NumericalTsByOrg> finAllEventByOrg(Long organizationId,
+    Flux<NumericalTsByOrg> findAllEventByOrg(Long organizationId,
                                             Long paramId,
                                             Timestamp startTime,
                                             Timestamp endTime);
