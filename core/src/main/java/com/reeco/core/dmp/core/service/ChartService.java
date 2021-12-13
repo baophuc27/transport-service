@@ -226,6 +226,8 @@ public class ChartService {
             DataPointDto dataPointDto = new DataPointDto();
             dataPointDto.setEventTime((LocalDateTime)entry.getKey());
             dataPointDto.setValue(mean.toString());
+            dataPointDto.setLat(entry.getValue().get(0).getLat());
+            dataPointDto.setLon(entry.getValue().get(0).getLon());
             for (Alarm alarm: alarms){
                 if(Comparison.checkMatchingAlarmCondition(alarm,mean)){
                     dataPointDto.setIsAlarm(Boolean.TRUE);

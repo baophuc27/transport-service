@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RequestDto {
 
-    private String paramKey;
+    private Long paramId;
 
     private String value;
 

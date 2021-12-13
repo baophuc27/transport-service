@@ -20,6 +20,10 @@ public class Parameter {
 
     private Long workspaceId;
 
+    private String indicatorName;
+
+    private Long indicatorId;
+
 
     public Parameter(ParamsByOrg paramsByOrg){
         this.paramId = paramsByOrg.getPartitionKey().getParamId();
@@ -28,5 +32,6 @@ public class Parameter {
         this.paramName = paramsByOrg.getParamName();
         this.stationId = paramsByOrg.getStationId();
         this.workspaceId = paramsByOrg.getStationId();
+        this.indicatorId = paramsByOrg.getIndicatorId();
     }
 }

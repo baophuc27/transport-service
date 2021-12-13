@@ -1,6 +1,7 @@
 package com.reeco.http.controller;
 
 import com.reeco.http.cache.ConnectionCache;
+import com.reeco.http.model.dto.Parameter;
 import com.reeco.http.model.dto.RequestDto;
 import com.reeco.http.service.TransportHttpService;
 import com.reeco.http.until.ApiResponse;
