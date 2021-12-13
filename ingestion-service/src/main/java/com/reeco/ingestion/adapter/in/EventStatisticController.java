@@ -48,12 +48,14 @@ public class EventStatisticController {
     public void aggStatisticEvent() {
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.MIN;
+//        LocalTime time = LocalTime.of(23, 59, 59);
         LocalDateTime endTime = LocalDateTime.of(date, time).atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime();
         LocalDateTime startTime = endTime.minusDays(5);
         Timestamp timestampEnd = Timestamp.valueOf(endTime);
         Timestamp timestampStart = Timestamp.valueOf(startTime);
         log.info("Start aggregation job with time range from {} to {}", startTime.toString(), endTime.toString());
         updateStatEventUseCase.updateNumStatEvent(endTime);
+        updateStatEventUseCase.updateCatStatEvent(timestampStart, timestampEnd);
     }
 
     @Scheduled(fixedRate = 60000)
@@ -98,7 +100,7 @@ public class EventStatisticController {
         kafkaProducerEventTemplate.send("reeco_time_series_event", msg);
     }
 
-    public Long generateRandomLong(Long leftLimit, Long rightLimit) {
+    public Long randomLong(Long leftLimit, Long rightLimit) {
         return leftLimit + (long) (Math.random() * (rightLimit - leftLimit));
     }
 

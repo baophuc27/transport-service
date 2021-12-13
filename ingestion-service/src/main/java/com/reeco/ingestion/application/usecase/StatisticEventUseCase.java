@@ -8,5 +8,5 @@ public interface StatisticEventUseCase {
 
     void updateNumStatEvent(LocalDateTime endTime);
 
-    void updateCatStatEvent();
+    void updateCatStatEvent(Timestamp startTime, Timestamp endTime);
 }

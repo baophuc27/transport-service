@@ -34,7 +34,7 @@ public class CategoricalStatByOrg {
     @PrimaryKey
     private CategoricalStatByOrg.Key partitionKey;
 
-    @Column("value_count")
+    @Column("count")
     private Long valueCount;
 
     @Column("last_updated")
