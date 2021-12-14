@@ -148,12 +148,16 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
                 .map(v -> numStatEventMapper.toPersistence(v))
                 .flatMap(v -> numericalStatByOrgRepository.save(v))
                 .log()
-                .flatMap(v->eventStatisticInfoRepository.save(
+                .flatMap(v->{
+                            LocalDateTime lastAggTime = LocalDateTime.of(LocalDate.now(), LocalTime.MIN)
+                                    .atZone(ZoneId.of("Asia/Ho_Chi_Minh"))
+                                    .toLocalDateTime();
+                    return eventStatisticInfoRepository.save(
                         new EventStatisticMetaInfo(new EventStatisticMetaInfo.Key(v.getPartitionKey().getOrganizationId(),
                                 v.getPartitionKey().getParamId()),
                                 LocalDateTime.now(),
-                                LocalDateTime.now().minusDays(1L))
-                ))
+                                lastAggTime.minusDays(1L)));}
+                    )
                 .subscribe(v -> log.info("Update meta info: " + v.toString()));
 
     }

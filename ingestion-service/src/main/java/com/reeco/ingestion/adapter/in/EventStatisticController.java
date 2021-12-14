@@ -2,15 +2,11 @@ package com.reeco.ingestion.adapter.in;
 
 import com.reeco.ingestion.application.port.in.IncomingTsEvent;
 import com.reeco.ingestion.application.usecase.StatisticEventUseCase;
-import com.reeco.ingestion.cache.model.AlarmCache;
 import com.reeco.ingestion.cache.service.AlarmCacheUseCase;
 import com.reeco.ingestion.cache.service.IndicatorCacheUseCase;
-import com.reeco.ingestion.domain.Indicator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
@@ -49,7 +45,9 @@ public class EventStatisticController {
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.MIN;
 //        LocalTime time = LocalTime.of(23, 59, 59);
-        LocalDateTime endTime = LocalDateTime.of(date, time).atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime();
+        LocalDateTime endTime = LocalDateTime.of(date, time)
+                .atZone(ZoneId.of("Asia/Ho_Chi_Minh"))
+                .toLocalDateTime();
         LocalDateTime startTime = endTime.minusDays(5);
         Timestamp timestampEnd = Timestamp.valueOf(endTime);
         Timestamp timestampStart = Timestamp.valueOf(startTime);
@@ -58,7 +56,7 @@ public class EventStatisticController {
         updateStatEventUseCase.updateCatStatEvent(timestampStart, timestampEnd);
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 120000)
     public void kafkaProducerMessage() {
         Random rand = new Random();
         LocalDateTime currTime = LocalDateTime.now();
