@@ -4,7 +4,7 @@ import com.reeco.common.model.dto.Alarm;
 import com.reeco.common.model.enumtype.AlarmType;
 import com.reeco.common.model.enumtype.MaintainType;
 import com.reeco.common.model.enumtype.ValueType;
-import com.reeco.ingestion.application.port.in.IncomingTsEvent;
+import com.reeco.common.model.dto.IncomingTsEvent;
 import com.reeco.ingestion.application.port.in.RuleEngineEvent;
 import com.reeco.ingestion.application.port.out.AlarmEvent;
 import com.reeco.ingestion.application.usecase.RuleEngineUseCase;
