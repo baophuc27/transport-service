@@ -299,13 +299,29 @@ public class DataService {
             latestDataConnection.setConnectionId(id);
             List<ParamsByOrg> paramsByOrgs = paramsByOrgRepository.findParamByConnection(orgId, id);
             for (ParamsByOrg paramsByOrg: paramsByOrgs){
-                NumericalTsByOrg numericalTsByOrg = numericalTsByOrgRepository.find1LatestRow(orgId,paramsByOrg.getPartitionKey().getParamId())
-                        .orElseThrow(()-> new Exception("invalid connectionId!"));
-                if (latestDataConnection.getLatestTime() == null){
-                    latestDataConnection.setLatestTime(numericalTsByOrg.getPartitionKey().getEventTime());
+                Indicator indicator = indicatorInfoRepository.findByPartitionKeyIndicatorId(paramsByOrg.getIndicatorId())
+                        .orElseThrow(()-> new Exception("Invalid Indicator Id"));
+                if (indicator.getValueType().equals("NUMBER")) {
+                    Optional<NumericalTsByOrg> numericalTsByOrg = numericalTsByOrgRepository.find1LatestRow(orgId, paramsByOrg.getPartitionKey().getParamId());
+                    if (numericalTsByOrg.isPresent()) {
+                        if (latestDataConnection.getLatestTime() == null) {
+                            latestDataConnection.setLatestTime(numericalTsByOrg.get().getPartitionKey().getEventTime());
+                        } else {
+                            if (latestDataConnection.getLatestTime().isBefore(numericalTsByOrg.get().getPartitionKey().getEventTime())) {
+                                latestDataConnection.setLatestTime(numericalTsByOrg.get().getPartitionKey().getEventTime());
+                            }
+                        }
+                    }
                 }else{
-                    if(latestDataConnection.getLatestTime().isBefore(numericalTsByOrg.getPartitionKey().getEventTime())){
-                        latestDataConnection.setLatestTime(numericalTsByOrg.getPartitionKey().getEventTime());
+                    Optional<CategoricalTsByOrg> categoricalTsByOrg = categoricalTsByOrgRepository.find1LatestRow(orgId, paramsByOrg.getPartitionKey().getParamId());
+                    if (categoricalTsByOrg.isPresent()) {
+                        if (latestDataConnection.getLatestTime() == null) {
+                            latestDataConnection.setLatestTime(categoricalTsByOrg.get().getPartitionKey().getEventTime());
+                        } else {
+                            if (latestDataConnection.getLatestTime().isBefore(categoricalTsByOrg.get().getPartitionKey().getEventTime())) {
+                                latestDataConnection.setLatestTime(categoricalTsByOrg.get().getPartitionKey().getEventTime());
+                            }
+                        }
                     }
                 }
 

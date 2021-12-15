@@ -1,12 +1,14 @@
 package com.reeco.core.dmp.core.repo;
 
 import com.reeco.core.dmp.core.model.CategoricalTsByOrg;
+import com.reeco.core.dmp.core.model.NumericalTsByOrg;
 import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.data.cassandra.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CategoricalTsByOrgRepository extends CassandraRepository<CategoricalTsByOrg, Long> {
@@ -21,4 +23,8 @@ public interface CategoricalTsByOrgRepository extends CassandraRepository<Catego
     @Query("SELECT * FROM categorical_series_by_organization WHERE organization_id=?0 and param_id=?1\n" +
             "LIMIT 2 ALLOW FILTERING ;")
     List<CategoricalTsByOrg> find2LatestRow(Long orgId, Long paramId);
+
+    @Query("SELECT * FROM categorical_series_by_organization WHERE organization_id=?0 and param_id=?1\n" +
+            "LIMIT 1;")
+    Optional<CategoricalTsByOrg> find1LatestRow(Long orgId, Long paramId);
 }
