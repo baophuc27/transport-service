@@ -64,21 +64,24 @@ public class IncomingTsEventController {
     }
 
     @KafkaListener(topics = "reeco_time_series_event",containerFactory = "timeSeriesEventListener")
-    public void listen(@Headers Map<String,byte[]> header, @Payload IncomingTsEvent event){
-        Indicator indicator = indicatorCacheUseCase.get(event.getIndicatorId().toString());
-        if (indicator != null) {
-            ParamAndAlarm paramAndAlarm = alarmCacheUseCase.get(event.getParamId().toString());
-            RuleEngineEvent ruleEngineEvent = null;
-            if (paramAndAlarm != null) {
-                for (Alarm alarm : paramAndAlarm.getAlarms()) {
-                    ruleEngineEvent = ruleEngineUseCase.handleRuleEvent(alarm, event, indicator);
-                    if (ruleEngineEvent.getIsAlarm()) break;
+    public void listen(@Payload IncomingTsEvent event){
+        try {
+            Indicator indicator = indicatorCacheUseCase.get(event.getIndicatorId().toString());
+            if (indicator != null) {
+                ParamAndAlarm paramAndAlarm = alarmCacheUseCase.get(event.getParamId().toString());
+                RuleEngineEvent ruleEngineEvent = null;
+                if (paramAndAlarm != null) {
+                    for (Alarm alarm : paramAndAlarm.getAlarms()) {
+                        ruleEngineEvent = ruleEngineUseCase.handleRuleEvent(alarm, event, indicator);
+                        if (ruleEngineEvent.getIsAlarm()) break;
+                    }
+                    storeTsEventUseCase.storeEvent(ruleEngineEvent, indicator);
                 }
-                storeTsEventUseCase.storeEvent(ruleEngineEvent, indicator);
-            }
+            } else log.warn("Indicator Not Found with Id: [{}]", event.getIndicatorId());
         }
-        else log.warn("Indicator Not Found with Id: [{}]", event.getIndicatorId());
-
+        catch (RuntimeException exception){
+            exception.printStackTrace();
+        }
     }
 
     @KafkaListener(topics = "reeco_config_event", containerFactory = "configEventListener")
