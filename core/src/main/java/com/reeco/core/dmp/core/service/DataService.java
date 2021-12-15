@@ -298,6 +298,9 @@ public class DataService {
             LatestDataConnection latestDataConnection = new LatestDataConnection();
             latestDataConnection.setConnectionId(id);
             List<ParamsByOrg> paramsByOrgs = paramsByOrgRepository.findParamByConnection(orgId, id);
+            if(paramsByOrgs.size() <= 0) {
+                throw new Exception("Not found connection in organization");
+            }
             for (ParamsByOrg paramsByOrg: paramsByOrgs){
                 Indicator indicator = indicatorInfoRepository.findByPartitionKeyIndicatorId(paramsByOrg.getIndicatorId())
                         .orElseThrow(()-> new Exception("Invalid Indicator Id"));
