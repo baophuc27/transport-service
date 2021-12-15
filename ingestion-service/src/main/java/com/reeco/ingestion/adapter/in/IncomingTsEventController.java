@@ -1,12 +1,11 @@
 package com.reeco.ingestion.adapter.in;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reeco.common.model.dto.Alarm;
 import com.reeco.common.model.dto.Parameter;
 import com.reeco.common.model.enumtype.ActionType;
 import com.reeco.common.model.enumtype.EntityType;
-import com.reeco.ingestion.application.port.in.IncomingTsEvent;
+import com.reeco.common.model.dto.IncomingTsEvent;
 import com.reeco.ingestion.application.port.in.RuleEngineEvent;
 import com.reeco.ingestion.application.usecase.RuleEngineUseCase;
 import com.reeco.ingestion.application.usecase.StoreConfigUseCase;

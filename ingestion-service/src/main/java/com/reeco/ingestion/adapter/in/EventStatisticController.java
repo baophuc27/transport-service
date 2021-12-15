@@ -1,6 +1,6 @@
 package com.reeco.ingestion.adapter.in;
 
-import com.reeco.ingestion.application.port.in.IncomingTsEvent;
+import com.reeco.common.model.dto.IncomingTsEvent;
 import com.reeco.ingestion.application.usecase.StatisticEventUseCase;
 import com.reeco.ingestion.cache.service.AlarmCacheUseCase;
 import com.reeco.ingestion.cache.service.IndicatorCacheUseCase;

@@ -1,6 +1,6 @@
 package com.reeco.ingestion.configuration;
 
-import com.reeco.ingestion.application.port.in.IncomingTsEvent;
+import com.reeco.common.model.dto.IncomingTsEvent;
 import com.reeco.ingestion.application.port.out.AlarmEvent;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;

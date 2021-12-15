@@ -1,6 +1,6 @@
 package com.reeco.ingestion.configuration;
 
-import com.reeco.ingestion.application.port.in.IncomingTsEvent;
+import com.reeco.common.model.dto.IncomingTsEvent;
 import lombok.extern.log4j.Log4j2;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -44,13 +44,10 @@ public class KafkaConsumerConfiguration {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, eventCg);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, eventCgResetOffset);
-        JsonDeserializer<IncomingTsEvent>
-                deserializer = new JsonDeserializer<>();
-        deserializer.addTrustedPackages("*");//your package
-        log.info("CONSUMERS: " + props.toString());
+
         return new DefaultKafkaConsumerFactory<>(props,
                 new StringDeserializer(),
-                deserializer);
+                new JsonDeserializer<>(IncomingTsEvent.class));
     }
 
 
