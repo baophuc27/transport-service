@@ -44,10 +44,13 @@ public class KafkaConsumerConfiguration {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, eventCg);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, eventCgResetOffset);
+        JsonDeserializer<IncomingTsEvent>
+                deserializer = new JsonDeserializer<>();
+        deserializer.addTrustedPackages("*");//your package
         log.info("CONSUMERS: " + props.toString());
         return new DefaultKafkaConsumerFactory<>(props,
                 new StringDeserializer(),
-                new JsonDeserializer<>(IncomingTsEvent.class));
+                deserializer);
     }
 
 
