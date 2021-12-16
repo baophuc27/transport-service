@@ -26,8 +26,8 @@ public class TransportHttpController {
     @Autowired
     TransportHttpService transportHttpService;
 
-    @RequestMapping("/recive-data")
-    public ResponseEntity<ApiResponse> reciveData(@RequestHeader("access_key") String accessKey, @RequestBody RequestDto requestDto) throws Exception{
+    @RequestMapping("/receive-data")
+    public ResponseEntity<ApiResponse> receiveData(@RequestHeader("access_key") String accessKey, @RequestBody RequestDto requestDto) throws Exception{
         ApiResponse apiResponse = transportHttpService.pushDataToKafka(requestDto, accessKey);
         return new ResponseEntity<>(apiResponse,apiResponse.getStatus());
     }
