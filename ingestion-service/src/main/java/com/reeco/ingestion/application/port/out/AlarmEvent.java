@@ -16,6 +16,12 @@ public class AlarmEvent {
 
     Long organizationId;
 
+    Long workspaceId;
+
+    Long stationId;
+
+    Long connectionId;
+
     Long paramId;
 
     Long alarmId;

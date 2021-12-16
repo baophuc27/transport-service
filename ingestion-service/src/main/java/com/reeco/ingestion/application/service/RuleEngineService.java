@@ -126,6 +126,9 @@ public class RuleEngineService implements RuleEngineUseCase {
             boolean isOutOfMatch = isOutOfMatchCount(alarm, alarmRuleCache);
             AlarmEvent alarmEvent = new AlarmEvent(
                     event.getOrganizationId(),
+                    event.getWorkspaceId(),
+                    event.getStationId(),
+                    event.getConnectionId(),
                     event.getParamId(),
                     alarm.getId(),
                     event.getEventTime(),
