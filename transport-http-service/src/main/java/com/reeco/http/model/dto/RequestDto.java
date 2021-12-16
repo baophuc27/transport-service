@@ -12,4 +12,8 @@ public class RequestDto {
     private String value;
 
     private String eventTime;
+
+    private Double lat;
+
+    private Double lon;
 }
