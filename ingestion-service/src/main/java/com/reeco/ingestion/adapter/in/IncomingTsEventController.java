@@ -2,10 +2,12 @@ package com.reeco.ingestion.adapter.in;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reeco.common.model.dto.Alarm;
+import com.reeco.common.model.dto.HTTPConnection;
 import com.reeco.common.model.dto.Parameter;
 import com.reeco.common.model.enumtype.ActionType;
 import com.reeco.common.model.enumtype.EntityType;
 import com.reeco.common.model.dto.IncomingTsEvent;
+import com.reeco.common.model.enumtype.Protocol;
 import com.reeco.ingestion.application.port.in.RuleEngineEvent;
 import com.reeco.ingestion.application.usecase.RuleEngineUseCase;
 import com.reeco.ingestion.application.usecase.StoreConfigUseCase;
@@ -100,6 +102,20 @@ public class IncomingTsEventController {
                         default: break;
                     }
                 case CONNECTION:
+                    Protocol protocol = Protocol.valueOf(new String(header.get("protocol"), StandardCharsets.UTF_8));
+                    if (protocol.equals(Protocol.HTTP)) {
+                        HTTPConnection httpConnection = objectMapper.readValue(config, HTTPConnection.class);
+                        switch (actionType) {
+                            case UPSERT:
+                                storeConfigUseCase.storeConnection(httpConnection);
+                                break;
+                            case DELETE:
+                                storeConfigUseCase.deleteConnection(httpConnection);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
                 default: break;
             }
         }

@@ -1,9 +1,12 @@
 package com.reeco.ingestion.application.service;
 
 import com.reeco.common.model.dto.Alarm;
+import com.reeco.common.model.dto.HTTPConnection;
 import com.reeco.common.model.dto.Parameter;
 import com.reeco.common.model.enumtype.ValueType;
+import com.reeco.common.utils.AES;
 import com.reeco.ingestion.application.mapper.AlarmMapper;
+import com.reeco.ingestion.application.mapper.ConnectionMapper;
 import com.reeco.ingestion.application.mapper.ParameterMapper;
 import com.reeco.ingestion.application.usecase.StoreConfigUseCase;
 import com.reeco.ingestion.cache.model.AlarmRuleCache;
@@ -12,13 +15,16 @@ import com.reeco.ingestion.cache.service.IndicatorCacheUseCase;
 import com.reeco.ingestion.cache.service.RuleEngineCacheUseCase;
 import com.reeco.ingestion.domain.ParamAndAlarm;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.AlarmInfo;
+import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.ConnectionInfo;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.EventStatisticMetaInfo;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.ParamsByOrg;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.AlarmInfoRepository;
+import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.ConnectionInfoRepository;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.EventStatisticInfoRepository;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.ParamsByOrgRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 
@@ -53,6 +59,12 @@ public class StoreConfigService implements StoreConfigUseCase {
 
     @Autowired
     IndicatorCacheUseCase indicatorCacheUseCase;
+
+    @Autowired
+    ConnectionInfoRepository connectionInfoRepository;
+
+    @Autowired
+    ConnectionMapper connectionMapper;
 
     private final LocalDateTime defaultDate = LocalDateTime.now().minusDays(1L);
 
@@ -128,9 +140,23 @@ public class StoreConfigService implements StoreConfigUseCase {
             alarmCacheUseCase.evict(parameter.getId().toString());
             log.info("Evict Alarms From Cache: [{}]", parameter.getId().toString());
         }
-        paramsByOrgRepository.deleteById(paramsByOrgKey);
+        paramsByOrgRepository.deleteById(paramsByOrgKey).subscribe();
         log.info("Deleted param: {}", paramsByOrgKey.toString());
-        eventStatisticInfoRepository.deleteById(eventStatMetaKey);
+        eventStatisticInfoRepository.deleteById(eventStatMetaKey).subscribe();
         log.info("Deleted event statistic meta: {}", eventStatMetaKey.toString());
+    }
+
+    @Override
+    public void storeConnection(HTTPConnection httpConnection){
+        httpConnection.setAccessToken(AES.decrypt(httpConnection.getAccessToken()));
+        ConnectionInfo connectionInfo = connectionMapper.toPersistence(httpConnection);
+        connectionInfoRepository.save(connectionInfo).subscribe(v -> log.info("Saved connection: {}", v));
+    }
+
+    @Override
+    public void deleteConnection(HTTPConnection httpConnection){
+        ConnectionInfo.Key connectionKey =  new ConnectionInfo.Key(httpConnection.getOrganizationId(), httpConnection.getId());
+        connectionInfoRepository.deleteById(connectionKey).subscribe();
+        log.info("Deleted connection: {}", connectionKey.toString());
     }
 }

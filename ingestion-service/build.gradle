@@ -33,6 +33,7 @@ dependencies {
 	implementation('com.google.guava:guava:14.0')
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
 	implementation("com.hazelcast:hazelcast:4.0.1")
+	implementation(group: 'org.apache.commons', name: 'commons-lang3', version: '3.0')
 	implementation("com.hazelcast:hazelcast-spring:4.0.1")
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 	implementation project(':common')
