@@ -1,5 +1,6 @@
 package com.reeco.http.controller;
 
+import com.reeco.common.model.dto.Connection;
 import com.reeco.http.cache.ConnectionCache;
 import com.reeco.http.model.dto.Parameter;
 import com.reeco.http.model.dto.RequestDto;
@@ -26,12 +27,17 @@ public class TransportHttpController {
     @Autowired
     TransportHttpService transportHttpService;
 
-    @RequestMapping("/receive-data")
+    @PostMapping("/receive-data")
     public ResponseEntity<ApiResponse> receiveData(@RequestHeader("access_key") String accessKey, @RequestBody RequestDto requestDto) throws Exception{
         ApiResponse apiResponse = transportHttpService.pushDataToKafka(requestDto, accessKey);
         return new ResponseEntity<>(apiResponse,apiResponse.getStatus());
     }
 
+    @GetMapping("/access-token")
+    public ResponseEntity<ApiResponse> getAccessToken(@RequestParam("connectionId") Long connectionId) throws Exception{
+        ApiResponse apiResponse = transportHttpService.getAccessToken(connectionId);
+        return new ResponseEntity<>(apiResponse,apiResponse.getStatus());
+    }
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup() {
         connectionCache.loadDataToCache();

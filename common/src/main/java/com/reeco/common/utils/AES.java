@@ -13,7 +13,7 @@ public class AES {
 
     private static SecretKeySpec secretKey;
     private static byte[] key;
-    private static final String myKey = "ari-recootech.key";
+    private static final String myKey = "Ari-ReecoTech.key";
 
     public static void setKey()
     {

@@ -63,4 +63,15 @@ public class TransportHttpService {
         apiResponse.setMessage("Successful!");
         return apiResponse;
     }
+
+    public ApiResponse getAccessToken(Long connectionId) throws Exception{
+        ApiResponse apiResponse = ApiResponse.getSuccessResponse();
+
+        Connection connection = connectionCache.get(connectionId.toString());
+        if (connection==null){
+            throw new Exception("Invalid connection Id.");
+        }
+        apiResponse.setData(connection.getAccessToken());
+        return apiResponse;
+    }
 }

@@ -26,7 +26,10 @@ public class PreInterceptor extends HandlerInterceptorAdapter {
         System.out.println("Request URL: " + request.getRequestURL());
 //        System.out.println("Start Time: " + secret_key);
 //        System.out.println("request header " + request.getHeader("secret_key"));
-
+        if (request.getRequestURL().toString().contains("/access-token")){
+            request.setAttribute("startTime", startTime);
+            return true;
+        }
         if(request.getHeader("access_key") == null){
             response.getWriter().write("Not specified access key");
             response.setStatus(403);
