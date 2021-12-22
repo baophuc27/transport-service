@@ -2,6 +2,7 @@ package com.reeco.http.configuration;
 
 
 import com.reeco.common.model.dto.IncomingTsEvent;
+import com.reeco.http.model.dto.ParameterCache;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -38,8 +39,21 @@ public class KafkaProducerConfiguration {
     }
 
     @Bean
+    public ProducerFactory<String, ParameterCache> configProducerFactory() {
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        return new DefaultKafkaProducerFactory<>(configProps);
+    }
+
+    @Bean
     public KafkaTemplate<String, IncomingTsEvent> produceTsEventTemplate() {
         return new KafkaTemplate<>(tsEventProducerFactory());
     }
 
+    @Bean
+    public KafkaTemplate<String, ParameterCache> produceConfigEventTemplate() {
+        return new KafkaTemplate<>(configProducerFactory());
+    }
 }

@@ -3,11 +3,10 @@ package com.reeco.http.service;
 import com.reeco.common.model.dto.IncomingTsEvent;
 import com.reeco.http.cache.ConnectionCache;
 import com.reeco.http.model.dto.Connection;
-import com.reeco.http.model.dto.Parameter;
 import com.reeco.http.model.dto.RequestDto;
+import com.reeco.http.model.dto.ParameterCache;
 import com.reeco.http.until.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.kafka.core.KafkaTemplate;
 
@@ -16,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Random;
 
 @Slf4j
 @Service
@@ -26,6 +24,11 @@ public class TransportHttpService {
 
     @Autowired
     private KafkaTemplate<String, IncomingTsEvent> kafkaProducerEventTemplate;
+
+    @Autowired
+    private KafkaTemplate<String, ParameterCache> configProducerEventTemplate;
+
+    private final String CONFIG_TOPIC_NAME = "reeco_config_event";
 
     public ApiResponse pushDataToKafka(RequestDto requestDto, String accessKey) throws Exception{
         ApiResponse apiResponse = ApiResponse.getSuccessResponse();
@@ -38,8 +41,11 @@ public class TransportHttpService {
         Long requestDtoParamId = requestDto.getParamId();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 
-        List<Parameter> paramList = connection.getParameterList();
-        for (Parameter param : paramList) {
+        ParameterCache paraMsg = new ParameterCache();
+
+
+        List<ParameterCache> paramList = connection.getParameterList();
+        for (ParameterCache param : paramList) {
             if (param.getParamId() == requestDtoParamId) {
                 msg.setOrganizationId(param.getOrgId());
                 msg.setWorkspaceId(param.getWorkspaceId());
