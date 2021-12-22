@@ -2,7 +2,7 @@ package com.reeco.http.cache;
 
 import com.reeco.common.model.enumtype.TransportType;
 import com.reeco.http.model.dto.Connection;
-import com.reeco.http.model.dto.Parameter;
+import com.reeco.http.model.dto.ParameterCache;
 import com.reeco.http.model.entity.ConnectionByOrg;
 import com.reeco.http.model.entity.ParamsByOrg;
 import com.reeco.http.model.repo.ConnectionByOrgRepository;
@@ -37,7 +37,7 @@ public class ConnectionCache {
         for (ConnectionByOrg connectionEntity: connectionByOrg){
             Connection connection = new Connection(connectionEntity);
             List<ParamsByOrg> paramsByOrgs = paramsByOrgRepository.findParamByConnection(connection.getOrgId(),connection.getConnectionId());
-            connection.setParameterList(paramsByOrgs.stream().map(Parameter::new).collect(Collectors.toList()));
+            connection.setParameterList(paramsByOrgs.stream().map(ParameterCache::new).collect(Collectors.toList()));
             put(connection);
         }
     }
@@ -48,9 +48,9 @@ public class ConnectionCache {
         }
     }
 
-    public void put(Parameter parameter){
-        if (parameter!=null){
-            get(parameter.getConnectionId().toString()).getParameterList().add(parameter);
+    public void put(ParameterCache parameterCache){
+        if (parameterCache!=null){
+            get(parameterCache.getConnectionId().toString()).getParameterList().add(parameterCache);
         }
     }
 
@@ -64,7 +64,7 @@ public class ConnectionCache {
          getCache().evict(key);
     }
 
-    public void evict(Parameter parameter){
-        get(parameter.getConnectionId().toString()).getParameterList().remove(parameter);
+    public void evict(ParameterCache parameterCache){
+        get(parameterCache.getConnectionId().toString()).getParameterList().remove(parameterCache);
     }
 }

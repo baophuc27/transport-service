@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data
-public class Parameter {
+public class ParameterCache {
 
     private Long orgId;
 
@@ -25,7 +25,7 @@ public class Parameter {
     private Long indicatorId;
 
 
-    public Parameter(ParamsByOrg paramsByOrg){
+    public ParameterCache(ParamsByOrg paramsByOrg){
         this.paramId = paramsByOrg.getPartitionKey().getParamId();
         this.orgId = paramsByOrg.getPartitionKey().getOrganizationId();
         this.connectionId = paramsByOrg.getConnectionId();
