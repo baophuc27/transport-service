@@ -24,7 +24,7 @@ public class Connection {
 
     private TransportType transportType;
 
-    private List<Parameter> parameterList = new ArrayList<>();
+    private List<ParameterCache> parameterList = new ArrayList<>();
 
     public Connection(ConnectionByOrg connectionByOrg){
         this.orgId = connectionByOrg.getPartitionKey().getOrganizationId();
@@ -33,4 +33,5 @@ public class Connection {
         this.name = connectionByOrg.getName();
         this.transportType = connectionByOrg.getTransportType();
     }
+
 }
