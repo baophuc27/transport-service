@@ -26,6 +26,11 @@ public class KafkaTopicsConfiguration {
     @Value(value = "${kafka.topics.config-topic.properties}")
     private String configProps;
 
+    @Value(value = "${kafka.topics.config-topic.partitions}")
+    private int partitions;
+
+    @Value(value = "${kafka.topics.config-topic.replications}")
+    private int replications;
 
     private Map<String, String> getConfigs(String properties) {
         Map<String, String> configs = new HashMap<>();
@@ -49,7 +54,7 @@ public class KafkaTopicsConfiguration {
     @Bean
     public NewTopic createConfigTopic() {
         Map<String, String> configs = getConfigs(configProps);
-        NewTopic newTopic = new NewTopic(configTopic,2,(short) 1);
+        NewTopic newTopic = new NewTopic(configTopic, partitions, (short) replications);
         newTopic.configs(configs);
         return newTopic;
     }

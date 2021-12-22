@@ -37,5 +37,5 @@ kafka:
     config-topic:
       name: reeco_config_event
       properties: "retention.ms:432000000;segment.bytes:26214400;retention.bytes:1048576000"
-
-
+      partitions: 1
+      replications: 1
