@@ -1,12 +1,9 @@
 package com.reeco.ingestion.adapter.in;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.reeco.common.model.dto.Alarm;
-import com.reeco.common.model.dto.HTTPConnection;
-import com.reeco.common.model.dto.Parameter;
+import com.reeco.common.model.dto.*;
 import com.reeco.common.model.enumtype.ActionType;
 import com.reeco.common.model.enumtype.EntityType;
-import com.reeco.common.model.dto.IncomingTsEvent;
 import com.reeco.common.model.enumtype.Protocol;
 import com.reeco.ingestion.application.port.in.RuleEngineEvent;
 import com.reeco.ingestion.application.usecase.RuleEngineUseCase;
@@ -111,6 +108,18 @@ public class IncomingTsEventController {
                                 break;
                             case DELETE:
                                 storeConfigUseCase.deleteConnection(httpConnection);
+                                break;
+                            default:
+                                break;
+                        }
+                    }else if(protocol.equals(Protocol.FTP)) {
+                        FTPConnection ftpConnection = objectMapper.readValue(config, FTPConnection.class);
+                        switch (actionType) {
+                            case UPSERT:
+                                storeConfigUseCase.storeConnection(ftpConnection);
+                                break;
+                            case DELETE:
+                                storeConfigUseCase.deleteConnection(ftpConnection);
                                 break;
                             default:
                                 break;

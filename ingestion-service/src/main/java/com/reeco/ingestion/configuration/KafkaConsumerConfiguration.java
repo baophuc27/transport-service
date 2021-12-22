@@ -13,7 +13,6 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
-
 import java.util.*;
 
 
@@ -52,7 +51,7 @@ public class KafkaConsumerConfiguration {
 
 
     @Bean
-    public ConsumerFactory<String, String> eventConsumerFactoryConfig() {
+    public ConsumerFactory<String, String> eventConsumerFactoryConfig(){
         List<String> bootstrapServers = new ArrayList<>(Collections.singletonList(bootstrapAddress));
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -62,18 +61,6 @@ public class KafkaConsumerConfiguration {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         return new DefaultKafkaConsumerFactory<>(props);
     }
-//    public ConsumerFactory<String, IncomingConfigEvent> eventConsumerFactoryConfig() {
-//        List<String> bootstrapServers = new ArrayList<>(Collections.singletonList(bootstrapAddress));
-//        Map<String, Object> props = new HashMap<>();
-//        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-//        props.put(ConsumerConfig.GROUP_ID_CONFIG, eventCg);
-//        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, eventCgResetOffset);
-//        log.info("CONSUMERS: " + props);
-//        return new DefaultKafkaConsumerFactory<>(props,
-//                new StringDeserializer(),
-//                new JsonDeserializer<>(IncomingConfigEvent.class));
-//    }
-
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, IncomingTsEvent> timeSeriesEventListener()
@@ -94,12 +81,5 @@ public class KafkaConsumerConfiguration {
         factory.setAckDiscarded(true);
         return factory;
     }
-//    public ConcurrentKafkaListenerContainerFactory<String, IncomingConfigEvent> configEventListener()
-//    {
-//        ConcurrentKafkaListenerContainerFactory<String, IncomingConfigEvent> factory
-//                = new ConcurrentKafkaListenerContainerFactory<>();
-//        factory.setConsumerFactory(eventConsumerFactoryConfig());
-//        factory.setAckDiscarded(true);
-//        return factory;
-//    }
+
 }

@@ -1,8 +1,10 @@
 package com.reeco.ingestion.application.service;
 
 import com.reeco.common.model.dto.Alarm;
+import com.reeco.common.model.dto.FTPConnection;
 import com.reeco.common.model.dto.HTTPConnection;
 import com.reeco.common.model.dto.Parameter;
+import com.reeco.common.model.enumtype.TransportType;
 import com.reeco.common.model.enumtype.ValueType;
 import com.reeco.common.utils.AES;
 import com.reeco.ingestion.application.mapper.AlarmMapper;
@@ -159,4 +161,20 @@ public class StoreConfigService implements StoreConfigUseCase {
         connectionInfoRepository.deleteById(connectionKey).subscribe();
         log.info("Deleted connection: {}", connectionKey.toString());
     }
+
+    @Override
+    public void storeConnection(FTPConnection ftpConnection){
+        ConnectionInfo.Key key = new ConnectionInfo.Key(ftpConnection.getOrganizationId(), ftpConnection.getId());
+        ConnectionInfo  connectionInfo = new ConnectionInfo(key, TransportType.FTP, null,ftpConnection.getEnglishName(),
+                ftpConnection.getVietnameseName(),null, ftpConnection.getWorkspaceId(), ftpConnection.getReceivedAt(),null,null);
+        connectionInfoRepository.save(connectionInfo).subscribe(v -> log.info("Saved connection: {}", v));
+    }
+
+    @Override
+    public void deleteConnection(FTPConnection ftpConnection){
+        ConnectionInfo.Key connectionKey =  new ConnectionInfo.Key(ftpConnection.getOrganizationId(), ftpConnection.getId());
+        connectionInfoRepository.deleteById(connectionKey).subscribe();
+        log.info("Deleted connection: {}", connectionKey.toString());
+    }
+
 }

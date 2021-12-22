@@ -1,6 +1,7 @@
 package com.reeco.ingestion.application.mapper;
 
 
+import com.reeco.common.model.dto.FTPConnection;
 import com.reeco.common.model.dto.HTTPConnection;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.ConnectionInfo;
 import org.mapstruct.Mapper;
