@@ -65,6 +65,12 @@ public class ConnectionCache {
     }
 
     public void evict(ParameterCache parameterCache){
-        get(parameterCache.getConnectionId().toString()).getParameterList().remove(parameterCache);
+        if (get(parameterCache.getConnectionId().toString()) == null){
+            return;
+        }
+        ParameterCache parameterCache1 = get(parameterCache.getConnectionId().toString())
+                .getParameterList().stream().filter(pr -> pr.getParamId().equals(parameterCache.getParamId()))
+                        .findFirst().orElse(null);
+        get(parameterCache.getConnectionId().toString()).getParameterList().remove(parameterCache1);
     }
 }

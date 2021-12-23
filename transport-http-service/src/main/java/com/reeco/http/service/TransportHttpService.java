@@ -63,6 +63,9 @@ public class TransportHttpService {
                 msg.setLon(requestDto.getLon());
             }
         }
+        if (msg.getParamId() == null){
+            throw new Exception ("Invalid access token!");
+        }
         log.info(String.valueOf(msg));
         kafkaProducerEventTemplate.send("reeco_time_series_event", msg);
 

@@ -79,7 +79,7 @@ public class TransportHttpController {
                     ParamsByOrg paramsByOrg = new ParamsByOrg(
                             new ParamsByOrg.Key(
                                     parameter.getOrganizationId(),
-                                    4L
+                                    parameter.getId()
                             ),
                             parameter.getIndicatorId(),
                             parameter.getEnglishName(),
@@ -88,26 +88,51 @@ public class TransportHttpController {
                             parameter.getUnit()
                     );
                     ParameterCache parameterCache = new ParameterCache(paramsByOrg);
-                    connectionCache.put(parameterCache);
-                    log.info("Saved to cache: " + parameterCache);
+                    switch (actionType) {
+                        case UPSERT:
+                            connectionCache.put(parameterCache);
+                            log.info("Saved to cache: " + parameterCache);
+                            break;
+                        case DELETE:
+                            connectionCache.evict(parameterCache);
+                            log.info("Evict paramId from cache: " + parameterCache.getParamId());
+                            break;
+                        default:
+                            break;
+
+                    }
                     break;
                 case CONNECTION:
                     Protocol protocol = Protocol.valueOf(new String(header.get("protocol"), StandardCharsets.UTF_8));
                     if (protocol.equals(Protocol.HTTP)) {
                         HTTPConnection httpConnection = new ObjectMapper().readValue(config, HTTPConnection.class);
-                        httpConnection.setAccessToken(AES.decrypt(httpConnection.getAccessToken()));
+                        if (httpConnection.getAccessToken() != null) {
+                            httpConnection.setAccessToken(AES.decrypt(httpConnection.getAccessToken()));
+                        }
                         ConnectionByOrg connectionByOrg = new ConnectionByOrg(
                                 new ConnectionByOrg.Key(
                                         httpConnection.getOrganizationId(),
-                                        Long.valueOf(httpConnection.getAccessToken().split("%")[0])
+                                        httpConnection.getId()
                                 ),
                                 httpConnection.getAccessToken(),
                                 httpConnection.getEnglishName(),
                                 httpConnection.getTransportType()
                         );
                         Connection connection = new Connection(connectionByOrg);
-                        connectionCache.put(connection);
-                        log.info("Saved to cache: " + connection);
+                        switch (actionType){
+                            case UPSERT:
+                                connectionCache.put(connection);
+                                log.info("Saved to cache: " + connection);
+                                break;
+
+                            case DELETE:
+                                connectionCache.evict(connection.getConnectionId().toString());
+                                log.info("Evict connectionId cache: " + connection.getConnectionId());
+                                break;
+                            default:
+                                break;
+                        }
+
                     }
                     break;
                 default: break;
