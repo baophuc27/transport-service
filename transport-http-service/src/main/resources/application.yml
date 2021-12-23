@@ -1,4 +1,4 @@
-server.port: 8003
+server.port: 8043
 
 server.error.include-message: always
 

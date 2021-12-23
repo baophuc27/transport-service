@@ -5,7 +5,7 @@ RUN gradle :transport-http-service:build --no-daemon
 
 
 FROM openjdk:11
-EXPOSE 8003
+EXPOSE 8043
 
 COPY --from=build /home/gradle/src/transport-http-service/build/libs/transport-http-service-0.1.0.jar reeco-http-transport.jar
 

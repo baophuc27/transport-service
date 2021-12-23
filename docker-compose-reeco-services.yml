@@ -30,3 +30,12 @@ services:
     restart: always
     ports:
       - 7001:7001
+  httptransportservice:
+    build:
+      context: .
+      dockerfile: dockerfile-http-transport-service
+      args:
+        VERSION: 0.1.0
+    restart: always
+    ports:
+      - 8043:8043
