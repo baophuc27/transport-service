@@ -66,7 +66,7 @@ public class TransportHttpController {
     }
 
 //    @KafkaListener(topics = "reeco_config_event", containerFactory = "configEventListener")
-    @KafkaListener(id = "1", topics = "reeco_config_event", containerFactory = "configEventListener")
+    @KafkaListener(topics = "reeco_config_event", containerFactory = "configEventListener")
     public void listen(@Headers Map<String, byte[]> header, @Payload String config) {
         try {
             EntityType entityType = EntityType.valueOf(new String(header.get("entityType"), StandardCharsets.UTF_8));
