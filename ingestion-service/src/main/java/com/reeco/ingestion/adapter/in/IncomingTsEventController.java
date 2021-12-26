@@ -102,6 +102,7 @@ public class IncomingTsEventController {
                         default:
                             break;
                     }
+                    break;
                 case CONNECTION:
                     String proto = new String(header.get("protocol"), StandardCharsets.UTF_8);
                     log.info("Received protocol: {}", proto);
@@ -124,6 +125,7 @@ public class IncomingTsEventController {
                         default:
                             break;
                     }
+                    break;
                 default:
                     break;
             }
