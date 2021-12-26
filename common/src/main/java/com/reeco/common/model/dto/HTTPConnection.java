@@ -9,6 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.reeco.common.framework.EnumNamePattern;
 import com.reeco.common.model.enumtype.TransportType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
@@ -18,19 +19,8 @@ import java.time.LocalDateTime;
 @Data
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class HTTPConnection {
-    @NotNull(message = "id must be not NULL")
-    private Long id;
-
-    @NotNull(message = "workspaceId must be not NULL")
-    private Long workspaceId;
-
-    @NotNull(message = "organizationId must be not NULL")
-    private Long organizationId;
-
-    private Long stationId;
-
-    private String accessToken;
+@EqualsAndHashCode(callSuper=false)
+public class HTTPConnection extends BaseConnection {
 
     @NotNull(message = "englishName must be not NULL")
     @NotBlank(message = "englishName must be not BLANK")
@@ -40,7 +30,7 @@ public class HTTPConnection {
     @NotBlank(message = "vietnameseName must be not BLANK")
     private String vietnameseName;
 
-    @EnumNamePattern(regexp = "HTTP|FTP", message = "parameterType must be in {HTTP, FPT}")
+    @EnumNamePattern(regexp = "HTTP|FTP", message = "parameterType must be in {HTTP, FTP}")
     private TransportType transportType;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)

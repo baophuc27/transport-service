@@ -26,12 +26,14 @@ public class KafkaConsumerConfiguration {
     @Value(value = "${kafka.consumer.event.group-id}")
     private String eventCg;
 
-
     @Value(value = "${kafka.consumer.event.auto-offset-reset}")
     private String eventCgResetOffset;
 
     @Value(value = "${kafka.consumer.config.group-id}")
     private String configCg;
+
+    @Value(value = "${kafka.consumer.event.max-concurrency}")
+    private Integer eventListenMaxConcurrency;
 
     @Autowired
     private KafkaProperties kafkaProperties;
@@ -68,6 +70,7 @@ public class KafkaConsumerConfiguration {
         ConcurrentKafkaListenerContainerFactory<String, IncomingTsEvent> factory
                 = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(eventConsumerFactory());
+        factory.setConcurrency(eventListenMaxConcurrency);
         factory.setAckDiscarded(true);
         return factory;
     }
