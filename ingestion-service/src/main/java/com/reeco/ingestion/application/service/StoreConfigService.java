@@ -1,9 +1,6 @@
 package com.reeco.ingestion.application.service;
 
-import com.reeco.common.model.dto.Alarm;
-import com.reeco.common.model.dto.FTPConnection;
-import com.reeco.common.model.dto.HTTPConnection;
-import com.reeco.common.model.dto.Parameter;
+import com.reeco.common.model.dto.*;
 import com.reeco.common.model.enumtype.TransportType;
 import com.reeco.common.model.enumtype.ValueType;
 import com.reeco.common.utils.AES;
@@ -149,6 +146,15 @@ public class StoreConfigService implements StoreConfigUseCase {
     }
 
     @Override
+    public void storeConnection(Connection connection){
+        if (connection instanceof HTTPConnection){
+            storeConnection((HTTPConnection) connection);
+        }
+        else if (connection instanceof FTPConnection){
+            storeConnection((FTPConnection) connection);
+        }
+    }
+
     public void storeConnection(HTTPConnection httpConnection){
         httpConnection.setAccessToken(AES.decrypt(httpConnection.getAccessToken()));
         ConnectionInfo connectionInfo = connectionMapper.toPersistence(httpConnection);
@@ -156,25 +162,17 @@ public class StoreConfigService implements StoreConfigUseCase {
     }
 
     @Override
-    public void deleteConnection(HTTPConnection httpConnection){
-        ConnectionInfo.Key connectionKey =  new ConnectionInfo.Key(httpConnection.getOrganizationId(), httpConnection.getId());
+    public void deleteConnection(Connection connection){
+        ConnectionInfo.Key connectionKey =  new ConnectionInfo.Key(connection.getOrganizationId(), connection.getId());
         connectionInfoRepository.deleteById(connectionKey).subscribe();
         log.info("Deleted connection: {}", connectionKey.toString());
     }
 
-    @Override
     public void storeConnection(FTPConnection ftpConnection){
         ConnectionInfo.Key key = new ConnectionInfo.Key(ftpConnection.getOrganizationId(), ftpConnection.getId());
         ConnectionInfo  connectionInfo = new ConnectionInfo(key, TransportType.FTP, null,ftpConnection.getEnglishName(),
                 ftpConnection.getVietnameseName(),null, ftpConnection.getWorkspaceId(), ftpConnection.getReceivedAt(),null,null);
         connectionInfoRepository.save(connectionInfo).subscribe(v -> log.info("Saved connection: {}", v));
-    }
-
-    @Override
-    public void deleteConnection(FTPConnection ftpConnection){
-        ConnectionInfo.Key connectionKey =  new ConnectionInfo.Key(ftpConnection.getOrganizationId(), ftpConnection.getId());
-        connectionInfoRepository.deleteById(connectionKey).subscribe();
-        log.info("Deleted connection: {}", connectionKey.toString());
     }
 
 }

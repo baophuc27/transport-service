@@ -44,7 +44,6 @@ public class EventStatisticController {
     public void aggStatisticEvent() {
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.MIN;
-//        LocalTime time = LocalTime.of(23, 59, 59);
         LocalDateTime endTime = LocalDateTime.of(date, time)
                 .atZone(ZoneId.of("Asia/Ho_Chi_Minh"))
                 .toLocalDateTime();

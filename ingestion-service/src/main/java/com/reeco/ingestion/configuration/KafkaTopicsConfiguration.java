@@ -23,8 +23,20 @@ public class KafkaTopicsConfiguration {
     @Value(value = "${kafka.topics.event-topic.name}")
     private String eventTopic;
 
+    @Value(value = "${kafka.topics.event-topic.partitions}")
+    private Integer eventTopicPartitions;
+
+    @Value(value = "${kafka.topics.event-topic.replications}")
+    private Integer eventTopicReplications;
+
     @Value(value = "${kafka.topics.config-topic.name}")
     private String configTopic;
+
+    @Value(value = "${kafka.topics.config-topic.partitions}")
+    private Integer configTopicPartitions;
+
+    @Value(value = "${kafka.topics.config-topic.replications}")
+    private Integer configTopicReplications;
 
     @Value(value = "${kafka.topics.config-topic.properties}")
     private String eventProps;
@@ -54,7 +66,7 @@ public class KafkaTopicsConfiguration {
     @Bean
     public NewTopic createEventTopic() {
         Map<String, String> eventConfigs = getConfigs(eventProps);
-        NewTopic newTopic = new NewTopic(eventTopic,1,(short) 1);
+        NewTopic newTopic = new NewTopic(eventTopic, eventTopicPartitions, eventTopicReplications.shortValue());
         newTopic.configs(eventConfigs);
         return newTopic;
     }
@@ -62,7 +74,7 @@ public class KafkaTopicsConfiguration {
     @Bean
     public NewTopic createConfigTopic() {
         Map<String, String> configs = getConfigs(configProps);
-        NewTopic newTopic = new NewTopic(configTopic,1,(short) 1);
+        NewTopic newTopic = new NewTopic(configTopic, configTopicPartitions, configTopicReplications.shortValue());
         newTopic.configs(configs);
         return newTopic;
     }

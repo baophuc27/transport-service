@@ -53,8 +53,8 @@ public class FTPConnection extends BaseConnection {
     public FTPConnection() {
     }
 
-    public FTPConnection(Long id, Long organizationId,  Long workspaceId, String englishName, String vietnameseName, Boolean active, Protocol protocol, String userName, @NotNull(message = "hostName must be not NULL") @NotBlank(message = "hostName must be not BLANK") String hostName, @NotNull(message = "port must be not NULL") @NotBlank(message = "port must be not BLANK") String port, String password, Boolean useSSL, String key, List<String> ipWhiteList, String fileType, @NotNull(message = "templateFormat must be not NULL") Integer templateFormat, Integer maximumTimeout, Integer maximumAttachment, String notificationType, Long removeAfterDays) {
-        super(id, organizationId, workspaceId, englishName, vietnameseName, active, protocol);
+    public FTPConnection(Long id, Long organizationId, Long stationId,  Long workspaceId, String englishName, String vietnameseName, Boolean active, Protocol protocol, String userName, @NotNull(message = "hostName must be not NULL") @NotBlank(message = "hostName must be not BLANK") String hostName, @NotNull(message = "port must be not NULL") @NotBlank(message = "port must be not BLANK") String port, String password, Boolean useSSL, String key, List<String> ipWhiteList, String fileType, @NotNull(message = "templateFormat must be not NULL") Integer templateFormat, Integer maximumTimeout, Integer maximumAttachment, String notificationType, Long removeAfterDays) {
+        super(id, organizationId, stationId, workspaceId, englishName, vietnameseName, active, protocol);
         this.userName = userName;
         this.hostName = hostName;
         this.port = port;

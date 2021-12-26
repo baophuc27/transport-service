@@ -26,16 +26,16 @@ logging:
 #  version: '@springdoc.version@'
 
 kafka:
-  bootstrap-servers: 118.69.53.93:29092 #118.69.53.93:29092
+  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:118.69.53.93:29092} #118.69.53.93:29092
 
   producer:
     key-serializer: org.apache.kafka.common.serialization.StringSerializer
     value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 
   # profile dev
-  topics:
-    config-topic:
-      name: reeco_config_event
-      properties: "retention.ms:432000000;segment.bytes:26214400;retention.bytes:1048576000"
-      partitions: 1
-      replications: 1
+#  topics:
+#    config-topic:
+#      name: reeco_config_event
+#      properties: "retention.ms:432000000;segment.bytes:26214400;retention.bytes:1048576000"
+#      partitions: 1
+#      replications: 1
