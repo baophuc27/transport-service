@@ -63,6 +63,18 @@ kafka:
       partitions: ${KAFKA_CONFIG_TOPIC_PARTITIONS:1}
       replications: ${KAFKA_CONFIG_TOPIC_REPLICATIONS:1}
 
+    alarm-topic:
+      name: reeco_alarm_event
+      properties: "retention.ms:432000000;segment.bytes:26214400;retention.bytes:1048576000"
+      partitions: ${KAFKA_ALARM_TOPIC_PARTITIONS:1}
+      replications: ${KAFKA_ALARM_TOPIC_REPLICATIONS:1}
+
+    alarm-noti-topic:
+      name: reeco_alarm_event
+      properties: "retention.ms:432000000;segment.bytes:26214400;retention.bytes:1048576000"
+      partitions: ${KAFKA_ALARM_NOTI_TOPIC_PARTITIONS:1}
+      replications: ${KAFKA_ALARM_NOTI_TOPIC_REPLICATIONS:1}
+
 logging:
   level:
     root: INFO
