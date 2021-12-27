@@ -29,6 +29,9 @@ public class KafkaTopicsConfiguration {
     @Value(value = "${kafka.topics.event-topic.replications}")
     private Integer eventTopicReplications;
 
+    @Value(value = "${kafka.topics.config-topic.properties}")
+    private String eventProps;
+
     @Value(value = "${kafka.topics.config-topic.name}")
     private String configTopic;
 
@@ -39,10 +42,31 @@ public class KafkaTopicsConfiguration {
     private Integer configTopicReplications;
 
     @Value(value = "${kafka.topics.config-topic.properties}")
-    private String eventProps;
-
-    @Value(value = "${kafka.topics.config-topic.properties}")
     private String configProps;
+
+    @Value(value = "${kafka.topics.alarm-topic.name}")
+    private String alarmTopic;
+
+    @Value(value = "${kafka.topics.alarm-topic.partitions}")
+    private Integer alarmTopicPartitions;
+
+    @Value(value = "${kafka.topics.alarm-topic.replications}")
+    private Integer alarmTopicReplications;
+
+    @Value(value = "${kafka.topics.alarm-topic.properties}")
+    private String alarmProps;
+
+    @Value(value = "${kafka.topics.alarm-noti-topic.name}")
+    private String alarmNotiTopic;
+
+    @Value(value = "${kafka.topics.alarm-noti-topic.partitions}")
+    private Integer alarmNotiTopicPartitions;
+
+    @Value(value = "${kafka.topics.alarm-noti-topic.replications}")
+    private Integer alarmNotiTopicReplications;
+
+    @Value(value = "${kafka.topics.alarm-noti-topic.properties}")
+    private String alarmNotiProps;
 
 
     private Map<String, String> getConfigs(String properties) {
@@ -75,6 +99,22 @@ public class KafkaTopicsConfiguration {
     public NewTopic createConfigTopic() {
         Map<String, String> configs = getConfigs(configProps);
         NewTopic newTopic = new NewTopic(configTopic, configTopicPartitions, configTopicReplications.shortValue());
+        newTopic.configs(configs);
+        return newTopic;
+    }
+
+    @Bean
+    public NewTopic createAlarmTopic() {
+        Map<String, String> configs = getConfigs(alarmProps);
+        NewTopic newTopic = new NewTopic(alarmTopic, alarmTopicPartitions, alarmTopicReplications.shortValue());
+        newTopic.configs(configs);
+        return newTopic;
+    }
+
+    @Bean
+    public NewTopic createAlarmNotiTopic() {
+        Map<String, String> configs = getConfigs(alarmNotiProps);
+        NewTopic newTopic = new NewTopic(alarmNotiTopic, alarmNotiTopicPartitions, alarmNotiTopicReplications.shortValue());
         newTopic.configs(configs);
         return newTopic;
     }
