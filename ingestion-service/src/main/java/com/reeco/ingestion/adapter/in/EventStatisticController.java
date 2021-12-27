@@ -40,19 +40,15 @@ public class EventStatisticController {
 
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    @Scheduled(fixedRate = 500000)
+    @Scheduled(cron = "0 1 * * * ?")
     public void aggStatisticEvent() {
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.MIN;
         LocalDateTime endTime = LocalDateTime.of(date, time)
                 .atZone(ZoneId.of("Asia/Ho_Chi_Minh"))
                 .toLocalDateTime();
-        LocalDateTime startTime = endTime.minusDays(5);
-        Timestamp timestampEnd = Timestamp.valueOf(endTime);
-        Timestamp timestampStart = Timestamp.valueOf(startTime);
-        log.info("Start aggregation job with time range from {} to {}", startTime.toString(), endTime.toString());
         updateStatEventUseCase.updateNumStatEvent(endTime);
-        updateStatEventUseCase.updateCatStatEvent(timestampStart, timestampEnd);
+//        updateStatEventUseCase.updateCatStatEvent(timestampStart, timestampEnd);
     }
 
     @Scheduled(fixedRate = 120000)
@@ -105,10 +101,6 @@ public class EventStatisticController {
         Random r = new Random();
         return leftLimit + (rightLimit - leftLimit) * r.nextDouble();
     }
-//
-//    @Scheduled(cron = "0 * * * * ?")
-//    public void scheduleTaskWithCronExpression() {
-//        log.info("Cron Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
-//    }
+
 
 }
