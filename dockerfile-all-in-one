@@ -1,0 +1,17 @@
+FROM gradle:7.1.1-jdk11 AS build
+COPY --chown=gradle:gradle . /home/gradle/src/
+WORKDIR /home/gradle/src
+RUN gradle :ingestion-service:build --no-daemon
+RUN gradle :config-service:build --no-daemon
+RUN gradle :core:build --no-daemon
+
+FROM openjdk:11
+ARG VERSION
+EXPOSE 8986
+
+COPY --from=build /home/gradle/src/ingestion-service/build/libs/ingestion-service-${VERSION}.jar reeco-ingestion-service.jar
+COPY --from=build /home/gradle/src/config-service/build/libs/config-service-${VERSION}.jar reeco-config-service.jar
+COPY --from=build /home/gradle/src/core/build/libs/core-${VERSION}.jar reeco-core.jar
+ADD start_reeco_services.sh .
+RUN chmod +x start_reeco_services.sh
+CMD ["bash", "start_reeco_services.sh"]

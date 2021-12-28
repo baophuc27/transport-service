@@ -27,7 +27,7 @@ kafka:
   consumer:
     config:
       topic-in: reeco_config_event
-      group-id: ${KAFKA_CONFIG_EVENT_GROUP_ID:reeco_config_event_http_group}
+      group-id: ${KAFKA_CONFIG_EVENT_HTTP_GROUP_ID:reeco_config_event_http_group}
       auto-offset-reset: ${KAFKA_CONFIG_AUTO_OFFSET_RESET:earliest}
 
   producer:
