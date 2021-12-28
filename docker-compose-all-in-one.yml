@@ -31,7 +31,8 @@ services:
       KAFKA_ALARM_NOTI_TOPIC_REPLICATIONS: ${KAFKA_ALARM_NOTI_TOPIC_REPLICATIONS}
       KAFKA_CONFIG_EVENT_HTTP_GROUP_ID: ${KAFKA_CONFIG_EVENT_HTTP_GROUP_ID}
     restart: always
-    ports:
-      - 8986:8986
-      - 7001:7001
-      - 8043:8043
+    network_mode: host
+#    ports:
+#      - 8986:8986
+#      - 7001:7001
+#      - 8043:8043
