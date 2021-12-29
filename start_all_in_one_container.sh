@@ -6,7 +6,7 @@ sudo docker-compose -f docker-compose-infras.yml up -d
 
 sleep 1
 echo "Init Cassandra Schema ..."
-docker exec -it cassandra bash -c "cqlsh -f /opt/initdb/schema.cql"
+sudo docker exec -it cassandra bash -c "cqlsh -f /opt/initdb/schema.cql"
 
 sleep 1
 echo "Starting Reeco serivces ..."
