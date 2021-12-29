@@ -32,7 +32,3 @@ services:
       KAFKA_CONFIG_EVENT_HTTP_GROUP_ID: ${KAFKA_CONFIG_EVENT_HTTP_GROUP_ID}
     restart: always
     network_mode: host
-#    ports:
-#      - 8986:8986
-#      - 7001:7001
-#      - 8043:8043
