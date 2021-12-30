@@ -1,6 +1,7 @@
 package com.reeco.ingestion.application.service;
 
 import com.reeco.common.model.dto.*;
+import com.reeco.common.model.enumtype.Protocol;
 import com.reeco.common.model.enumtype.TransportType;
 import com.reeco.common.model.enumtype.ValueType;
 import com.reeco.common.utils.AES;
@@ -168,7 +169,7 @@ public class StoreConfigService implements StoreConfigUseCase {
 
     public void storeConnection(FTPConnection ftpConnection){
         ConnectionInfo.Key key = new ConnectionInfo.Key(ftpConnection.getOrganizationId(), ftpConnection.getId());
-        ConnectionInfo  connectionInfo = new ConnectionInfo(key, TransportType.FTP, null,ftpConnection.getEnglishName(),
+        ConnectionInfo  connectionInfo = new ConnectionInfo(key, Protocol.FTP, null,ftpConnection.getEnglishName(),
                 ftpConnection.getVietnameseName(),null, ftpConnection.getWorkspaceId(), ftpConnection.getReceivedAt(),null,null);
         connectionInfoRepository.save(connectionInfo).subscribe(v -> log.info("Saved connection: {}", v));
     }
