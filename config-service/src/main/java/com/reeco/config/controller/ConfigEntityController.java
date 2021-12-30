@@ -143,7 +143,7 @@ class ConfigEntityController {
                 msg.headers()
                         .add("actionType", ActionType.UPSERT.name().getBytes())
                         .add("entityType", EntityType.CONNECTION.name().getBytes())
-                        .add("protocol", httpConnection.getTransportType().name().getBytes());
+                        .add("protocol", httpConnection.getProtocol().name().getBytes());
 
                 producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
 //                responseWriter.setResult(new ResponseEntity<>(access_token, HttpStatus.OK));
