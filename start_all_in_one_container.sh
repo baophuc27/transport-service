@@ -10,7 +10,7 @@ echo "Init Cassandra Schema ..."
 sudo docker exec -it cassandra bash -c "cqlsh -u ${CASSANDRA_USER} -p ${CASSANDRA_PASSWORD} -f /opt/initdb/schema.cql"
 
 sleep 1
-echo "Starting Reeco serivces ..."
+echo "Starting Reeco services ..."
 sudo docker-compose -f docker-compose-all-in-one.yml up --build -d
 
 echo "Done!"
