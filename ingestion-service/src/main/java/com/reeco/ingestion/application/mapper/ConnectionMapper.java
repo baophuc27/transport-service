@@ -21,7 +21,7 @@ public interface ConnectionMapper extends DomainEntityMapper<HTTPConnection, Con
             @Mapping(source = "stationId", target = "stationId"),
             @Mapping(source = "englishName", target = "name"),
             @Mapping(source = "vietnameseName", target = "nameVi"),
-            @Mapping(source = "transportType", target = "transportType"),
+            @Mapping(source = "protocol", target = "transportType"),
             @Mapping(source = "updatedAt", target = "updatedAt")
     })
     ConnectionInfo toPersistence(HTTPConnection httpConnection);
