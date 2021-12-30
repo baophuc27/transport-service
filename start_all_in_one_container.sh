@@ -1,6 +1,7 @@
 #!/bin/bash
 set -ex
-
+CASSANDRA_USER=$1
+CASSANDRA_PASSWORD=$2
 echo "Starting docker compose ..."
 sudo docker-compose -f docker-compose-infras.yml up -d
 
