@@ -11,7 +11,7 @@ sudo docker exec -it cassandra bash -c "cqlsh -u ${CASSANDRA_USER} -p ${CASSANDR
 
 sleep 1
 echo "Starting Reeco services ..."
-sudo docker-compose -f docker-compose-all-in-one.yml up --build -d
+sudo docker-compose -f docker-compose-run-all-in-one.yml up -d
 
 echo "Done!"
 
