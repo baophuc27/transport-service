@@ -71,8 +71,6 @@ public class StoreConfigService implements StoreConfigUseCase {
     public void storeParameter(Parameter parameter) {
         ParamsByOrg paramsByOrg = parameterMapper.toPersistence(parameter);
 
-        ValueType valueType = indicatorCacheUseCase.get(parameter.getIndicatorId().toString()).getValueType();
-
         EventStatisticMetaInfo.Key eventMetaInfoKey = new EventStatisticMetaInfo.Key(parameter.getOrganizationId(),
                 parameter.getId());
 
