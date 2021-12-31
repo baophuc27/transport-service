@@ -8,8 +8,8 @@ services:
     container_name: zookeeper
     ports:
       - "2181:2181"
-    mem_limit: 256m
-    cpus: 0.5
+    mem_limit: ${ZK_MEMORY}
+    cpus: ${ZK_CPUS}
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -24,8 +24,8 @@ services:
     container_name: broker
     depends_on:
       - zookeeper
-    mem_limit: 256m
-    cpus: 1
+    mem_limit: ${KAFKA_MEMORY}
+    cpus: ${KAFKA_CPUS}
     ports:
       - "29092:29092"
     environment:
@@ -45,8 +45,8 @@ services:
     restart: "no"
     ports:
       - "19000:9000"
-    mem_limit: 512m
-    cpus: 0.5
+    mem_limit: ${KAFKA_UI_MEMORY}
+    cpus: ${KAFKA_UI_CPU}
     environment:
       KAFKA_BROKERCONNECT: "broker:19092"
       JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
@@ -57,8 +57,8 @@ services:
     image: scylladb/scylla
     hostname: 'cassandra'
     container_name: 'cassandra'
-    mem_limit: 1g
-    cpus: 1
+    mem_limit: ${CASSANDRA_MEMORY}
+    cpus: ${CASSANDRA_CPUS}
     command:
       - "--smp"
       - "2"
