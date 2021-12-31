@@ -74,8 +74,8 @@ public class IncomingTsEventController {
                         ruleEngineEvent = ruleEngineUseCase.handleRuleEvent(alarm, event, indicator);
                         if (ruleEngineEvent.getIsAlarm()) break;
                     }
-                    storeTsEventUseCase.storeEvent(ruleEngineEvent, indicator);
                 }
+                storeTsEventUseCase.storeEvent(ruleEngineEvent, indicator);
             } else log.warn("Indicator Not Found with Id: [{}]", event.getIndicatorId());
         } catch (RuntimeException exception) {
             exception.printStackTrace();

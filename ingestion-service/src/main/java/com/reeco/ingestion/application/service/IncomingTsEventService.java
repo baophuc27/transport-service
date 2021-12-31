@@ -31,10 +31,15 @@ public class IncomingTsEventService implements StoreTsEventUseCase {
         switch (indicator.getValueType()){
             case NUMBER: {
                 NumericalTsByOrg numTsEvent = ruleEngineEventMapper.toNumPersistence(event);
-                numTsEvent.setValue(Double.valueOf(event.getValue()));
-                numericalTsByOrgRepository
-                        .save(numTsEvent)
-                        .subscribe(v->log.info("Inserted Numeric Event: {}", v));
+                try{
+                    numTsEvent.setValue(Double.valueOf(event.getValue()));
+                    numericalTsByOrgRepository
+                            .save(numTsEvent)
+                            .subscribe(v->log.info("Inserted Numeric Event: {}", v));
+                }
+                catch (RuntimeException ex) {
+                    ex.printStackTrace();
+                }
                 break;
             }
             case STRING: {
