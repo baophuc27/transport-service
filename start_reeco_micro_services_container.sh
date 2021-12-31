@@ -11,7 +11,7 @@ sudo docker exec -it cassandra bash -c "cqlsh -u ${CASSANDRA_USER} -p ${CASSANDR
 
 sleep 1
 echo "Starting Reeco services ..."
-sudo docker-compose -f docker-compose-reeco-services up -d
+sudo docker-compose -f docker-compose-reeco-services.yml up -d
 
 echo "Done!"
 
