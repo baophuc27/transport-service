@@ -40,6 +40,7 @@ public class RuleEngineService implements RuleEngineUseCase {
     private final String ALARM_RULE_TOPIC = "reeco_alarm_noti_event";
 
     private final String ALARM_TOPIC = "reeco_alarm_event";
+
     @Override
     public boolean checkThreshold(IncomingTsEvent event) {
         return true;
@@ -62,7 +63,7 @@ public class RuleEngineService implements RuleEngineUseCase {
                                      AlarmRuleCache alarmRuleCache,
                                      IncomingTsEvent event) {
         long minutes = ChronoUnit.MINUTES.between(event.getEventTime(), alarmRuleCache.getLastMatchedTime());
-        return minutes >= (alarm.getFrequence()*alarm.getFrequenceType().getValueFromEnum());
+        return minutes >= (alarm.getFrequence() * alarm.getFrequenceType().getValueFromEnum());
     }
 
     private boolean isInSquareRange(Alarm alarm, Double value) {
@@ -115,7 +116,7 @@ public class RuleEngineService implements RuleEngineUseCase {
         return false;
     }
 
-    public RuleEngineEvent handleRuleEvent(Alarm alarm, IncomingTsEvent event, Indicator indicator) {
+    public boolean handleRuleEvent(Alarm alarm, IncomingTsEvent event, Indicator indicator) {
         AlarmRuleCache alarmRuleCache = ruleEngineCacheUseCase.get(alarm.getId().toString());
         boolean isMatchCondition = checkMatchingAlarmCondition(alarm, event, indicator.getValueType());
         MaintainType maintainType = alarm.getMaintainType();
@@ -162,27 +163,7 @@ public class RuleEngineService implements RuleEngineUseCase {
             alarmRuleCache.setLastMatchedTime(event.getEventTime());
         }
         ruleEngineCacheUseCase.put(alarmRuleCache);
-        return new RuleEngineEvent(
-                event.getOrganizationId(),
-                event.getWorkspaceId(),
-                event.getStationId(),
-                event.getConnectionId(),
-                event.getParamId(),
-                event.getEventTime(),
-                event.getIndicatorId(),
-                event.getIndicatorName(),
-                event.getParamName(),
-                event.getValue(),
-                event.getReceivedAt(),
-                event.getSentAt(),
-                event.getLat(),
-                event.getLon(),
-                isAlarmEvent,
-                alarm.getId(),
-                alarm.getAlarmType(),
-                alarm.getMinValue(),
-                alarm.getMaxValue()
-        );
+        return isAlarmEvent;
     }
 
 }

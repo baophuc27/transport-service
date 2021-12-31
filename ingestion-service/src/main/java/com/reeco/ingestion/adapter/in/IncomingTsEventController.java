@@ -68,11 +68,36 @@ public class IncomingTsEventController {
             Indicator indicator = indicatorCacheUseCase.get(event.getIndicatorId().toString());
             if (indicator != null) {
                 ParamAndAlarm paramAndAlarm = alarmCacheUseCase.get(event.getParamId().toString());
-                RuleEngineEvent ruleEngineEvent = null;
+                RuleEngineEvent ruleEngineEvent = new RuleEngineEvent(
+                        event.getOrganizationId(),
+                        event.getWorkspaceId(),
+                        event.getStationId(),
+                        event.getConnectionId(),
+                        event.getParamId(),
+                        event.getEventTime(),
+                        event.getIndicatorId(),
+                        event.getIndicatorName(),
+                        event.getParamName(),
+                        event.getValue(),
+                        event.getReceivedAt(),
+                        event.getSentAt(),
+                        event.getLat(),
+                        event.getLon(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                );
                 if (paramAndAlarm != null) {
                     for (Alarm alarm : paramAndAlarm.getAlarms()) {
-                        ruleEngineEvent = ruleEngineUseCase.handleRuleEvent(alarm, event, indicator);
-                        if (ruleEngineEvent.getIsAlarm()) break;
+                        boolean isAlarm = ruleEngineUseCase.handleRuleEvent(alarm, event, indicator);
+                        ruleEngineEvent.setAlarmId(alarm.getId());
+                        ruleEngineEvent.setAlarmType(alarm.getAlarmType());
+                        ruleEngineEvent.setMinValue(alarm.getMinValue());
+                        ruleEngineEvent.setMaxValue(alarm.getMaxValue());
+                        ruleEngineEvent.setIsAlarm(isAlarm);
+                        if (isAlarm) break;
                     }
                 }
                 storeTsEventUseCase.storeEvent(ruleEngineEvent, indicator);
