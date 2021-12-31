@@ -49,36 +49,60 @@ public class IncomingTsEventController {
 
 
     @PostConstruct
-    private void postProcess(){
+    private void postProcess() {
         objectMapper = new ObjectMapper();
     }
 
-    private <T> T parseObject(byte[] message, Class<T> valueType){
+    private <T> T parseObject(byte[] message, Class<T> valueType) {
         try {
-            return objectMapper.readValue(message,valueType);
+            return objectMapper.readValue(message, valueType);
         } catch (RuntimeException | IOException e) {
-            log.warn("Error when parsing message object: {}",e.getMessage());
+            log.warn("Error when parsing message object: {}", e.getMessage());
             return null;
         }
     }
 
-    @KafkaListener(topics = "reeco_time_series_event",containerFactory = "timeSeriesEventListener")
-    public void listen(@Payload IncomingTsEvent event){
+    @KafkaListener(topics = "reeco_time_series_event", containerFactory = "timeSeriesEventListener")
+    public void listen(@Payload IncomingTsEvent event) {
         try {
             Indicator indicator = indicatorCacheUseCase.get(event.getIndicatorId().toString());
             if (indicator != null) {
                 ParamAndAlarm paramAndAlarm = alarmCacheUseCase.get(event.getParamId().toString());
-                RuleEngineEvent ruleEngineEvent = null;
+                RuleEngineEvent ruleEngineEvent = new RuleEngineEvent(
+                        event.getOrganizationId(),
+                        event.getWorkspaceId(),
+                        event.getStationId(),
+                        event.getConnectionId(),
+                        event.getParamId(),
+                        event.getEventTime(),
+                        event.getIndicatorId(),
+                        event.getIndicatorName(),
+                        event.getParamName(),
+                        event.getValue(),
+                        event.getReceivedAt(),
+                        event.getSentAt(),
+                        event.getLat(),
+                        event.getLon(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                );
                 if (paramAndAlarm != null) {
                     for (Alarm alarm : paramAndAlarm.getAlarms()) {
-                        ruleEngineEvent = ruleEngineUseCase.handleRuleEvent(alarm, event, indicator);
-                        if (ruleEngineEvent.getIsAlarm()) break;
+                        boolean isAlarm = ruleEngineUseCase.handleRuleEvent(alarm, event, indicator);
+                        ruleEngineEvent.setAlarmId(alarm.getId());
+                        ruleEngineEvent.setAlarmType(alarm.getAlarmType());
+                        ruleEngineEvent.setMinValue(alarm.getMinValue());
+                        ruleEngineEvent.setMaxValue(alarm.getMaxValue());
+                        ruleEngineEvent.setIsAlarm(isAlarm);
+                        if (isAlarm) break;
                     }
-                    storeTsEventUseCase.storeEvent(ruleEngineEvent, indicator);
                 }
+                storeTsEventUseCase.storeEvent(ruleEngineEvent, indicator);
             } else log.warn("Indicator Not Found with Id: [{}]", event.getIndicatorId());
-        }
-        catch (RuntimeException exception){
+        } catch (RuntimeException exception) {
             exception.printStackTrace();
         }
     }
@@ -91,44 +115,46 @@ public class IncomingTsEventController {
             log.info("Received entityType: {}, actionType: {}", entityType, actionType);
             switch (entityType) {
                 case PARAM:
-                    Parameter parameter  = objectMapper.readValue(config, Parameter.class);
+                    Parameter parameter = objectMapper.readValue(config, Parameter.class);
                     log.info("Received Param Config: {}", parameter.toString());
                     switch (actionType) {
-                        case DELETE: storeConfigUseCase.deleteParameter(parameter); break;
-                        case UPSERT: storeConfigUseCase.storeParameter(parameter); break;
-                        default: break;
+                        case DELETE:
+                            storeConfigUseCase.deleteParameter(parameter);
+                            break;
+                        case UPSERT:
+                            storeConfigUseCase.storeParameter(parameter);
+                            break;
+                        default:
+                            break;
                     }
+                    break;
                 case CONNECTION:
-                    Protocol protocol = Protocol.valueOf(new String(header.get("protocol"), StandardCharsets.UTF_8));
+                    String proto = new String(header.get("protocol"), StandardCharsets.UTF_8);
+                    log.info("Received protocol: {}", proto);
+                    Protocol protocol = Protocol.valueOf(proto);
+                    Connection connection = null;
                     if (protocol.equals(Protocol.HTTP)) {
-                        HTTPConnection httpConnection = objectMapper.readValue(config, HTTPConnection.class);
-                        switch (actionType) {
-                            case UPSERT:
-                                storeConfigUseCase.storeConnection(httpConnection);
-                                break;
-                            case DELETE:
-                                storeConfigUseCase.deleteConnection(httpConnection);
-                                break;
-                            default:
-                                break;
-                        }
-                    }else if(protocol.equals(Protocol.FTP)) {
-                        FTPConnection ftpConnection = objectMapper.readValue(config, FTPConnection.class);
-                        switch (actionType) {
-                            case UPSERT:
-                                storeConfigUseCase.storeConnection(ftpConnection);
-                                break;
-                            case DELETE:
-                                storeConfigUseCase.deleteConnection(ftpConnection);
-                                break;
-                            default:
-                                break;
-                        }
+                        connection = objectMapper.readValue(config, HTTPConnection.class);
+                    } else if (protocol.equals(Protocol.FTP)) {
+                        connection = objectMapper.readValue(config, FTPConnection.class);
+                    } else {
+                        log.error("Received Unsupported protocol: {}", proto);
                     }
-                default: break;
+                    switch (actionType) {
+                        case UPSERT:
+                            storeConfigUseCase.storeConnection(connection);
+                            break;
+                        case DELETE:
+                            storeConfigUseCase.deleteConnection(connection);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                default:
+                    break;
             }
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }

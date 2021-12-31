@@ -5,20 +5,17 @@ server.error.include-message: always
 spring:
   data:
     cassandra:
-      keyspace-name: reecotech
-#      username: cassandra
-#      password: cassandra
-      contact-points: 118.69.53.93
-      port: 9042
+      keyspace-name: ${CASSANDRA_KEYSPACE:reecotech}
+      username: ${CASSANDRA_USER:cassandra}
+      password: ${CASSANDRA_PASSWORD:cassandra}
+      contact-points: ${CASSANDRA_CONTACT_POINTS:118.69.53.93}
+      port: ${CASSANDRA_PORT:9042}
       local-datacenter: datacenter1
       request:
         timeout: 15s
       connection:
         init-query-timeout: 15s
-#  datasource:
-#    username: ari
-#    password: password
-#    url: jdbc:postgresql://118.69.53.93:8081/postgres
+
 
   servlet:
     multipart:

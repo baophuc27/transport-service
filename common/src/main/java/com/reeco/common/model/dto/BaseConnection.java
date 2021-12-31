@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.reeco.common.framework.EnumNamePattern;
 import com.reeco.common.model.enumtype.Protocol;
 import lombok.Data;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -29,6 +30,9 @@ public class BaseConnection implements Connection {
     @NotNull(message = "workspaceId must be not NULL")
     private Long workspaceId;
 
+    @NotNull(message = "stationId must be not NULL")
+    private Long stationId;
+
     @NotNull(message = "englishName must be not NULL")
     @NotBlank(message = "englishName must be not BLANK")
     private String englishName;
@@ -43,6 +47,7 @@ public class BaseConnection implements Connection {
     @EnumNamePattern(regexp = "FTP|FTPS|HTTP", message = "protocol must be in {FTP, FTPS, HTTP}")
     private Protocol protocol;
 
+    private String accessToken;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -55,6 +60,7 @@ public class BaseConnection implements Connection {
     public BaseConnection(Long id,
                           Long organizationId,
                           Long workspaceId,
+                          Long stationId,
                           String englishName,
                           String vietnameseName,
                           Boolean active,
@@ -63,6 +69,7 @@ public class BaseConnection implements Connection {
         this.id = id;
         this.organizationId = organizationId;
         this.englishName = englishName;
+        this.stationId = stationId;
         this.vietnameseName = vietnameseName;
         this.workspaceId = workspaceId;
         this.active = active;
@@ -75,11 +82,12 @@ public class BaseConnection implements Connection {
                 "id=" + id +
                 ", organizationId=" + organizationId +
                 ", workspaceId=" + workspaceId +
+                ", stationId=" + stationId +
                 ", englishName='" + englishName + '\'' +
                 ", vietnameseName='" + vietnameseName + '\'' +
                 ", active=" + active +
                 ", protocol=" + protocol +
-                ", receivedAt='" + receivedAt + '\'' +
+                ", receivedAt=" + receivedAt +
                 '}';
     }
 }

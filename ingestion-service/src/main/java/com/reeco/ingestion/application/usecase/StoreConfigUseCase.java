@@ -1,6 +1,7 @@
 package com.reeco.ingestion.application.usecase;
 
 
+import com.reeco.common.model.dto.Connection;
 import com.reeco.common.model.dto.FTPConnection;
 import com.reeco.common.model.dto.HTTPConnection;
 import com.reeco.common.model.dto.Parameter;
@@ -10,11 +11,10 @@ public interface StoreConfigUseCase {
 
     void deleteParameter(Parameter parameter);
 
-    void storeConnection(HTTPConnection httpConnection);
+    void storeConnection(Connection connection);
 
-    void deleteConnection(HTTPConnection httpConnection);
+    void deleteConnection(Connection connection);
 
     void storeConnection(FTPConnection ftpConnection);
 
-    void deleteConnection(FTPConnection ftpConnection);
 }

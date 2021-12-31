@@ -205,8 +205,6 @@ public class EventStatPersistenceAdapter implements AggregateEventsPort, NumStat
                 );
     }
 
-//    public
-
     @Override
     public void insertCat(Timestamp startTime, Timestamp endTime) {
         aggCatEventByOrgAndParams(startTime, endTime)

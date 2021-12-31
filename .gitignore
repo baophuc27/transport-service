@@ -73,3 +73,5 @@ fabric.properties
 /services/core
 /services/ingestion-service
 /transport-http-service/build
+
+.env

@@ -1,0 +1,72 @@
+version: '3.9'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.5.3
+    hostname: zookeeper
+    restart: always
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    mem_limit: ${ZK_MEMORY}
+    cpus: ${ZK_CPUS}
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - ../../data/zookeeper/data:/var/lib/zookeeper/data
+      - ../../data/zookeeper/log:/var/lib/zookeeper/log
+
+  broker:
+    image: confluentinc/cp-kafka:5.5.3
+    hostname: broker
+    restart: always
+    container_name: broker
+    depends_on:
+      - zookeeper
+    mem_limit: ${KAFKA_MEMORY}
+    cpus: ${KAFKA_CPUS}
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:19092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    volumes:
+      - ../../data/kafka/data:/var/lib/kafka/data
+
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    restart: "no"
+    ports:
+      - "19000:9000"
+    mem_limit: ${KAFKA_UI_MEMORY}
+    cpus: ${KAFKA_UI_CPUS}
+    environment:
+      KAFKA_BROKERCONNECT: "broker:19092"
+      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+    depends_on:
+      - broker
+
+  cassandra:
+    image: scylladb/scylla
+    hostname: 'cassandra'
+    container_name: 'cassandra'
+    mem_limit: ${CASSANDRA_MEMORY}
+    cpus: ${CASSANDRA_CPUS}
+    command:
+      - "--smp"
+      - "2"
+      - "--authenticator"
+      - "PasswordAuthenticator"
+    ports:
+      - "9160:9160"
+      - "9042:9042"
+    volumes:
+      - ./schema/:/opt/initdb/
+      - ../../data/scylla:/var/lib/scylla

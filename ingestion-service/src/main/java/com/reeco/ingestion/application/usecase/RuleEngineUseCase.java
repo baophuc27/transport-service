@@ -12,7 +12,7 @@ public interface RuleEngineUseCase {
 
     boolean checkRange(IncomingTsEvent event);
 
-    RuleEngineEvent handleRuleEvent(Alarm alarm, IncomingTsEvent event, Indicator indicator);
+    boolean handleRuleEvent(Alarm alarm, IncomingTsEvent event, Indicator indicator);
 
     boolean checkMatchingAlarmCondition(Alarm alarm, Double value);
 

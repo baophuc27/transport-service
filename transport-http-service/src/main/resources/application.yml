@@ -5,20 +5,16 @@ server.error.include-message: always
 spring:
   data:
     cassandra:
-      keyspace-name: reecotech
-      #      username: cassandra
-      #      password: cassandra
-      contact-points: 118.69.53.93
-      port: 9042
+      keyspace-name: ${CASSANDRA_KEYSPACE:reecotech}
+      username: ${CASSANDRA_USER:cassandra}
+      password: ${CASSANDRA_PASSWORD:cassandra}
+      contact-points: ${CASSANDRA_CONTACT_POINTS:118.69.53.93}
+      port: ${CASSANDRA_PORT:9042}
       local-datacenter: datacenter1
       request:
         timeout: 15s
       connection:
         init-query-timeout: 15s
-  #  datasource:
-  #    username: ari
-  #    password: password
-  #    url: jdbc:postgresql://118.69.53.93:8081/postgres
 
   servlet:
     multipart:
@@ -26,20 +22,13 @@ spring:
       max-request-size: 50MB
 
 kafka:
-  bootstrap-servers: 118.69.53.93:29092 #118.69.53.93:29092
+  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:118.69.53.93:29092} #118.69.53.93:29092
 
   consumer:
-    event:
-      topic-in: reeco_time_series_event
-      group-id: reeco_time_series_event_cg
-      auto-offset-reset: earliest
-      max-concurency: 1
-
     config:
       topic-in: reeco_config_event
-      group-id: reeco_config_cg
-      auto-offset-reset: earliest
-      max-concurency: 1
+      group-id: ${KAFKA_CONFIG_EVENT_HTTP_GROUP_ID:reeco_config_event_http_group}
+      auto-offset-reset: ${KAFKA_CONFIG_AUTO_OFFSET_RESET:earliest}
 
   producer:
     key-serializer: org.apache.kafka.common.serialization.StringSerializer

@@ -8,11 +8,11 @@ spring:
 
   data:
     cassandra:
-      keyspace-name: reecotech
-      username: cassandra
-      password: cassandra
-      contact-points: 118.69.53.93
-      port: 9042
+      keyspace-name: ${CASSANDRA_KEYSPACE:reecotech}
+      username: ${CASSANDRA_USER:cassandra}
+      password: ${CASSANDRA_PASSWORD:cassandra}
+      contact-points: ${CASSANDRA_CONTACT_POINTS:118.69.53.93}
+      port: ${CASSANDRA_PORT:9042}
       local-datacenter: datacenter1
       request:
         timeout: PT50S
@@ -31,20 +31,19 @@ spring:
   kafka.consumer.properties.spring.json.trusted.packages: "*"
 
 kafka:
-  bootstrap-servers: 118.69.53.93:29092 #118.69.53.93:29092
+  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:118.69.53.93:29092} #118.69.53.93:29092
 
   consumer:
     event:
       topic-in: reeco_time_series_event
-      group-id: reeco_time_series_event_cg
-      auto-offset-reset: earliest
-      max-concurency: 1
+      group-id: ${KAFKA_TS_EVENT_GROUP_ID:reeco_time_series_event_cg}
+      auto-offset-reset: ${KAFKA_TS_EVENT_AUTO_OFFSET_RESET:earliest}
+      max-concurrency: ${KAFKA_MAX_CONCURRENCY:2}
 
     config:
       topic-in: reeco_config_event
-      group-id: reeco_config_cg
-      auto-offset-reset: earliest
-      max-concurency: 1
+      group-id: ${KAFKA_CONFIG_EVENT_GROUP_ID:reeco_config_event_ingestion_group}
+      auto-offset-reset: ${KAFKA_CONFIG_AUTO_OFFSET_RESET:earliest}
 
   producer:
     key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -55,11 +54,26 @@ kafka:
     event-topic:
       name: reeco_time_series_event
       properties: "retention.ms:432000000;segment.bytes:26214400;retention.bytes:1048576000"
+      partitions: ${KAFKA_TS_EVENT_TOPIC_PARTITIONS:1}
+      replications: ${KAFKA_TS_EVENT_TOPIC_REPLICATIONS:1}
 
     config-topic:
       name: reeco_config_event
       properties: "retention.ms:432000000;segment.bytes:26214400;retention.bytes:1048576000"
+      partitions: ${KAFKA_CONFIG_TOPIC_PARTITIONS:1}
+      replications: ${KAFKA_CONFIG_TOPIC_REPLICATIONS:1}
 
+    alarm-topic:
+      name: reeco_alarm_event
+      properties: "retention.ms:432000000;segment.bytes:26214400;retention.bytes:1048576000"
+      partitions: ${KAFKA_ALARM_TOPIC_PARTITIONS:1}
+      replications: ${KAFKA_ALARM_TOPIC_REPLICATIONS:1}
+
+    alarm-noti-topic:
+      name: reeco_alarm_event
+      properties: "retention.ms:432000000;segment.bytes:26214400;retention.bytes:1048576000"
+      partitions: ${KAFKA_ALARM_NOTI_TOPIC_PARTITIONS:1}
+      replications: ${KAFKA_ALARM_NOTI_TOPIC_REPLICATIONS:1}
 
 logging:
   level:

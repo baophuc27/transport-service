@@ -2,6 +2,7 @@ package com.reeco.ingestion.infrastructure.persistence.cassandra.entity;
 
 
 import com.reeco.common.model.enumtype.AlarmType;
+import com.reeco.common.model.enumtype.Protocol;
 import com.reeco.common.model.enumtype.TransportType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,7 +37,7 @@ public class ConnectionInfo {
 
     @Column("transport_type")
     @CassandraType(type = CassandraType.Name.TEXT)
-    private TransportType transportType;
+    private Protocol transportType;
 
     @Column("access_token")
     private String accessToken;
