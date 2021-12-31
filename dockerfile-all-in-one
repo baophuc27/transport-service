@@ -8,6 +8,7 @@ RUN gradle :core:build --no-daemon
 FROM openjdk:11
 ARG VERSION
 EXPOSE 8986
+EXPOSE 7001
 
 COPY --from=build /home/gradle/src/ingestion-service/build/libs/ingestion-service-${VERSION}.jar reeco-ingestion-service.jar
 COPY --from=build /home/gradle/src/config-service/build/libs/config-service-${VERSION}.jar reeco-config-service.jar
