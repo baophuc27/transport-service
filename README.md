@@ -67,7 +67,7 @@
     `sudo docker-compose -f docker-compose-reeco-services.yml --build up -d`
     
 
-#### For Reeco Software License For other Party.
+#### For Reeco Software License.
 - Build in advance an image and push to your docker hub.
 Run  `sudo docker-compose -f docker-compose-build-all-in-one.yml --build` and push the image you just built in your docker repo.
 Then just run `sudo docker-compose -f docker-compose-run-all-in-one.yml up -d`
