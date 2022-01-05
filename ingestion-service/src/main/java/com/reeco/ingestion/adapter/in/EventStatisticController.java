@@ -40,7 +40,7 @@ public class EventStatisticController {
 
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    @Scheduled(cron = "0 1 * * * ?")
+    @Scheduled(cron = "0 1 1 * * ?")
     public void aggStatisticEvent() {
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.MIN;

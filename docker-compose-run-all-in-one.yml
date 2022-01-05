@@ -4,7 +4,7 @@ version: '3.9'
 services:
   # App backend service
   reecotechservices:
-    image: arihub/reeco-data-services:0.1.0
+    image: arihub/reeco-data-services:${VERSION}
     environment:
       CASSANDRA_KEYSPACE: ${CASSANDRA_KEYSPACE}
       CASSANDRA_USER: ${CASSANDRA_USER}

@@ -4,12 +4,12 @@ version: '3.9'
 services:
   # App backend service
   reecotechservices:
-    image: arihub/reeco-data-services:0.1.0
+    image: arihub/reeco-data-services:${VERSION}
     build:
       context: .
       dockerfile: dockerfile-all-in-one
       args:
-        VERSION: 0.1.0
+        VERSION: ${VERSION}
     environment:
       CASSANDRA_KEYSPACE: ${CASSANDRA_KEYSPACE}
       CASSANDRA_USER: ${CASSANDRA_USER}

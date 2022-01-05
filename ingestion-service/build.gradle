@@ -5,7 +5,6 @@ plugins {
 }
 
 group = 'com.reeco'
-version = '0.1.0'
 sourceCompatibility = '11'
 
 ext {
