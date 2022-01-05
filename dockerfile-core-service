@@ -8,7 +8,7 @@ RUN gradle :core:build -Pversion=${VERSION} --no-daemon
 
 FROM openjdk:11
 EXPOSE 7001
-
+ARG VERSION
 COPY --from=build /home/gradle/src/core/build/libs/core-${VERSION}.jar reeco-core.jar
 
 CMD ["java","-jar","reeco-core.jar"]
