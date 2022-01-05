@@ -1,9 +1,10 @@
 FROM gradle:7.1.1-jdk11 AS build
+ARG VERSION
 COPY --chown=gradle:gradle . /home/gradle/src/
 WORKDIR /home/gradle/src
-RUN gradle :ingestion-service:build --no-daemon
-RUN gradle :config-service:build --no-daemon
-RUN gradle :core:build --no-daemon
+RUN gradle :ingestion-service:build -Pversion=${VERSION} --no-daemon
+RUN gradle :config-service:build -Pversion=${VERSION} --no-daemon
+RUN gradle :core:build -Pversion=${VERSION} --no-daemon
 
 FROM openjdk:11
 ARG VERSION

@@ -17,7 +17,6 @@ apply plugin: 'io.spring.dependency-management'
 
 
 group = 'com.reeco'
-version = '0.1.0'
 sourceCompatibility = "11"
 
 
