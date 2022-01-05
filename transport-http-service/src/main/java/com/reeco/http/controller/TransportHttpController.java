@@ -6,6 +6,7 @@ import com.reeco.common.model.dto.Parameter;
 import com.reeco.common.model.enumtype.ActionType;
 import com.reeco.common.model.enumtype.EntityType;
 import com.reeco.common.model.enumtype.Protocol;
+import com.reeco.common.model.enumtype.TransportType;
 import com.reeco.common.utils.AES;
 import com.reeco.http.cache.ConnectionCache;
 import com.reeco.http.model.dto.RequestDto;
@@ -116,7 +117,7 @@ public class TransportHttpController {
                                 ),
                                 httpConnection.getAccessToken(),
                                 httpConnection.getEnglishName(),
-                                httpConnection.getTransportType()
+                                TransportType.HTTP
                         );
                         Connection connection = new Connection(connectionByOrg);
                         switch (actionType){
