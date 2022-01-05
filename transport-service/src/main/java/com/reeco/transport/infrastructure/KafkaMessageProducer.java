@@ -23,13 +23,13 @@ public class KafkaMessageProducer {
     @Autowired
     private ByteSerializer byteSerializer;
 
-    @Value(value = "${spring.kafka.topic.data.name}")
+    @Value(value = "reeco_time_series_event")
     private String sendDataTopicName;
 
     @Value(value = "${spring.kafka.topic.response.name}")
     private String sendResponseTopicName;
 
-    @Value(value = "${spring.kafka.topic.alarm.name}")
+    @Value(value = "reeco_connection_noti_event")
     private String sendAlarmTopicName;
 
 
