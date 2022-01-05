@@ -8,20 +8,22 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring", uses = {}, unmappedTargetPolicy = ReportingPolicy.WARN,unmappedSourcePolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", uses = {}, unmappedTargetPolicy = ReportingPolicy.IGNORE,unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface AttributeMapper {
     @Mappings({
-//            @Mapping(source = "stationId", target = "deviceId"),
-            @Mapping(source = "attribute.englishName", target = "englishName"),
-            @Mapping(source = "attribute.vietnameseName", target = "vietnameseName"),
-            @Mapping(source = "attribute.parameterType", target = "parameterType"),
-            @Mapping(source = "attribute.indexType", target = "indexType"),
-            @Mapping(source = "attribute.displayType", target = "displayType"),
-            @Mapping(source = "attribute.unit", target = "unit"),
-            @Mapping(source = "attribute.format", target = "format"),
-            @Mapping(source = "attribute.id", target = "id"),
-            @Mapping(source = "attribute.keyName", target = "keyName"),
-            @Mapping(source = "connectionId", target = "deviceId")
+            @Mapping(source = "englishName", target = "englishName"),
+            @Mapping(source = "vietnameseName", target = "vietnameseName"),
+            @Mapping(source = "parameterType", target = "parameterType"),
+            @Mapping(source = "displayType", target = "displayType"),
+            @Mapping(source = "unit", target = "unit"),
+            @Mapping(source = "format", target = "format"),
+            @Mapping(source = "id", target = "paramId"),
+            @Mapping(source = "keyName", target = "keyName"),
+            @Mapping(source = "connectionId", target = "deviceId"),
+            @Mapping(source = "stationId", target = "stationId"),
+            @Mapping(source = "organizationId", target = "organizationId"),
+            @Mapping(source = "workspaceId",target = "workspaceId"),
+            @Mapping(source = "indicatorId", target = "indicatorId")
     })
     AttributeEntity messageToAttributeEntity(UpsertAttributeMessage upsertAttributeMessage);
 

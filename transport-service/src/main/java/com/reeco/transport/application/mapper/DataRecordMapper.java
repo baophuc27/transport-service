@@ -2,6 +2,7 @@ package com.reeco.transport.application.mapper;
 
 import com.reeco.transport.domain.DataRecord;
 import com.reeco.transport.infrastructure.model.DataRecordMessage;
+import com.reeco.transport.infrastructure.persistence.postgresql.AttributeEntity;
 import org.mapstruct.*;
 
 import java.lang.annotation.ElementType;
@@ -15,18 +16,21 @@ import java.time.format.DateTimeFormatter;
 @Mapper(componentModel = "spring", uses = {}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface DataRecordMapper {
     @Mappings({
-            @Mapping(source = "deviceId", target = "connection_id"),
-            @Mapping(source = "stationId", target = "station_id"),
-            @Mapping(source = "key", target = "parameter"),
-            @Mapping(source = "value", target = "measure"),
-            @Mapping(source = "timeStamp", target = "event_ts", qualifiedBy = FormatLocalDateTime.class),
-            @Mapping(source = "receivedAt", target = "received_at", qualifiedBy = FormatLocalDateTime.class),
-            @Mapping(expression = "java(getNowTime())", target = "sent_at"),
-            @Mapping(source = "timeStamp",target = "date", qualifiedBy = GetLocalDate.class),
-            @Mapping(source = "lat", target = "lat"),
-            @Mapping(source = "lon", target = "lon")
+            @Mapping(source = "data.deviceId", target = "connectionId"),
+            @Mapping(source = "data.key", target = "paramName"),
+            @Mapping(source = "data.value", target = "value"),
+            @Mapping(source = "data.timeStamp", target = "eventTime", qualifiedBy = FormatLocalDateTime.class),
+            @Mapping(source = "data.receivedAt", target = "receivedAt", qualifiedBy = FormatLocalDateTime.class),
+            @Mapping(expression = "java(getNowTime())", target = "sentAt"),
+            @Mapping(source = "data.lat", target = "lat"),
+            @Mapping(source = "data.lon", target = "lon"),
+            @Mapping(source = "attribute.organizationId", target = "organizationId"),
+            @Mapping(source = "attribute.stationId", target = "stationId"),
+            @Mapping(source = "attribute.indicatorId", target = "indicatorId"),
+            @Mapping(source = "attribute.workspaceId", target = "workspaceId"),
+            @Mapping(source = "attribute.paramId",target = "paramId")
     })
-    DataRecordMessage domainEntityToMessage(DataRecord dataRecord);
+    DataRecordMessage domainEntityToMessage(DataRecord data, AttributeEntity attribute);
 
     @FormatLocalDateTime
     default String format(LocalDateTime dateTime){

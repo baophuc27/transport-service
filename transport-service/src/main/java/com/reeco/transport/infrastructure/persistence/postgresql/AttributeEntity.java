@@ -6,6 +6,7 @@ import javax.persistence.*;
 @Table(name = "attribute")
 public class AttributeEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
@@ -17,9 +18,6 @@ public class AttributeEntity {
 
     @Column(name = "parameter_type")
     private String parameterType;
-
-    @Column(name = "index_type")
-    private String indexType;
 
     @Column(name = "key_name")
     private String keyName;
@@ -35,6 +33,21 @@ public class AttributeEntity {
 
     @Column(name = "device_id")
     private int deviceId;
+
+   @Column(name = "organization_id")
+    private int organizationId;
+
+   @Column(name = "param_id")
+   private int paramId;
+
+   @Column(name = "station_id")
+    private int stationId;
+
+   @Column(name = "workspace_id")
+    private int workspaceId;
+
+   @Column(name = "indicator_id")
+    private int indicatorId;
 
     public int getId() {
         return id;
@@ -68,13 +81,6 @@ public class AttributeEntity {
         this.parameterType = parameterType;
     }
 
-    public String getIndexType() {
-        return indexType;
-    }
-
-    public void setIndexType(String indexType) {
-        this.indexType = indexType;
-    }
 
     public String getKeyName() {
         return keyName;
@@ -116,6 +122,47 @@ public class AttributeEntity {
         this.deviceId = deviceId;
     }
 
+
+    public int getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(int organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public int getStationId() {
+        return stationId;
+    }
+
+    public void setStationId(int stationId) {
+        this.stationId = stationId;
+    }
+
+    public int getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(int workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
+    public int getIndicatorId() {
+        return indicatorId;
+    }
+
+    public void setIndicatorId(int indicatorId) {
+        this.indicatorId = indicatorId;
+    }
+
+    public int getParamId() {
+        return paramId;
+    }
+
+    public void setParamId(int paramId) {
+        this.paramId = paramId;
+    }
+
     public AttributeEntity() {
     }
 
@@ -126,12 +173,16 @@ public class AttributeEntity {
                 ", vietnameseName='" + vietnameseName + '\'' +
                 ", englishName='" + englishName + '\'' +
                 ", parameterType='" + parameterType + '\'' +
-                ", indexType='" + indexType + '\'' +
                 ", keyName='" + keyName + '\'' +
                 ", displayType='" + displayType + '\'' +
                 ", unit='" + unit + '\'' +
                 ", format='" + format + '\'' +
                 ", deviceId=" + deviceId +
+                ", organizationId=" + organizationId +
+                ", paramId=" + paramId +
+                ", stationId=" + stationId +
+                ", workspaceId=" + workspaceId +
+                ", indicatorId=" + indicatorId +
                 '}';
     }
 }

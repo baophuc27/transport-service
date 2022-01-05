@@ -1,16 +1,25 @@
 package com.reeco.transport.infrastructure.persistence.postgresql;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "device")
+@Data
 public class DeviceEntity {
     @Id
     private int id;
 
-    @Column(name = "station_id")
+    @Column(name = "organization_id")
     private int stationId;
 
+    @Column(name = "workspace_id")
+    private int workspaceId;
 
     @Column(name = "vietnamese_name")
     private String vietnameseName;
@@ -33,12 +42,37 @@ public class DeviceEntity {
     @Column(name = "template_format")
     private int templateFormat;
 
+    @Column(name = "active")
+    private boolean active;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+    @Column(name = "last_active",columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    @UpdateTimestamp
+    private LocalDateTime lastActive;
+
+
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getStationId() {
+        return stationId;
+    }
+
+    public void setStationId(int stationId) {
+        this.stationId = stationId;
+    }
+
+    public int getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(int workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     public String getVietnameseName() {
@@ -85,14 +119,6 @@ public class DeviceEntity {
         return protocolType;
     }
 
-    public int getStationId() {
-        return stationId;
-    }
-
-    public void setStationId(int stationId) {
-        this.stationId = stationId;
-    }
-
     public void setProtocolType(String protocolType) {
         this.protocolType = protocolType;
     }
@@ -105,8 +131,10 @@ public class DeviceEntity {
         this.templateFormat = templateFormat;
     }
 
-    public DeviceEntity(int id, String vietnameseName, String englishName, int maximumTimeout, int maximumAttachment, String notificationType, String protocolType, int templateFormat) {
+    public DeviceEntity(int id, int stationId, int workspaceId, String vietnameseName, String englishName, int maximumTimeout, int maximumAttachment, String notificationType, String protocolType, int templateFormat) {
         this.id = id;
+        this.stationId = stationId;
+        this.workspaceId = workspaceId;
         this.vietnameseName = vietnameseName;
         this.englishName = englishName;
         this.maximumTimeout = maximumTimeout;
@@ -117,6 +145,7 @@ public class DeviceEntity {
     }
 
     public DeviceEntity() {
+        this.active= true;
     }
 
     @Override
@@ -124,6 +153,7 @@ public class DeviceEntity {
         return "DeviceEntity{" +
                 "id=" + id +
                 ", stationId=" + stationId +
+                ", workspaceId=" + workspaceId +
                 ", vietnameseName='" + vietnameseName + '\'' +
                 ", englishName='" + englishName + '\'' +
                 ", maximumTimeout=" + maximumTimeout +
@@ -131,6 +161,7 @@ public class DeviceEntity {
                 ", notificationType='" + notificationType + '\'' +
                 ", protocolType='" + protocolType + '\'' +
                 ", templateFormat=" + templateFormat +
+                ", active=" + active +
                 '}';
     }
 }

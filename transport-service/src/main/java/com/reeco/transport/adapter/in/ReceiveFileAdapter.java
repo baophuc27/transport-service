@@ -15,6 +15,6 @@ public class ReceiveFileAdapter implements ReceiveFilePort {
 
     @Override
     public DataRecord receiveFile(){
-        return new DataRecord(1,LocalDateTime.MIN,"hello",10.0,1,LocalDateTime.now(),null,null);
+        return new DataRecord(LocalDateTime.MIN,"hello",10.0,1,LocalDateTime.now(),null,null);
     }
 }

@@ -1,5 +1,6 @@
 package com.reeco.transport.adapter.out;
 
+import com.reeco.transport.infrastructure.persistence.postgresql.AttributeEntity;
 import com.reeco.transport.utils.annotators.Adapter;
 import com.reeco.transport.application.mapper.DataRecordMapper;
 import com.reeco.transport.application.port.out.StreamingDataPort;
@@ -26,10 +27,9 @@ public class DataToKafkaMessageAdapter implements StreamingDataPort {
 
     @Override
     public void streamData(DataRecord dataRecord){
-        DataRecordMessage message = mapper.domainEntityToMessage(dataRecord);
-        String mappedAttribute = attributeRepository.findMappingAttribute(dataRecord.getDeviceId(),dataRecord.getKey());
+        AttributeEntity mappedAttribute = attributeRepository.findMappingAttribute(dataRecord.getDeviceId(),dataRecord.getKey());
         if (mappedAttribute != null){
-            message.setParameter(mappedAttribute);
+            DataRecordMessage message = mapper.domainEntityToMessage(dataRecord,mappedAttribute);
             log.info("Sending message: {}",message.toString());
             kafkaMessageProducer.sendDataRecord(message);
         }
