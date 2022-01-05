@@ -8,7 +8,7 @@ services:
       context: .
       dockerfile: dockerfile-config-service
       args:
-        VERSION: 0.1.0
+        VERSION: ${VERSION}
     environment:
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
     network_mode: host
@@ -21,7 +21,7 @@ services:
       context: .
       dockerfile: dockerfile-ingestion-service
       args:
-        VERSION: 0.1.0
+        VERSION: ${VERSION}
     network_mode: host
     environment:
       CASSANDRA_KEYSPACE: ${CASSANDRA_KEYSPACE}
@@ -50,7 +50,7 @@ services:
       context: .
       dockerfile: dockerfile-core-service
       args:
-        VERSION: 0.1.0
+        VERSION: ${VERSION}
     network_mode: host
     environment:
       CASSANDRA_KEYSPACE: ${CASSANDRA_KEYSPACE}
