@@ -19,6 +19,8 @@ public final class DeviceConnection {
 
     private int stationId;
 
+    private int workspaceId;
+
     private String deviceId;
 
     private FTPConfiguration protocolConfiguration;
@@ -35,82 +37,4 @@ public final class DeviceConnection {
 
     private String englishName;
 
-//    private DeviceConnection(Builder builder){
-//        this.deviceId = builder.deviceId;
-//        this.protocolConfiguration = builder.protocolConfiguration;
-//        this.maximumTimeoutMinutes = builder.maximumTimeoutMinutes;
-//        this.maximumAttachment = builder.maximumAttachment;
-//        this.removeAfterDays = builder.removeAfterDays;
-//        this.ipWhiteList = builder.ipWhiteList;
-//        this.vietnameseName = builder.vietnameseName;
-//        this.englishName = builder.englishName;
-//        this.notificationType = builder.notificationType;
-//    }
-
-//    public static class Builder {
-//        private final String deviceId;
-//
-//        private final FTPConfiguration protocolConfiguration;
-//
-//        private int maximumTimeoutMinutes;
-//
-//        private int maximumAttachment;
-//
-//        private int removeAfterDays;
-//
-//        private NotificationType notificationType;
-//
-//        private List<String> ipWhiteList;
-//
-//        private String vietnameseName;
-//
-//        private String englishName;
-//
-//        public Builder(String deviceId, FTPConfiguration protocolConfiguration){
-//            if (deviceId == null || protocolConfiguration == null){
-//                throw new InvalidInputException("Device ID and protocol configuration must not be null");
-//            }
-//            this.deviceId = deviceId;
-//            this.protocolConfiguration = protocolConfiguration;
-//        }
-//
-//        public Builder withMaximumTimeoutMinutes(int maximumTimeoutMinutes){
-//            this.maximumTimeoutMinutes = maximumTimeoutMinutes;
-//            return this;
-//        }
-//
-//        public Builder withMaximumAttachment(int maximumAttachment){
-//            this.maximumAttachment = maximumAttachment;
-//            return this;
-//        }
-//
-//        public Builder withRemoveAfterDays(int removeAfterDays){
-//            this.removeAfterDays = removeAfterDays;
-//            return this;
-//        }
-//
-//        public Builder withNotificationType(NotificationType notificationType){
-//            this.notificationType = notificationType;
-//            return this;
-//        }
-//
-//        public Builder withIpWhiteList(List<String> ipWhiteList){
-//            this.ipWhiteList = ipWhiteList;
-//            return this;
-//        }
-//
-//        public Builder withVietnameseName(String vietnameseName){
-//            this.vietnameseName = vietnameseName;
-//            return this;
-//        }
-//
-//        public Builder withEnglishName(String englishName){
-//            this.englishName = englishName;
-//            return this;
-//        }
-//
-//        public DeviceConnection build(){
-//            return new DeviceConnection(this);
-//        }
-//    }
 }

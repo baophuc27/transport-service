@@ -5,8 +5,8 @@ server.error.include-message: always
 spring:
   datasource:
     url: jdbc:postgresql://103.88.122.104:5432/configuration
-    username: root
-    password: password
+    username: admin
+    password: admin123
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   kafka:
@@ -30,12 +30,17 @@ spring:
         name: "reeco-core-response"
         partition: 1
         replication-factor: 1
+      alarm:
+        name: "reeco-alarm-test"
+        partition: 1
+        replication-factor: 1
       consume:
         name: "reeco-core-backend"
 
 
 application:
-  file-directory: reeco-ftp-server/data/
+  file-directory: ./data/
+  alarm-logs-directory: ./logs
   sync-frequency: 2*500
 
 logging:

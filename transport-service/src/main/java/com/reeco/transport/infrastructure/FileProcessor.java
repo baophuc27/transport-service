@@ -1,5 +1,6 @@
 package com.reeco.transport.infrastructure;
 
+import com.reeco.transport.application.usecase.AlarmManagementUsecase;
 import com.reeco.transport.domain.DataRecord;
 import com.reeco.transport.utils.annotators.Infrastructure;
 import com.reeco.transport.utils.exception.FileProcessingException;
@@ -7,17 +8,19 @@ import com.reeco.transport.application.usecase.DataManagementUseCase;
 import com.reeco.transport.infrastructure.persistence.postgresql.PostgresDeviceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-
+import java.util.regex.*;
 import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 
 @Infrastructure
@@ -29,11 +32,17 @@ public class FileProcessor {
 
     private final DataManagementUseCase dataManagementUseCase;
 
+    private final AlarmManagementUsecase alarmManagementUsecase;
+
     @Autowired
     private PostgresDeviceRepository postgresDeviceRepository;
 
     @Value(value = "${application.file-directory}")
     private String FILE_DIRECTORY;
+
+    @Value(value = "${application.alarm-logs-directory}")
+    private String ALARM_LOGS_DIRECTORY;
+
 
     @PostConstruct
     private void postProcess(){
@@ -46,12 +55,30 @@ public class FileProcessor {
         }
     }
 
+    @PostConstruct
+    private void watchAlarmLogs(){
+        String relativePath = ALARM_LOGS_DIRECTORY;
+        log.info(relativePath);
+        Path path = Paths.get(relativePath);
+        try{
+
+            path.register(
+                    watchService,
+                    StandardWatchEventKinds.ENTRY_CREATE
+            );
+            log.info("Observing files in: {}",relativePath);
+        }
+        catch (IOException ex){
+            log.warn("Got an exception when register file watcher for: {}",relativePath);
+            throw new FileProcessingException(ex.getMessage());
+        }
+    }
     public void observe(String subFolder) {
 
         String relativePath = FILE_DIRECTORY + subFolder;
         Path path = Paths.get(relativePath);
         try{
-            log.info("Begin observing SFTP files for device: {}",subFolder);
+            log.info("Observing files in: {}",subFolder);
             path.register(
                     watchService,
                     StandardWatchEventKinds.ENTRY_CREATE
@@ -83,33 +110,147 @@ public class FileProcessor {
             for (WatchEvent<?> event : watchKey.pollEvents()) {
                 log.info("[FILE PROCESSOR] - {} : {}",event.kind(),event.context());
                     if (event.kind().equals(StandardWatchEventKinds.ENTRY_CREATE)){
-                        Path deviceDir = (Path) watchKey.watchable();
-                        readFile(event.context().toString(),deviceDir);
+                        Path watchedDir = (Path) watchKey.watchable();
+                        log.info(String.valueOf(watchedDir));
+                        String fileName = event.context().toString();
+                        if (String.valueOf(watchedDir).equals(ALARM_LOGS_DIRECTORY)){
+                            readLogsFile(fileName);
+                        }
+                        else{
+                            readDataFile(fileName,watchedDir);
+                        }
                     }
                 }
             watchKey.reset();
         }
     }
-
-    private void readFile(String fileName,Path deviceDir){
-        String filePath = deviceDir +"/" +fileName;
-        String folderName = deviceDir.getFileName().toString();
-        int stationId = Integer.parseInt(folderName);
-        int templateId = postgresDeviceRepository.findTemplateById(stationId);
-        log.warn("Device info: {}",postgresDeviceRepository.findDeviceById(stationId));
-        switch (templateId){
-            case 1:
-                readFile1(filePath,stationId);
+    private String getNowTime(){
+        LocalDateTime time = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return time.format(formatter);
+    }
+    private void readLogsFile(String filename){
+        String cleanedFileName = filename.replace("~","");
+        log.info("Getting logs: {}",cleanedFileName);
+        String filePath = ALARM_LOGS_DIRECTORY + "/" + cleanedFileName;
+        switch (cleanedFileName){
+            case "auth_failed.txt":
+                authFailedAlarm(filePath);
                 break;
-            case 2:
-                readFile2(filePath,stationId);
+            case "logout.txt":
+                logoutAlarm(filePath);
+                break;
+            case "connect.txt":
+                connectAlarm(filePath);
                 break;
             default:
-                log.warn("Invalid template");
+                break;
         }
     }
 
-    private void readFile2(String filePath, int stationId) {
+    private void authFailedAlarm(String filePath){
+        String regex = "\\[(.*?)\\]";
+        Pattern p = Pattern.compile(regex);
+        try{
+            File file = new File(filePath);
+            file.setReadable(true);
+            Scanner scanner = new Scanner(file);
+
+            scanner.useDelimiter("\n");
+
+            Thread.sleep(2000);
+            while(scanner.hasNext()){
+                String record = scanner.next();
+                Matcher m = p.matcher(record);
+                while (m.find()){
+                    String userName = m.group(1);
+                    if  (!userName.equals("WARNING")){
+                        alarmManagementUsecase.alarmAuthenticationFailed(userName,getNowTime());
+                    }
+                }
+            }
+            scanner.close();
+        }
+        catch (InterruptedException | RuntimeException | IOException exception){
+            log.warn("Got an exception when reading file {} :{}", filePath,exception.getMessage());
+        }
+    }
+
+    private void logoutAlarm(String filePath){
+        String regex = "\\((.*?)@";
+        Pattern p = Pattern.compile(regex);
+        try{
+            File file = new File(filePath);
+            file.setReadable(true);
+            Scanner scanner = new Scanner(file);
+
+            scanner.useDelimiter("\n");
+
+            Thread.sleep(2000);
+            while(scanner.hasNext()){
+                String record = scanner.next();
+                Matcher m = p.matcher(record);
+                while (m.find()){
+                    String userName = m.group(1);
+                    if  (!userName.equals("WARNING")){
+                        alarmManagementUsecase.alarmDisconnected(userName,getNowTime());
+                    }
+                }
+            }
+            scanner.close();
+        }
+        catch (InterruptedException | RuntimeException | IOException exception){
+            log.warn("Got an exception when reading file {} :{}", filePath,exception.getMessage());
+        }
+    }
+
+    private void connectAlarm(String filePath){
+        String regex = "\\[INFO\\] (.*?) is now logged in";
+        Pattern p = Pattern.compile(regex);
+        try{
+            File file = new File(filePath);
+            file.setReadable(true);
+            Scanner scanner = new Scanner(file);
+
+            scanner.useDelimiter("\n");
+
+            Thread.sleep(2000);
+            while(scanner.hasNext()){
+                String record = scanner.next();
+                Matcher m = p.matcher(record);
+                while (m.find()){
+                    String userName = m.group(1);
+                    alarmManagementUsecase.alarmConnected(userName,getNowTime());
+                }
+            }
+            scanner.close();
+        }
+        catch (InterruptedException | RuntimeException | IOException exception){
+            log.warn("Got an exception when reading file {} :{}", filePath,exception.getMessage());
+        }
+    }
+
+    private void readDataFile(String fileName,Path deviceDir){
+        String filePath = deviceDir +"/" +fileName;
+        String folderName = deviceDir.getFileName().toString();
+        int deviceId = Integer.parseInt(folderName);
+        int templateId = postgresDeviceRepository.findTemplateById(deviceId);
+        postgresDeviceRepository.updateDeviceActive(deviceId);
+        log.warn("Device info: {}",postgresDeviceRepository.findDeviceById(deviceId));
+        switch (templateId){
+            case 1:
+                readFile1(filePath,deviceId);
+                break;
+            case 2:
+                readFile2(filePath,deviceId);
+                break;
+            default:
+                log.warn("Invalid template");
+                break;
+        }
+    }
+
+    private void readFile2(String filePath, int deviceId) {
             try{
                 File file = new File(filePath);
                 file.setReadable(true);
@@ -126,10 +267,13 @@ public class FileProcessor {
                     }
                     if (splitRecord.length == 2){
                         String key = splitRecord[0];
+                        if (key.strip().toLowerCase() == "lat"){
+                            log.info("Lat: {}",splitRecord[1]);
+                        }
                         String[] valueRecord = splitRecord[1].split(" ");
                         if (valueRecord.length == 2){
                             Double value = Double.valueOf(valueRecord[0]);
-                            DataRecord dataRecord = new DataRecord(0,timeStamp,key,value,stationId,LocalDateTime.now().withNano(0),10.0,103.0);
+                            DataRecord dataRecord = new DataRecord(timeStamp,key,value,deviceId,LocalDateTime.now().withNano(0),10.0,103.0);
                             log.info("Template 2 record: {}",dataRecord.toString());
                             dataManagementUseCase.receiveData(dataRecord);
                         }
@@ -142,7 +286,7 @@ public class FileProcessor {
             }
     }
 
-    private void readFile1(String filePath, int stationId) {
+    private void readFile1(String filePath, int deviceId) {
         try{
             File file = new File(filePath);
             file.setExecutable(true);
@@ -156,8 +300,8 @@ public class FileProcessor {
                 LocalDateTime timestamp = getTimeStamp(splitRecord[3]);
                 String key = splitRecord[0];
                 Double value = Double.valueOf(splitRecord[1]);
-                DataRecord dataRecord = new DataRecord(0,timestamp,key,value,stationId,LocalDateTime.now().withNano(0),null,null);
-                log.info("Template 2 record: {}",dataRecord.toString());
+                DataRecord dataRecord = new DataRecord(timestamp,key,value,deviceId,LocalDateTime.now().withNano(0),null,null);
+                log.info("Template 1 record: {}",dataRecord.toString());
                 dataManagementUseCase.receiveData(dataRecord);
             }
             scanner.close();

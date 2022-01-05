@@ -37,9 +37,6 @@ public class PersistenceAdapter implements StoreConfigurationPort {
 
 
         FtpEntity ftpEntity = connectionMapper.domainToFtpEntity(deviceConnection);
-        log.warn(String.valueOf(ftpEntity));
-        ftpEntity.setHostName("103.88.122.104");
-        ftpEntity.setHostPort(2100);
         Integer ftpId = postgresFTPRepository.findFtpByUserName(ftpEntity.getUserName());
         if (ftpId != null && ftpId != ftpEntity.getId()){
             throw new EventProcessingException("Duplicate ftp username");

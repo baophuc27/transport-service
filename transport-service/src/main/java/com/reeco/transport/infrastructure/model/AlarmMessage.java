@@ -7,32 +7,19 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
-public class DataRecordMessage {
+public class AlarmMessage {
 
     Integer organizationId;
+
+    Integer connectionId;
 
     Integer workspaceId;
 
     Integer stationId;
 
-    Integer connectionId;
+    String message;
 
-    Integer indicatorId;
-
-    Integer paramId;
-
-    String eventTime;
-
-    String receivedAt;
+    String lastEventTime;
 
     String sentAt;
-
-    String paramName;
-
-    Double value;
-
-    Double lat;
-
-    Double lon;
-
 }

@@ -11,32 +11,35 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.ReportingPolicy;
-
+import com.reeco.common.model.dto.FTPConnection;
 
 @Mapper(componentModel = "spring", uses = {}, unmappedTargetPolicy = ReportingPolicy.IGNORE,unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface ConnectionMapper {
     @Mappings({
-            @Mapping(source = "stationId", target = "stationId"),
-            @Mapping(source = "connection.vietnameseName", target = "vietnameseName"),
-            @Mapping(source = "connection.englishName",target = "englishName"),
-            @Mapping(source = "connection.port",  target = "protocolConfiguration.hostPort"),
-            @Mapping(source= "connection.userName", target = "protocolConfiguration.userName"),
-            @Mapping(source = "connection.hostName", target = "protocolConfiguration.hostAddress"),
-            @Mapping(source = "connection.password", target = "protocolConfiguration.password"),
-            @Mapping(source = "connection.key", target = "protocolConfiguration.key"),
-            @Mapping(source = "connection.maximumTimeout", target = "protocolConfiguration.maximumTimeoutSeconds"),
-            @Mapping(source = "connection.ipWhiteList", target = "ipWhiteList"),
-            @Mapping(source = "connection.fileType", target = "fileType"),
-            @Mapping(source = "connection.id",target = "deviceId"),
-            @Mapping(source = "connection.maximumAttachment", target = "maximumAttachment"),
-            @Mapping(source = "connection.removeAfterDays",target = "removeAfterDays"),
-            @Mapping(source = "connection.notificationType", target = "notificationType"),
-            @Mapping(source = "connection.templateFormat", target = "protocolConfiguration.templateFormat")
+            @Mapping(source = "organizationId", target = "stationId"),
+            @Mapping(source = "workspaceId",target = "workspaceId"),
+            @Mapping(source = "vietnameseName", target = "vietnameseName"),
+            @Mapping(source = "englishName",target = "englishName"),
+            @Mapping(source = "port",  target = "protocolConfiguration.hostPort"),
+            @Mapping(source= "userName", target = "protocolConfiguration.userName"),
+            @Mapping(source = "hostName", target = "protocolConfiguration.hostAddress"),
+            @Mapping(source = "password", target = "protocolConfiguration.password"),
+            @Mapping(source = "key", target = "protocolConfiguration.key"),
+            @Mapping(source = "maximumTimeout", target = "protocolConfiguration.maximumTimeoutSeconds"),
+            @Mapping(source = "ipWhiteList", target = "ipWhiteList"),
+            @Mapping(source = "fileType", target = "protocolConfiguration.fileType"),
+            @Mapping(source = "id",target = "deviceId"),
+            @Mapping(source = "maximumAttachment", target = "maximumAttachment"),
+            @Mapping(source = "removeAfterDays",target = "removeAfterDays"),
+            @Mapping(source = "notificationType", target = "notificationType"),
+            @Mapping(source = "templateFormat", target = "protocolConfiguration.templateFormat")
     })
-    RegisterDeviceCommand messageToRegisterCommand(UpsertConnectionMessage message);
+    RegisterDeviceCommand messageToRegisterCommand(FTPConnection message);
 
     @Mappings({
             @Mapping(source = "deviceId", target = "deviceId"),
+            @Mapping(source = "stationId",target = "stationId"),
+            @Mapping(source = "workspaceId",target = "workspaceId"),
             @Mapping(source = "vietnameseName", target = "vietnameseName"),
             @Mapping(source = "englishName", target = "englishName"),
             @Mapping(source = "ipWhiteList", target = "ipWhiteList"),
@@ -67,7 +70,8 @@ public interface ConnectionMapper {
             @Mapping(source = "maximumAttachment", target = "maximumAttachment"),
             @Mapping(source = "protocolConfiguration.key", target = "protocolType"),
             @Mapping(source = "protocolConfiguration.templateFormat", target = "templateFormat"),
-            @Mapping(source = "stationId", target = "stationId")
+            @Mapping(source = "stationId", target = "stationId"),
+            @Mapping(source = "workspaceId",target = "workspaceId")
     })
     DeviceEntity domainToDeviceEntity(DeviceConnection deviceConnection);
 

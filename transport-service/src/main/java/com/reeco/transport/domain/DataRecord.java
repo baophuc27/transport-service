@@ -2,13 +2,13 @@ package com.reeco.transport.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 public class DataRecord {
-    Integer stationId;
 
     LocalDateTime timeStamp;
 
