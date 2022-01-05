@@ -1,38 +1,76 @@
-# Marvin
-Marvin is a ProductionReady project used for speed up building data management platform based application
+# Reeco Data Services
 
-# Start dmp service
-- Point to dmp service work dir: cd services/core-service
-- Build and run container: docker-compose down && ./gradlew clean build && docker-compose build && docker-compose up -d
-- Sanity check: ./scripts/test-em-all.bash
-- Then: http://localhost:7001/swagger-ui/
+## Config service
+- Receive config entity from UI through HTTP and push to message queue topic for further consumption.
 
+## Ingestion service
+- Receive time series events from devices through message queue and ingest data into bigtable.
+- Handle batch processing daily to aggregate event metrics and statistics.
+- Process & check matching alarm condition. 
 
-## Main Component
-- General purpose services (IAM for example)
-- Core services (DMP and related services)
-- Support services (Crawler services, Ingestion services, IoT)
-- Scripts describe the construction of the projects
-- Scripts for sanity checking
-
-## Criteria
-- Provide general purpose microservices with basic use cases, and the facilities to extend or customize for a special domain 
-- Provide scalable Infrastructure
-- Expose some PoC of concrete special domain applications
-
-## Application Implementation
-- Use Spring Boot framework to construct application code base on the framework's AOP and IoC supports
-- Use async manner for communication between core services
+## Chart Service
+- Expose API endpoint to return historical data from a specific time ranges.
 
 
-## Infrastructure
-- Use K8s as the container-orchestration system for automating application deployment, scaling, and management
+## Deployment
+### Infrastructure
+- Component:
+    + Kafka - Message Broker (must)
+    + Cassandra - Time series database(must)
+    + Kafkadrop - Kafka UI to view event and topic(optional)
+    + Zookeeper - Services Coordinator(must)
+    
 
-## Guideline
-- [Reactive approach](https://www.reactivemanifesto.org/)
-- [Microservice Architecture Pattern](http://martinfowler.com/microservices/)
+- Create .env file in the same root folder reco-dmp. That contain multiple env variables need to be configured:
 
+```# cassandra config
+   CASSANDRA_KEYSPACE=reecotech
+   CASSANDRA_USER=yourpassword
+   CASSANDRA_PASSWORD=yourpassword
+   CASSANDRA_CONTACT_POINTS=localhost
+   CASSANDRA_PORT=9042
+   
+   # kafka config
+   KAFKA_BOOTSTRAP_SERVERS=localhost:29092
+   KAFKA_TS_EVENT_GROUP_ID=reeco_time_series_event_cg
+   KAFKA_CONFIG_EVENT_GROUP_ID=reeco_config_event_ingestion
+   KAFKA_CONFIG_AUTO_OFFSET_RESET=earliest
+   KAFKA_TS_EVENT_AUTO_OFFSET_RESET=earliest
+   KAFKA_MAX_CONCURRENCY=1
+   KAFKA_TS_EVENT_TOPIC_PARTITIONS=1
+   KAFKA_TS_EVENT_TOPIC_REPLICATIONS=1
+   KAFKA_CONFIG_TOPIC_PARTITIONS=1
+   KAFKA_CONFIG_TOPIC_REPLICATIONS=1
+   KAFKA_ALARM_TOPIC_PARTITIONS=1
+   KAFKA_ALARM_TOPIC_REPLICATIONS=1
+   KAFKA_ALARM_NOTI_TOPIC_PARTITIONS=1
+   KAFKA_ALARM_NOTI_TOPIC_REPLICATIONS=1
+   
+   KAFKA_CONFIG_EVENT_HTTP_GROUP_ID=reeco_config_event_http
+   
+   # Resource provision
+   CASSANDRA_CPUS=4
+   CASSANDRA_MEMORY=4g
+   
+   KAFKA_CPUS=2
+   KAFKA_MEMORY=2g
+   
+   ZK_CPUS=1
+   ZK_MEMORY=1g
+```
 
+- Start infrastructure using docker-compose, please make sure that docker and docker-compose are already installed first!.
+`sudo docker-compose -f docker-compose-infras.yml up -d`
+
+### Reeco Data Services.
+#### For Reeco Centralize Server Scenario.
+    `sudo docker-compose -f docker-compose-reeco-services.yml --build up -d`
+    
+
+#### For Reeco Software License.
+- Build in advance an image and push to your docker hub.
+Run  `sudo docker-compose -f docker-compose-build-all-in-one.yml --build` and push the image you just built in your docker repo.
+Then just run `sudo docker-compose -f docker-compose-run-all-in-one.yml up -d`
 
 
 
