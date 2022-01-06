@@ -12,4 +12,6 @@ public interface DeviceManagementUseCase {
     void registerAttribute(UpsertAttributeMessage message);
 
     void deleteAttribute(DeleteAttributeMessage message);
+
+
 }

@@ -17,6 +17,8 @@ public class RegisterDeviceCommand extends SelfValidating<RegisterDeviceCommand>
 
     @NotNull int deviceId;
 
+    @NotNull int workspaceId;
+
     @NotNull
     @Positive
     int maximumAttachment;
@@ -25,7 +27,7 @@ public class RegisterDeviceCommand extends SelfValidating<RegisterDeviceCommand>
     int removeAfterDays;
 
     @NotNull
-    DeviceConnection.NotificationType notificationType;
+    String notificationType;
 
     @NotNull
     List<String> ipWhiteList;
@@ -38,9 +40,10 @@ public class RegisterDeviceCommand extends SelfValidating<RegisterDeviceCommand>
     @NotNull
     String englishName;
 
-    public RegisterDeviceCommand(int stationId,int deviceId, DeviceConnection.FileType fileType, int maximumAttachment, int removeAfterDays, DeviceConnection.NotificationType notificationType, List<String> ipWhiteList, FTPConfiguration protocolConfiguration, String vietnameseName, String englishName) {
+    public RegisterDeviceCommand(int stationId, int deviceId, int workspaceId, int maximumAttachment, int removeAfterDays, String notificationType, List<String> ipWhiteList, FTPConfiguration protocolConfiguration, String vietnameseName, String englishName) {
         this.stationId = stationId;
         this.deviceId = deviceId;
+        this.workspaceId = workspaceId;
         this.maximumAttachment = maximumAttachment;
         this.removeAfterDays = removeAfterDays;
         this.notificationType = notificationType;
@@ -48,6 +51,5 @@ public class RegisterDeviceCommand extends SelfValidating<RegisterDeviceCommand>
         this.protocolConfiguration = protocolConfiguration;
         this.vietnameseName = vietnameseName;
         this.englishName = englishName;
-        this.validateSelf();
     }
 }

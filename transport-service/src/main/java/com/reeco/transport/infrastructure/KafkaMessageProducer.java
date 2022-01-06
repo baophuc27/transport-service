@@ -3,6 +3,7 @@ package com.reeco.transport.infrastructure;
 import com.reeco.transport.infrastructure.kafka.ByteSerializer;
 import com.reeco.transport.infrastructure.kafka.KafkaBaseMsg;
 import com.reeco.transport.infrastructure.kafka.KafkaMsgCallback;
+import com.reeco.transport.infrastructure.model.AlarmMessage;
 import com.reeco.transport.infrastructure.model.DataRecordMessage;
 import com.reeco.transport.infrastructure.model.ResponseMessage;
 import lombok.RequiredArgsConstructor;
@@ -22,15 +23,19 @@ public class KafkaMessageProducer {
     @Autowired
     private ByteSerializer byteSerializer;
 
-    @Value(value = "${spring.kafka.topic.data.name}")
+    @Value(value = "reeco_time_series_event")
     private String sendDataTopicName;
 
     @Value(value = "${spring.kafka.topic.response.name}")
     private String sendResponseTopicName;
 
+    @Value(value = "reeco_connection_noti_event")
+    private String sendAlarmTopicName;
+
+
     public void sendDataRecord(DataRecordMessage message){
         byte[] data = byteSerializer.getBytes(message);
-        String key = message.getStation_id().toString();
+        String key = message.getStationId().toString();
         KafkaBaseMsg kafkaMsg = new KafkaBaseMsg(key,data,null);
         send(sendDataTopicName,kafkaMsg,kafkaTemplate);
     }
@@ -40,6 +45,13 @@ public class KafkaMessageProducer {
         String key = null;
         KafkaBaseMsg kafkaBaseMsg = new KafkaBaseMsg(key,data,null);
         send(sendDataTopicName,kafkaBaseMsg,kafkaTemplate);
+    }
+
+    public void sendAlarmMessage(AlarmMessage message){
+        byte[] data = byteSerializer.getBytes(message);
+        String key = null;
+        KafkaBaseMsg kafkaBaseMsg = new KafkaBaseMsg(key,data,null);
+        send(sendAlarmTopicName,kafkaBaseMsg,kafkaTemplate);
     }
 
     private void send(String topicName, KafkaBaseMsg message, KafkaTemplate<String,byte[]> template){

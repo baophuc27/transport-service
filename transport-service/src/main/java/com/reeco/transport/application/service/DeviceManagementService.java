@@ -63,4 +63,5 @@ public class DeviceManagementService implements DeviceManagementUseCase {
         saveAttributePort.delete(message);
     }
 
+
 }

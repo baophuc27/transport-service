@@ -1,12 +1,16 @@
 package com.reeco.transport.configuration;
 
 import com.reeco.transport.adapter.in.DeleteDeviceAdapter;
+import com.reeco.transport.adapter.in.GetFTPDeviceInfoAdapter;
 import com.reeco.transport.adapter.in.ReceiveFileAdapter;
 import com.reeco.transport.adapter.out.*;
 import com.reeco.transport.application.port.in.DeleteDevicePort;
+import com.reeco.transport.application.port.in.GetAlarmInfoPort;
 import com.reeco.transport.application.port.in.ReceiveFilePort;
 import com.reeco.transport.application.port.in.RegisterDevicePort;
 import com.reeco.transport.application.port.out.*;
+import com.reeco.transport.application.service.AlarmManagementService;
+import com.reeco.transport.application.usecase.AlarmManagementUsecase;
 import com.reeco.transport.domain.ServiceConnection;
 import com.reeco.transport.infrastructure.*;
 import com.reeco.transport.infrastructure.persistence.stimulate.InMemFtpRepository;
@@ -55,6 +59,10 @@ public class TransportConfiguration {
     DataManagementUseCase dataManagementUseCase(BatchingFilePort batchingFilePort, StreamingDataPort streamingDataPort, ReceiveFilePort receiveFilePort){
         return new DataManagementService(batchingFilePort, streamingDataPort,receiveFilePort);
     }
+
+    AlarmManagementUsecase alarmManagementUsecase(GetAlarmInfoPort getAlarmInfoPort, SendAlarmPort sendAlarmPort){
+        return new AlarmManagementService(getAlarmInfoPort,sendAlarmPort);
+    }
     /* *
      * PORTS & adapter CONFIGURATION
      * */
@@ -101,5 +109,13 @@ public class TransportConfiguration {
     @Bean
     SaveAttributePort saveAttributePort(){
         return new AttributeAdapter();
+    }
+
+    @Bean
+    GetAlarmInfoPort getAlarmInfoPort(){ return new GetFTPDeviceInfoAdapter();}
+
+    @Bean
+    SendAlarmPort sendAlarmPort(KafkaMessageProducer producer){
+        return new SendAlarmMessageAdapter(producer);
     }
 }
