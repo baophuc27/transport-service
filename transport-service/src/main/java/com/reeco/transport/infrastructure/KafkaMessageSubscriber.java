@@ -66,7 +66,13 @@ public class KafkaMessageSubscriber {
         ActionType actionType = ActionType
                                 .valueOf((new String(header.get("actionType")))
                                 .replace("\"",""));
-        String protocol = new String(header.get("protocol"));
+        String protocol = "FTP";
+        try{
+            protocol = new String(header.get("protocol"));
+        }
+        catch (RuntimeException exception){
+            log.info("No problem");
+        }
 
         switch (entityType){
             case CONNECTION:
