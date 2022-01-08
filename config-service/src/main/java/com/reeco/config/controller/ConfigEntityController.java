@@ -66,7 +66,7 @@ class ConfigEntityController {
             producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            responseWriter.setResult(new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST));
+            responseWriter.setResult(new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST));
         }
 
         return responseWriter;
@@ -94,7 +94,7 @@ class ConfigEntityController {
             producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
 
         } catch (JsonProcessingException e) {
-            responseWriter.setResult(new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST));
+            responseWriter.setResult(new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST));
         }
 
         return responseWriter;
@@ -110,11 +110,14 @@ class ConfigEntityController {
         LocalDateTime currentTimestamp = LocalDateTime.now();
 
         try {
-            if (!Protocol.FTP.name().toLowerCase().equals(protocol) && !Protocol.HTTP.name().toLowerCase().equals(protocol)) {
+            if (!Protocol.FTP.name().toLowerCase().equals(protocol)
+                    && !Protocol.FTPS.name().toLowerCase().equals(protocol)
+                    && !Protocol.HTTP.name().toLowerCase().equals(protocol)) {
+
                 responseWriter.setResult(new ResponseEntity<>("Unsupported connection method " + protocol, HttpStatus.BAD_REQUEST));
                 return responseWriter;
             }
-            if (Protocol.FTP.name().toLowerCase().equals(protocol)) {
+            if (Protocol.FTP.name().toLowerCase().equals(protocol) || Protocol.FTPS.name().toLowerCase().equals(protocol)) {
                 FTPConnection connection = objectMapper.convertValue(connectionPayload, FTPConnection.class);
                 connection.setReceivedAt(currentTimestamp);
                 ReecoRequestParamValidator<Connection> validator = new ReecoRequestParamValidator<>();
@@ -131,12 +134,12 @@ class ConfigEntityController {
                         .add("protocol", connection.getProtocol().name().getBytes());
 
                 producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
-            } else if (Protocol.HTTP.name().toLowerCase().equals(protocol)){
+            } else if (Protocol.HTTP.name().toLowerCase().equals(protocol)) {
                 HTTPConnection httpConnection = objectMapper.convertValue(connectionPayload, HTTPConnection.class);
                 String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~`!@#$?";
-                String access_token = httpConnection.getId() +"%" + RandomStringUtils.random( 30, characters );
+                String access_token = httpConnection.getId() + "%" + RandomStringUtils.random(30, characters);
                 httpConnection.setUpdatedAt(currentTimestamp);
-                log.info("Access_token: {}",access_token);
+                log.info("Access_token: {}", access_token);
                 httpConnection.setAccessToken(AES.encrypt(access_token));
                 ProducerRecord<String, byte[]> msg = new ProducerRecord<>(TOPIC_NAME, httpConnection.getOrganizationId().toString(),
                         objectMapper.writeValueAsString(httpConnection).getBytes());
@@ -150,7 +153,7 @@ class ConfigEntityController {
             }
 
 
-        } catch (IllegalArgumentException|JsonProcessingException ex) {
+        } catch (IllegalArgumentException | JsonProcessingException ex) {
             ex.printStackTrace();
             responseWriter.setResult(new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST));
         }
@@ -164,7 +167,7 @@ class ConfigEntityController {
         DeferredResult<ResponseEntity<String>> responseWriter = new DeferredResult<>();
         log.info("Delete connection: {} in station: {}", id, orgId);
 
-        if (Protocol.FTP.name().toLowerCase().equals(protocol)){
+        if (Protocol.FTP.name().toLowerCase().equals(protocol) || Protocol.FTPS.name().toLowerCase().equals(protocol)) {
             FTPConnection connection = new FTPConnection();
             connection.setOrganizationId(orgId);
             connection.setId(id);
@@ -174,14 +177,14 @@ class ConfigEntityController {
                 msg.headers()
                         .add("actionType", ActionType.DELETE.name().getBytes())
                         .add("entityType", EntityType.CONNECTION.name().getBytes())
-                        .add("protocol",Protocol.FTP.name().getBytes());
+                        .add("protocol", Protocol.FTP.name().getBytes());
                 producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
-                responseWriter.setResult(new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST));
+                responseWriter.setResult(new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST));
             }
 
-        }else if(Protocol.HTTP.name().toLowerCase().equals(protocol)){
+        } else if (Protocol.HTTP.name().toLowerCase().equals(protocol)) {
             HTTPConnection httpConnection = new HTTPConnection();
             httpConnection.setOrganizationId(orgId);
             httpConnection.setId(id);
@@ -191,14 +194,13 @@ class ConfigEntityController {
                 msg.headers()
                         .add("actionType", ActionType.DELETE.name().getBytes())
                         .add("entityType", EntityType.CONNECTION.name().getBytes())
-                        .add("protocol",Protocol.HTTP.name().getBytes());
+                        .add("protocol", Protocol.HTTP.name().getBytes());
                 producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
-                responseWriter.setResult(new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST));
+                responseWriter.setResult(new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST));
             }
-        }
-        else {
+        } else {
             responseWriter.setResult(new ResponseEntity<>("Unsupported protocol " + protocol, HttpStatus.BAD_REQUEST));
         }
 
@@ -229,7 +231,7 @@ class ConfigEntityController {
         }
     }
 
-    public Map<String, byte[]> buildHeaders(ActionType actionType, EntityType entityType){
+    public Map<String, byte[]> buildHeaders(ActionType actionType, EntityType entityType) {
         Map<String, byte[]> headers = new HashMap<>();
         headers.put("actionType", actionType.name().getBytes());
         headers.put("entityType", entityType.name().getBytes());
