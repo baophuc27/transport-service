@@ -308,10 +308,10 @@ public class DataService {
                     Optional<NumericalTsByOrg> numericalTsByOrg = numericalTsByOrgRepository.find1LatestRow(orgId, paramsByOrg.getPartitionKey().getParamId());
                     if (numericalTsByOrg.isPresent()) {
                         if (latestDataConnection.getLatestTime() == null) {
-                            latestDataConnection.setLatestTime(numericalTsByOrg.get().getReceivedAt());
+                            latestDataConnection.setLatestTime(numericalTsByOrg.get().getPartitionKey().getEventTime());
                         } else {
-                            if (latestDataConnection.getLatestTime().isBefore(numericalTsByOrg.get().getReceivedAt())) {
-                                latestDataConnection.setLatestTime(numericalTsByOrg.get().getReceivedAt());
+                            if (latestDataConnection.getLatestTime().isBefore(numericalTsByOrg.get().getPartitionKey().getEventTime())) {
+                                latestDataConnection.setLatestTime(numericalTsByOrg.get().getPartitionKey().getEventTime());
                             }
                         }
                     }
@@ -319,10 +319,10 @@ public class DataService {
                     Optional<CategoricalTsByOrg> categoricalTsByOrg = categoricalTsByOrgRepository.find1LatestRow(orgId, paramsByOrg.getPartitionKey().getParamId());
                     if (categoricalTsByOrg.isPresent()) {
                         if (latestDataConnection.getLatestTime() == null) {
-                            latestDataConnection.setLatestTime(categoricalTsByOrg.get().getReceivedAt());
+                            latestDataConnection.setLatestTime(categoricalTsByOrg.get().getPartitionKey().getEventTime());
                         } else {
-                            if (latestDataConnection.getLatestTime().isBefore(categoricalTsByOrg.get().getReceivedAt())) {
-                                latestDataConnection.setLatestTime(categoricalTsByOrg.get().getReceivedAt());
+                            if (latestDataConnection.getLatestTime().isBefore(categoricalTsByOrg.get().getPartitionKey().getEventTime())) {
+                                latestDataConnection.setLatestTime(categoricalTsByOrg.get().getPartitionKey().getEventTime());
                             }
                         }
                     }
