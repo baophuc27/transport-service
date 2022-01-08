@@ -254,7 +254,7 @@ public class FileProcessor {
         int templateId = postgresDeviceRepository.findTemplateById(deviceId);
         postgresDeviceRepository.updateDeviceActive(deviceId);
         DeviceEntity device = postgresDeviceRepository.findDeviceById(deviceId);
-        if (device.isActive()){
+        if (device.getActive()){
             switch (templateId){
                 case 1:
                     readFile1(filePath,deviceId);
