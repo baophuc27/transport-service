@@ -2,6 +2,7 @@ package com.reeco.transport.infrastructure;
 
 import com.reeco.transport.application.usecase.AlarmManagementUsecase;
 import com.reeco.transport.domain.DataRecord;
+import com.reeco.transport.infrastructure.persistence.postgresql.DeviceEntity;
 import com.reeco.transport.utils.annotators.Infrastructure;
 import com.reeco.transport.utils.exception.FileProcessingException;
 import com.reeco.transport.application.usecase.DataManagementUseCase;
@@ -73,6 +74,16 @@ public class FileProcessor {
             throw new FileProcessingException(ex.getMessage());
         }
     }
+
+    @PostConstruct
+    private void watchRegisteredFolder(){
+        List<Integer> registered_devices = postgresDeviceRepository.getRegisteredDevices();
+        for (Integer device_id : registered_devices){
+            createDirectory(String.valueOf(device_id));
+            observe(String.valueOf(device_id));
+        }
+    }
+
     public void observe(String subFolder) {
 
         String relativePath = FILE_DIRECTORY + subFolder;
@@ -149,6 +160,7 @@ public class FileProcessor {
     }
 
     private void authFailedAlarm(String filePath){
+        log.info("auth failed ALARM");
         String regex = "\\[(.*?)\\]";
         Pattern p = Pattern.compile(regex);
         try{
@@ -161,6 +173,7 @@ public class FileProcessor {
             Thread.sleep(2000);
             while(scanner.hasNext()){
                 String record = scanner.next();
+                log.info(record);
                 Matcher m = p.matcher(record);
                 while (m.find()){
                     String userName = m.group(1);
@@ -177,6 +190,7 @@ public class FileProcessor {
     }
 
     private void logoutAlarm(String filePath){
+        log.info("Logout ALARM");
         String regex = "\\((.*?)@";
         Pattern p = Pattern.compile(regex);
         try{
@@ -189,6 +203,7 @@ public class FileProcessor {
             Thread.sleep(2000);
             while(scanner.hasNext()){
                 String record = scanner.next();
+                log.info(record);
                 Matcher m = p.matcher(record);
                 while (m.find()){
                     String userName = m.group(1);
@@ -205,6 +220,7 @@ public class FileProcessor {
     }
 
     private void connectAlarm(String filePath){
+        log.info("Connected ALARM");
         String regex = "\\[INFO\\] (.*?) is now logged in";
         Pattern p = Pattern.compile(regex);
         try{
@@ -217,6 +233,7 @@ public class FileProcessor {
             Thread.sleep(2000);
             while(scanner.hasNext()){
                 String record = scanner.next();
+                log.info(record);
                 Matcher m = p.matcher(record);
                 while (m.find()){
                     String userName = m.group(1);
@@ -236,17 +253,19 @@ public class FileProcessor {
         int deviceId = Integer.parseInt(folderName);
         int templateId = postgresDeviceRepository.findTemplateById(deviceId);
         postgresDeviceRepository.updateDeviceActive(deviceId);
-        log.warn("Device info: {}",postgresDeviceRepository.findDeviceById(deviceId));
-        switch (templateId){
-            case 1:
-                readFile1(filePath,deviceId);
-                break;
-            case 2:
-                readFile2(filePath,deviceId);
-                break;
-            default:
-                log.warn("Invalid template");
-                break;
+        DeviceEntity device = postgresDeviceRepository.findDeviceById(deviceId);
+        if (device.getActive()){
+            switch (templateId){
+                case 1:
+                    readFile1(filePath,deviceId);
+                    break;
+                case 2:
+                    readFile2(filePath,deviceId);
+                    break;
+                default:
+                    log.warn("Invalid template");
+                    break;
+            }
         }
     }
 
@@ -259,27 +278,45 @@ public class FileProcessor {
 
                 scanner.useDelimiter(",");
                 Thread.sleep(2000);
-                while(scanner.hasNext()){
+                Double lat = 0.;
+                Double lon = 0.;
+                while(scanner.hasNext()) {
                     String record = scanner.next();
+                    String[] splitRecord = record.split(":");
+                    if (splitRecord.length == 2) {
+                        String key = splitRecord[0];
+                        if (key.strip().equals("Lat")) {
+                            lat = Double.valueOf(splitRecord[1]);
+                        }
+                        if (key.strip().equals("Long")) {
+                            lon = Double.valueOf(splitRecord[1]);
+                        }
+                    }
+                }
+                scanner.close();
+
+                Scanner scanner2 = new Scanner(file);
+                scanner2.useDelimiter(",");
+                Thread.sleep(2000);
+
+                while(scanner2.hasNext()){
+                    String record = scanner2.next();
                     String[] splitRecord = record.split(":");
                     if (splitRecord.length == 1){
                         timeStamp = getTimeStamp(splitRecord[0]);
                     }
                     if (splitRecord.length == 2){
                         String key = splitRecord[0];
-                        if (key.strip().toLowerCase() == "lat"){
-                            log.info("Lat: {}",splitRecord[1]);
-                        }
                         String[] valueRecord = splitRecord[1].split(" ");
                         if (valueRecord.length == 2){
                             Double value = Double.valueOf(valueRecord[0]);
-                            DataRecord dataRecord = new DataRecord(timeStamp,key,value,deviceId,LocalDateTime.now().withNano(0),10.0,103.0);
+                            DataRecord dataRecord = new DataRecord(timeStamp,key,value,deviceId,LocalDateTime.now().withNano(0),lat,lon);
                             log.info("Template 2 record: {}",dataRecord.toString());
                             dataManagementUseCase.receiveData(dataRecord);
                         }
                     }
                 }
-                scanner.close();
+                scanner2.close();
             }
             catch (InterruptedException | RuntimeException | IOException exception){
                 log.warn("Got an exception when reading file {} :{}", filePath,exception.getMessage());

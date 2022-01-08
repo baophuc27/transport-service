@@ -14,6 +14,8 @@ public class SFTPObserveFileAdapter implements BeginReceivingDataPort {
     public void beginReceivingData(DeviceConnection deviceConnection){
         String folderName = deviceConnection.getDeviceId();
         fileProcessor.createDirectory(folderName);
-        fileProcessor.observe(folderName);
+        if (deviceConnection.getActive()){
+            fileProcessor.observe(folderName);
+        }
     }
 }

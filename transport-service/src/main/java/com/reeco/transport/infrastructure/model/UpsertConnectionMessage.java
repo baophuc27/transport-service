@@ -24,6 +24,9 @@ public class UpsertConnectionMessage {
     @JsonProperty("entityType")
     EntityType entityType;
 
+    @JsonProperty("active")
+    Boolean active;
+
     public void setStationId(int stationId) {
         this.stationId = stationId;
     }

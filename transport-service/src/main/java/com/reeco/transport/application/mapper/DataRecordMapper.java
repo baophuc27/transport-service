@@ -34,13 +34,13 @@ public interface DataRecordMapper {
 
     @FormatLocalDateTime
     default String format(LocalDateTime dateTime){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
         return dateTime.format(formatter);
     }
 
     default String getNowTime(){
         LocalDateTime time = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
         return time.format(formatter);
     }
 

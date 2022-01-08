@@ -50,6 +50,8 @@ public class FTPConnection extends BaseConnection {
 
     private Long removeAfterDays;
 
+    private Boolean active;
+
     public FTPConnection() {
     }
 
@@ -93,6 +95,6 @@ public class FTPConnection extends BaseConnection {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getUserName(), getHostName(), getPort(), getPassword(), getUseSSL(), getKey(), getIpWhiteList(), getFileType(), getTemplateFormat(), getMaximumTimeout(), getMaximumAttachment(), getNotificationType(), getRemoveAfterDays());
+        return Objects.hash(super.hashCode(), getUserName(), getHostName(), getPort(), getPassword(), getUseSSL(), getKey(), getIpWhiteList(), getFileType(), getTemplateFormat(), getMaximumTimeout(), getMaximumAttachment(), getNotificationType(), getRemoveAfterDays(),getActive());
     }
 }

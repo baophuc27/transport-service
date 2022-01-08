@@ -43,7 +43,7 @@ public class DeviceEntity {
     private int templateFormat;
 
     @Column(name = "active")
-    private boolean active;
+    private Boolean active;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS")
     @Column(name = "last_active",columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
