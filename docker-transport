@@ -1,0 +1,13 @@
+FROM gradle:7.1.1-jdk11 AS build
+COPY --chown=gradle:gradle . /home/gradle/src/
+WORKDIR /home/gradle/src
+RUN cd transport-service/build && ls
+RUN gradle :transport-service:build --no-daemon
+
+
+FROM openjdk:11
+EXPOSE 8043
+
+COPY --from=build /home/gradle/src/transport-service/build/libs/transport-service-0.1.0.jar reeco-transport.jar
+
+CMD ["java","-jar","reeco-transport.jar"]

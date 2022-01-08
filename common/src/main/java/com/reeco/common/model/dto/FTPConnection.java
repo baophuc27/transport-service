@@ -50,6 +50,8 @@ public class FTPConnection extends BaseConnection {
 
     private Long removeAfterDays;
 
+    private boolean active;
+
     public FTPConnection() {
     }
 

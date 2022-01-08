@@ -58,7 +58,7 @@ public class KafkaMessageSubscriber {
 //            partitionOffsets = { @PartitionOffset(
 //                    partition = "1",
 //                    initialOffset = "0") }),containerFactory = "connectionListener")
-    @KafkaListener(topics = "reeco_core_backend",containerFactory = "connectionListener")
+    @KafkaListener(topics = "reeco_config_event",containerFactory = "connectionListener")
     public void process(@Headers Map<String,byte[]> header,@Payload ConsumerRecord<String,byte[]> message) {
         EntityType entityType = EntityType
                                 .valueOf((new String(header.get("entityType")))

@@ -37,4 +37,5 @@ public final class DeviceConnection {
 
     private String englishName;
 
+    private boolean active;
 }

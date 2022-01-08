@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
+import java.util.List;
 
 
 @Repository
@@ -23,4 +23,7 @@ public interface PostgresDeviceRepository extends JpaRepository<DeviceEntity, In
     @Modifying
     @Query(value = "UPDATE DeviceEntity d set d.id = ?1 WHERE d.id = ?1")
     void updateDeviceActive(Integer deviceId);
+
+    @Query(value = "SELECT device.id FROM public.device device WHERE device.active = true",nativeQuery = true)
+    List<Integer> getRegisteredDevices();
 }

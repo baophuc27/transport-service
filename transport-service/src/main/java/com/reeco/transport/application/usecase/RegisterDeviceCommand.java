@@ -40,7 +40,10 @@ public class RegisterDeviceCommand extends SelfValidating<RegisterDeviceCommand>
     @NotNull
     String englishName;
 
-    public RegisterDeviceCommand(int stationId, int deviceId, int workspaceId, int maximumAttachment, int removeAfterDays, String notificationType, List<String> ipWhiteList, FTPConfiguration protocolConfiguration, String vietnameseName, String englishName) {
+    @NotNull
+    boolean active;
+
+    public RegisterDeviceCommand(int stationId, int deviceId, int workspaceId, int maximumAttachment, int removeAfterDays, String notificationType, List<String> ipWhiteList, FTPConfiguration protocolConfiguration, String vietnameseName, String englishName, boolean active) {
         this.stationId = stationId;
         this.deviceId = deviceId;
         this.workspaceId = workspaceId;
@@ -51,5 +54,6 @@ public class RegisterDeviceCommand extends SelfValidating<RegisterDeviceCommand>
         this.protocolConfiguration = protocolConfiguration;
         this.vietnameseName = vietnameseName;
         this.englishName = englishName;
+        this.active = active;
     }
 }
