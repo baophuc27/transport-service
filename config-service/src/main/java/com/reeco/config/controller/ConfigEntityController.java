@@ -113,8 +113,9 @@ class ConfigEntityController {
             if (!Protocol.FTP.name().toLowerCase().equals(protocol)
                     && !Protocol.FTPS.name().toLowerCase().equals(protocol)
                     && !Protocol.HTTP.name().toLowerCase().equals(protocol)) {
-
-                responseWriter.setResult(new ResponseEntity<>("Unsupported connection method " + protocol, HttpStatus.BAD_REQUEST));
+                String message = "Unsupported connection method " + protocol;
+                responseWriter.setResult(new ResponseEntity<>(message, HttpStatus.BAD_REQUEST));
+                log.error(message);
                 return responseWriter;
             }
             if (Protocol.FTP.name().toLowerCase().equals(protocol) || Protocol.FTPS.name().toLowerCase().equals(protocol)) {

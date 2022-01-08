@@ -1,5 +1,6 @@
 package com.reeco.config.service;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -10,6 +11,7 @@ import javax.validation.Validator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Log4j2
 public class ReecoRequestParamValidator<T> {
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
@@ -20,6 +22,7 @@ public class ReecoRequestParamValidator<T> {
         if (!violations.isEmpty()) {
             String l = violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(",\n"));
             responseWriter.setResult(new ResponseEntity<>(l, HttpStatus.BAD_REQUEST));
+            log.error(l);
         }
         return responseWriter;
     }
