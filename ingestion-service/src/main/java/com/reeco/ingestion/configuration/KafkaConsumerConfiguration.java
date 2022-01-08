@@ -56,7 +56,7 @@ public class KafkaConsumerConfiguration {
 
 
     @Bean
-    public ConsumerFactory<String, String> eventConsumerFactoryConfig(){
+    public ConsumerFactory<String, String> configEventConsumerFactory(){
         List<String> bootstrapServers = new ArrayList<>(Collections.singletonList(bootstrapAddress));
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -85,7 +85,7 @@ public class KafkaConsumerConfiguration {
     {
         ConcurrentKafkaListenerContainerFactory<String, String> factory
                 = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(eventConsumerFactoryConfig());
+        factory.setConsumerFactory(configEventConsumerFactory());
         factory.setAckDiscarded(true);
         factory.setErrorHandler(new SeekToCurrentErrorHandler());
         return factory;
