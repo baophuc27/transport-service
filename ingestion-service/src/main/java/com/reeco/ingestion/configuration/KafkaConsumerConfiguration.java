@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.SeekToCurrentErrorHandler;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import java.util.*;
 
@@ -45,10 +47,11 @@ public class KafkaConsumerConfiguration {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, eventCg);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, eventCgResetOffset);
-
-        return new DefaultKafkaConsumerFactory<>(props,
-                new StringDeserializer(),
-                new JsonDeserializer<>(IncomingTsEvent.class));
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, IncomingTsEvent.class);
+        return new DefaultKafkaConsumerFactory<>(props);
     }
 
 
@@ -61,6 +64,7 @@ public class KafkaConsumerConfiguration {
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, eventCgResetOffset);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
@@ -72,6 +76,7 @@ public class KafkaConsumerConfiguration {
         factory.setConsumerFactory(eventConsumerFactory());
         factory.setConcurrency(eventListenMaxConcurrency);
         factory.setAckDiscarded(true);
+        factory.setErrorHandler(new SeekToCurrentErrorHandler());
         return factory;
     }
 
@@ -82,6 +87,7 @@ public class KafkaConsumerConfiguration {
                 = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(eventConsumerFactoryConfig());
         factory.setAckDiscarded(true);
+        factory.setErrorHandler(new SeekToCurrentErrorHandler());
         return factory;
     }
 

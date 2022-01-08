@@ -160,7 +160,7 @@ public class RuleEngineService implements RuleEngineUseCase {
             log.info("Sent Alarm {} as matched condition", alarmEvent);
         } else {
             alarmRuleCache.setMatchedCount(0L);
-            alarmRuleCache.setLastMatchedTime(event.getEventTime());
+            alarmRuleCache.setLastMatchedTime(event.getReceivedAt());
         }
         ruleEngineCacheUseCase.put(alarmRuleCache);
         return isAlarmEvent;

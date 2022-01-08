@@ -1,9 +1,6 @@
 package com.reeco.ingestion.application.service;
 
 import com.reeco.common.model.dto.*;
-import com.reeco.common.model.enumtype.Protocol;
-import com.reeco.common.model.enumtype.TransportType;
-import com.reeco.common.model.enumtype.ValueType;
 import com.reeco.common.utils.AES;
 import com.reeco.ingestion.application.mapper.AlarmMapper;
 import com.reeco.ingestion.application.mapper.ConnectionMapper;
@@ -24,7 +21,6 @@ import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.Event
 import com.reeco.ingestion.infrastructure.persistence.cassandra.repository.ParamsByOrgRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 
@@ -169,7 +165,7 @@ public class StoreConfigService implements StoreConfigUseCase {
 
     public void storeConnection(FTPConnection ftpConnection){
         ConnectionInfo.Key key = new ConnectionInfo.Key(ftpConnection.getOrganizationId(), ftpConnection.getId());
-        ConnectionInfo  connectionInfo = new ConnectionInfo(key, Protocol.FTP, null,ftpConnection.getEnglishName(),
+        ConnectionInfo  connectionInfo = new ConnectionInfo(key, ftpConnection.getProtocol(), null,ftpConnection.getEnglishName(),
                 ftpConnection.getVietnameseName(),null, ftpConnection.getWorkspaceId(), ftpConnection.getReceivedAt(),null,null);
         connectionInfoRepository.save(connectionInfo).subscribe(v -> log.info("Saved connection: {}", v));
     }

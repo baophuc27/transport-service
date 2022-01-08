@@ -52,6 +52,8 @@ services:
       args:
         VERSION: ${VERSION}
     network_mode: host
+    volumes:
+      - ../uploads:$PWD/uploads
     environment:
       CASSANDRA_KEYSPACE: ${CASSANDRA_KEYSPACE}
       CASSANDRA_USER: ${CASSANDRA_USER}
