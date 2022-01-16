@@ -1,12 +1,13 @@
 FROM gradle:7.1.1-jdk11 AS build
+ARG VERSION
 COPY --chown=gradle:gradle . /home/gradle/src/
 WORKDIR /home/gradle/src
-RUN gradle :transport-http-service:build --no-daemon
+RUN gradle :transport-http-service:build  -Pversion=${VERSION} --no-daemon
 
 
 FROM openjdk:11
 EXPOSE 8043
-
-COPY --from=build /home/gradle/src/transport-http-service/build/libs/transport-http-service-0.1.0.jar reeco-http-transport.jar
+ARG VERSION
+COPY --from=build /home/gradle/src/transport-http-service/build/libs/transport-http-service-${VERSION}.jar reeco-http-transport.jar
 
 CMD ["java","-jar","reeco-http-transport.jar"]

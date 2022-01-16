@@ -57,6 +57,7 @@ services:
     image: scylladb/scylla
     hostname: 'cassandra'
     container_name: 'cassandra'
+    restart: always
     mem_limit: ${CASSANDRA_MEMORY}
     cpus: ${CASSANDRA_CPUS}
     command:
