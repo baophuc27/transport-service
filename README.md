@@ -62,6 +62,9 @@
 - Start infrastructure using docker-compose, please make sure that docker and docker-compose are already installed first!.
 `sudo docker-compose -f docker-compose-infras.yml up -d`
 
+and runing cql to init Database.
+`sudo docker exec -it cassandra bash -c "cqlsh -u ${CASSANDRA_USER} -p ${CASSANDRA_PASSWORD} -f /opt/initdb/schema.cql`
+
 ### Reeco Data Services.
 #### For Reeco Centralize Server Scenario.
     `sudo docker-compose -f docker-compose-reeco-services.yml --build up -d`
