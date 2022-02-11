@@ -32,12 +32,12 @@ public class Comparison {
     }
 
     public static boolean isInBracketRange(Alarm alarm, Double value) {
-        return value > Double.parseDouble(alarm.getMinValue())
-                && value < Double.parseDouble(alarm.getMaxValue());
+        return ((value==null) || value > Double.parseDouble(alarm.getMinValue()))
+                && ((value==null) || value < Double.parseDouble(alarm.getMaxValue()));
     }
     public static boolean isInSquareRange(Alarm alarm, Double value) {
-        return value >= Double.parseDouble(alarm.getMinValue())
-                && value <= Double.parseDouble(alarm.getMaxValue());
+        return  ((value==null) || value >= Double.parseDouble(alarm.getMinValue()))
+                &&((value==null) || value <= Double.parseDouble(alarm.getMaxValue()));
     }
 
     public static boolean isExactEqualNumber(Alarm alarm, Double value) {
