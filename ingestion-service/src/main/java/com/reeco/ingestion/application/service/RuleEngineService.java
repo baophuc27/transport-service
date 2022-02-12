@@ -66,15 +66,15 @@ public class RuleEngineService implements RuleEngineUseCase {
         return minutes >= (alarm.getFrequence() * alarm.getFrequenceType().getValueFromEnum());
     }
 
-    private boolean isInSquareRange(Alarm alarm, Double value) {
-        return value >= Double.parseDouble(alarm.getMinValue())
-                && value <= Double.parseDouble(alarm.getMaxValue());
+    public static boolean isInBracketRange(Alarm alarm, Double value) {
+        return ((alarm.getMinValue()==null) || value > Double.parseDouble(alarm.getMinValue()))
+                && ((alarm.getMaxValue()==null) || value < Double.parseDouble(alarm.getMaxValue()));
+    }
+    public static boolean isInSquareRange(Alarm alarm, Double value) {
+        return  ((alarm.getMinValue()==null) || value >= Double.parseDouble(alarm.getMinValue()))
+                &&((alarm.getMaxValue()==null) || value <= Double.parseDouble(alarm.getMaxValue()));
     }
 
-    private boolean isInBracketRange(Alarm alarm, Double value) {
-        return value > Double.parseDouble(alarm.getMinValue())
-                && value < Double.parseDouble(alarm.getMaxValue());
-    }
 
     private boolean isExactEqualNumber(Alarm alarm, Double value) {
         return value.equals(Double.valueOf(alarm.getMinValue()));
