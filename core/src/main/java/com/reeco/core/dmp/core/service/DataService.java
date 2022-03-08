@@ -263,7 +263,6 @@ public class DataService {
             if(chartDto.getStartTime().isBefore(chartDto.getEndTime())){
                 List<NumericalTsByOrg> numericalTsByOrgs = numericalTsByOrgRepository.findDataDetail(Timestamp.valueOf(chartDto.getStartTime()),
                         Timestamp.valueOf(chartDto.getEndTime()), parameterDto.getOrganizationId(), parameterDto.getParameterId());
-
                 for (NumericalTsByOrg numericalTsByOrg: numericalTsByOrgs){
                     List<String> data = new ArrayList<>();
                     String key = numericalTsByOrg.getPartitionKey().getEventTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toString();
@@ -279,18 +278,18 @@ public class DataService {
                             }
                         }
                         else {
-                            data.add(numericalTsByOrg.getValue().toString());
+                            for (int i = 0; i<= idx ; i++){
+                                if(i == idx){
+                                    data.add(numericalTsByOrg.getValue().toString());
+                                }
+                                else{
+                                    data.add("");
+                                }
+                            }
                             response.put(key, data);
                         }
                     }else{
-                        for (int i = 0; i<= idx ; i++){
-                            if(i == idx){
-                                data.add(numericalTsByOrg.getValue().toString());
-                            }
-                            else{
-                                data.add("");
-                            }
-                        }
+                        data.add(numericalTsByOrg.getValue().toString());
                         response.put(key, data);
                     }
                 }
@@ -298,6 +297,15 @@ public class DataService {
             idx += 1;
         }
         csvBody.add(rowData1);
+//        log.info(response.toString());
+//        response.entrySet().stream()
+//                .sorted(Map.Entry.comparingByKey())
+//                .collect(Collectors.toMap(
+//                        Map.Entry::getKey,
+//                        Map.Entry::getValue,
+//                        (a, b) -> { throw new AssertionError(); },
+//                        LinkedHashMap::new
+//                ));
 //        log.info(response.toString());
         for (Map.Entry<String, List<String>> entry: response.entrySet()){
             List<String> rowData = new ArrayList<>();
