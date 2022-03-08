@@ -5,6 +5,7 @@ import com.reeco.core.dmp.core.model.*;
 import com.reeco.core.dmp.core.repo.*;
 import com.reeco.core.dmp.core.until.ApiResponse;
 import com.reeco.core.dmp.core.until.Comparison;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,11 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
+@Slf4j
 public class DataService {
 
     @Autowired
@@ -245,31 +249,62 @@ public class DataService {
         List<List<String>> csvBody = new ArrayList<>();
         ByteArrayInputStream byteArrayOutputStream = null;
         String encodedString = "";
-        csvBody.add(Arrays.asList("Time event", "Value", "Param", "Indicator", "Unit", "Lat","Lon"));
+//        csvBody.add(Arrays.asList("Time event", "Value", "Param1(Unit)", "Param2(Unit)"));
+        List<String> rowData1 = new ArrayList<>();
+        rowData1.add("Time event");
+
+        HashMap<String, List<String>> response = new HashMap<>();
+        int idx = 0;
         for (ParameterDto parameterDto : chartDto.getParameterDtos()) {
             ParamsByOrg paramsByOrg = paramsByOrgRepository.findByPartitionKeyOrganizationIdAndPartitionKeyParamId(parameterDto.getOrganizationId(), parameterDto.getParameterId())
                     .orElseThrow(() -> new Exception("Invalid Parameter!"));
             Indicator indicator = indicatorInfoRepository.findByPartitionKeyIndicatorId(paramsByOrg.getIndicatorId()).orElseThrow(() -> new Exception("Invalid Indicator"));
+            rowData1.add(paramsByOrg.getParamName() + "(" + indicator.getStandardUnit()+ ")");
             if(chartDto.getStartTime().isBefore(chartDto.getEndTime())){
                 List<NumericalTsByOrg> numericalTsByOrgs = numericalTsByOrgRepository.findDataDetail(Timestamp.valueOf(chartDto.getStartTime()),
                         Timestamp.valueOf(chartDto.getEndTime()), parameterDto.getOrganizationId(), parameterDto.getParameterId());
+
                 for (NumericalTsByOrg numericalTsByOrg: numericalTsByOrgs){
-                    List<String> rowData = new ArrayList<>();
-                    rowData.add(numericalTsByOrg.getPartitionKey().getEventTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-                    rowData.add(numericalTsByOrg.getValue().toString());
-                    rowData.add(paramsByOrg.getParamName());
-                    rowData.add(indicator.getIndicatorName());
-                    rowData.add(indicator.getStandardUnit());
-                    rowData.add((numericalTsByOrg.getLat()!= null)? numericalTsByOrg.getLat().toString() : null);
-                    rowData.add((numericalTsByOrg.getLon()!= null)? numericalTsByOrg.getLon().toString() : null);
-                    csvBody.add(rowData);
+                    List<String> data = new ArrayList<>();
+                    String key = numericalTsByOrg.getPartitionKey().getEventTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toString();
+                    if (idx > 0){
+                        if (response.containsKey(key)){
+                            for (int i = response.get(key).size(); i<= idx ; i++){
+                                if(i == idx){
+                                    response.get(key).add(numericalTsByOrg.getValue().toString());
+                                }
+                                else{
+                                    response.get(key).add("");
+                                }
+                            }
+                        }
+                        else {
+                            data.add(numericalTsByOrg.getValue().toString());
+                            response.put(key, data);
+                        }
+                    }else{
+                        for (int i = 0; i<= idx ; i++){
+                            if(i == idx){
+                                data.add(numericalTsByOrg.getValue().toString());
+                            }
+                            else{
+                                data.add("");
+                            }
+                        }
+                        response.put(key, data);
+                    }
                 }
-
-
             }
-
+            idx += 1;
         }
-
+        csvBody.add(rowData1);
+//        log.info(response.toString());
+        for (Map.Entry<String, List<String>> entry: response.entrySet()){
+            List<String> rowData = new ArrayList<>();
+            rowData.add(entry.getKey());
+            rowData.addAll(entry.getValue());
+            csvBody.add(rowData);
+        }
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CSVPrinter csvPrinter = new CSVPrinter(
                 new PrintWriter(out),
