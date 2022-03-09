@@ -259,7 +259,9 @@ public class DataService {
             ParamsByOrg paramsByOrg = paramsByOrgRepository.findByPartitionKeyOrganizationIdAndPartitionKeyParamId(parameterDto.getOrganizationId(), parameterDto.getParameterId())
                     .orElseThrow(() -> new Exception("Invalid Parameter!"));
             Indicator indicator = indicatorInfoRepository.findByPartitionKeyIndicatorId(paramsByOrg.getIndicatorId()).orElseThrow(() -> new Exception("Invalid Indicator"));
-            rowData1.add(paramsByOrg.getParamName() + "(" + indicator.getStandardUnit()+ ")");
+            // Temp comment, standard unit in db is null for now
+            // rowData1.add(paramsByOrg.getParamName() + "(" + indicator.getStandardUnit()+ ")");
+            rowData1.add(paramsByOrg.getParamName());
             if(chartDto.getStartTime().isBefore(chartDto.getEndTime())){
                 List<NumericalTsByOrg> numericalTsByOrgs = numericalTsByOrgRepository.findDataDetail(Timestamp.valueOf(chartDto.getStartTime()),
                         Timestamp.valueOf(chartDto.getEndTime()), parameterDto.getOrganizationId(), parameterDto.getParameterId());
@@ -296,7 +298,6 @@ public class DataService {
             }
             idx += 1;
         }
-        csvBody.add(rowData1);
 //        log.info(response.toString());
 //        response.entrySet().stream()
 //                .sorted(Map.Entry.comparingByKey())
@@ -307,12 +308,25 @@ public class DataService {
 //                        LinkedHashMap::new
 //                ));
 //        log.info(response.toString());
+
         for (Map.Entry<String, List<String>> entry: response.entrySet()){
             List<String> rowData = new ArrayList<>();
             rowData.add(entry.getKey());
             rowData.addAll(entry.getValue());
             csvBody.add(rowData);
         }
+
+        Collections.sort(csvBody, new Comparator<List<String>>() {
+            public int compare(List<String> o1, List<String> o2) {
+                // 0 is datetime column
+                if (o1.get(0) == null || o2.get(0) == null)
+                    return 0;
+                return o1.get(0).compareTo(o2.get(0));
+            }
+        });
+
+        csvBody.add(0, rowData1);
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CSVPrinter csvPrinter = new CSVPrinter(
                 new PrintWriter(out),
