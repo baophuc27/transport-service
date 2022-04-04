@@ -5,6 +5,7 @@ import com.reeco.core.dmp.core.model.*;
 import com.reeco.core.dmp.core.repo.*;
 import com.reeco.core.dmp.core.until.ApiResponse;
 import com.reeco.core.dmp.core.until.Comparison;
+import com.reeco.core.dmp.core.until.NumericAggregate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -247,85 +249,118 @@ public class DataService {
                 "Data Export"
         };
         List<List<String>> csvBody = new ArrayList<>();
+        List<List<String>> csvBodyQA = new ArrayList<>();
         ByteArrayInputStream byteArrayOutputStream = null;
         String encodedString = "";
-//        csvBody.add(Arrays.asList("Time event", "Value", "Param1(Unit)", "Param2(Unit)"));
         List<String> rowData1 = new ArrayList<>();
         rowData1.add("Time event");
 
         HashMap<String, List<String>> response = new HashMap<>();
         int idx = 0;
+
+        // Agreggate
+        List<ParameterDataDto> parameterDataDtos = new ArrayList<>();
+
         for (ParameterDto parameterDto : chartDto.getParameterDtos()) {
             ParamsByOrg paramsByOrg = paramsByOrgRepository.findByPartitionKeyOrganizationIdAndPartitionKeyParamId(parameterDto.getOrganizationId(), parameterDto.getParameterId())
                     .orElseThrow(() -> new Exception("Invalid Parameter!"));
             Indicator indicator = indicatorInfoRepository.findByPartitionKeyIndicatorId(paramsByOrg.getIndicatorId()).orElseThrow(() -> new Exception("Invalid Indicator"));
-            // Temp comment, standard unit in db is null for now
-            // rowData1.add(paramsByOrg.getParamName() + "(" + indicator.getStandardUnit()+ ")");
-            rowData1.add(paramsByOrg.getParamName());
+            String standardUnit = indicator.getStandardUnit();
+            String paramName = paramsByOrg.getParamName();
+            rowData1.add(standardUnit == null ? paramName : paramName + "(" + standardUnit + ")");
+
+            // Agreggate
+            ParameterDataDto parameterDataDto = new ParameterDataDto();
+            parameterDto.setIndicatorType(indicator.getValueType());
+            parameterDto.setIndicatorName(indicator.getIndicatorName());
+            parameterDto.setUnit(indicator.getStandardUnit());
+            parameterDto.setParameterName(indicator.getIndicatorName());
+            parameterDataDto.setParameterDto(parameterDto);
+            List<DataPointDto> dataPointDtos = new ArrayList<>();
+
             if(chartDto.getStartTime().isBefore(chartDto.getEndTime())){
                 List<NumericalTsByOrg> numericalTsByOrgs = numericalTsByOrgRepository.findDataDetail(Timestamp.valueOf(chartDto.getStartTime()),
                         Timestamp.valueOf(chartDto.getEndTime()), parameterDto.getOrganizationId(), parameterDto.getParameterId());
                 for (NumericalTsByOrg numericalTsByOrg: numericalTsByOrgs){
                     List<String> data = new ArrayList<>();
                     String key = numericalTsByOrg.getPartitionKey().getEventTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toString();
-                    if (idx > 0){
+                    if (idx > 0) {
                         if (response.containsKey(key)){
                             for (int i = response.get(key).size(); i<= idx ; i++){
-                                if(i == idx){
-                                    response.get(key).add(numericalTsByOrg.getValue().toString());
-                                }
-                                else{
-                                    response.get(key).add("");
-                                }
+                                response.get(key).add(i==idx ? numericalTsByOrg.getValue().toString() : "");
                             }
                         }
                         else {
                             for (int i = 0; i<= idx ; i++){
-                                if(i == idx){
-                                    data.add(numericalTsByOrg.getValue().toString());
-                                }
-                                else{
-                                    data.add("");
-                                }
+                                data.add(i==idx ? numericalTsByOrg.getValue().toString() : "");
                             }
                             response.put(key, data);
                         }
-                    }else{
-                        data.add(numericalTsByOrg.getValue().toString());
+                    } else {
+                        data.add(numericalTsByOrg.getValue()!=null ? numericalTsByOrg.getValue().toString() : "");
                         response.put(key, data);
+                    }
+                }
+
+
+                // Aggregate
+                ChartResolution chartResolution = ChartResolution.valueOf(chartDto.getResolution());
+                List<Alarm> alarms = alarmRepository.findByPartitionKeyOrganizationIdAndPartitionKeyParamId(parameterDto.getOrganizationId(),parameterDto.getParameterId());
+                if (chartResolution.equals(ChartResolution.DEFAULT) || chartResolution.equals(ChartResolution.MIN_30) ||
+                    chartResolution.equals(ChartResolution.HOUR_1) || chartResolution.equals(ChartResolution.HOUR_2) ||
+                    chartResolution.equals(ChartResolution.HOUR_4) || chartResolution.equals(ChartResolution.HOUR_8)) {
+
+                    List<NumericalTsByOrg> numericalTsByOrgsQA = numericalTsByOrgRepository.findDataDetail(Timestamp.valueOf(chartDto.getStartTime()),
+                            Timestamp.valueOf(chartDto.getEndTime()), parameterDto.getOrganizationId(), parameterDto.getParameterId());
+
+                    if(numericalTsByOrgsQA.size()>0) {
+                        dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgsQA, chartResolution, alarms);
+                    }
+                } else {
+                    List<NumericalStatByOrg> numericalStatByOrgs = numericalStatByOrgRepository.findNumericDataDate(parameterDto.getOrganizationId(),
+                            parameterDto.getParameterId(), chartDto.getStartTime().toLocalDate(), chartDto.getEndTime().toLocalDate());
+                    if(numericalStatByOrgs.size()>0) {
+//                        numericalStatByOrgs.sort(Comparator.comparing(o -> o.getPartitionKey().getDate()));
+                        dataPointDtos = NumericAggregate.calulateNumericDataDate(numericalStatByOrgs, chartResolution,chartDto.getStartTime().toLocalDate(), alarms);
                     }
                 }
             }
             idx += 1;
-        }
-//        log.info(response.toString());
-//        response.entrySet().stream()
-//                .sorted(Map.Entry.comparingByKey())
-//                .collect(Collectors.toMap(
-//                        Map.Entry::getKey,
-//                        Map.Entry::getValue,
-//                        (a, b) -> { throw new AssertionError(); },
-//                        LinkedHashMap::new
-//                ));
-//        log.info(response.toString());
 
-        for (Map.Entry<String, List<String>> entry: response.entrySet()){
+            // Agreggate
+            parameterDataDto.setDataPointDtos(dataPointDtos);
+            parameterDataDtos.add(parameterDataDto);
+        }
+
+        for (DataPointDto dataPointDto: parameterDataDtos.get(0).getDataPointDtos()){
             List<String> rowData = new ArrayList<>();
-            rowData.add(entry.getKey());
-            rowData.addAll(entry.getValue());
+            rowData.add(String.valueOf(dataPointDto.getEventTime()));
+            rowData.add(dataPointDto.getValue());
+            rowData.add(String.valueOf(dataPointDto.getIsAlarm()));
+            rowData.add(String.valueOf(dataPointDto.getCount()));
+            rowData.add(dataPointDto.getMax());
+            rowData.add(dataPointDto.getMin());
+            rowData.add((dataPointDto.getMedian()));
             csvBody.add(rowData);
         }
 
-        Collections.sort(csvBody, new Comparator<List<String>>() {
-            public int compare(List<String> o1, List<String> o2) {
-                // 0 is datetime column
-                if (o1.get(0) == null || o2.get(0) == null)
-                    return 0;
-                return o1.get(0).compareTo(o2.get(0));
-            }
-        });
-
-        csvBody.add(0, rowData1);
+//        for (Map.Entry<String, List<String>> entry: response.entrySet()){
+//            List<String> rowData = new ArrayList<>();
+//            rowData.add(entry.getKey());
+//            rowData.addAll(entry.getValue());
+//            csvBody.add(rowData);
+//        }
+//
+//        Collections.sort(csvBody, new Comparator<List<String>>() {
+//            public int compare(List<String> o1, List<String> o2) {
+//                // 0 is datetime column
+//                if (o1.get(0) == null || o2.get(0) == null)
+//                    return 0;
+//                return o1.get(0).compareTo(o2.get(0));
+//            }
+//        });
+//
+//        csvBody.add(0, rowData1);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CSVPrinter csvPrinter = new CSVPrinter(
