@@ -248,6 +248,7 @@ public class DataService {
         int idx = 0;
 
         // Aggregate
+        Resolution resolution = Resolution.valueOf(chartDto.getResolution());
         List<ParameterDataDto> parameterDataDtos = new ArrayList<>();
 
         for (ParameterDto parameterDto : chartDto.getParameterDtos()) {
@@ -274,36 +275,38 @@ public class DataService {
                         parameterDto.getOrganizationId(),
                         parameterDto.getParameterId()
                 );
-                for (NumericalTsByOrg numericalTsByOrg: numericalTsByOrgs){
-                    List<String> data = new ArrayList<>();
-                    String key = numericalTsByOrg.getPartitionKey().getEventTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                    if (idx > 0) {
-                        if (response.containsKey(key)){
-                            for (int i = response.get(key).size(); i<= idx ; i++){
-                                response.get(key).add(i==idx ? numericalTsByOrg.getValue().toString() : "");
+
+                List<Alarm> alarms = new ArrayList<>();
+
+                if (resolution.equals(Resolution.DEFAULT)) {
+                    for (NumericalTsByOrg numericalTsByOrg : numericalTsByOrgs) {
+                        List<String> data = new ArrayList<>();
+                        String key = numericalTsByOrg.getPartitionKey().getEventTime()
+                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                        if (idx > 0) {
+                            if (response.containsKey(key)) {
+                                for (int i = response.get(key).size(); i <= idx; i++) {
+                                    response.get(key).add(i == idx ? numericalTsByOrg.getValue().toString() : "");
+                                }
+                            } else {
+                                for (int i = 0; i <= idx; i++) {
+                                    data.add(i == idx ? numericalTsByOrg.getValue().toString() : "");
+                                }
+                                response.put(key, data);
                             }
-                        }
-                        else {
-                            for (int i = 0; i<= idx ; i++){
-                                data.add(i==idx ? numericalTsByOrg.getValue().toString() : "");
-                            }
+                        } else {
+                            data.add(numericalTsByOrg.getValue() != null ? numericalTsByOrg.getValue().toString() : "");
                             response.put(key, data);
                         }
-                    } else {
-                        data.add(numericalTsByOrg.getValue()!=null ? numericalTsByOrg.getValue().toString() : "");
-                        response.put(key, data);
                     }
                 }
-
                 // Aggregate
-                ChartResolution chartResolution = ChartResolution.valueOf(chartDto.getResolution());
-                List<Alarm> alarms = new ArrayList<>();
-                if (chartResolution.equals(ChartResolution.DEFAULT) || chartResolution.equals(ChartResolution.MIN_30) ||
-                    chartResolution.equals(ChartResolution.HOUR_1) || chartResolution.equals(ChartResolution.HOUR_2) ||
-                    chartResolution.equals(ChartResolution.HOUR_4) || chartResolution.equals(ChartResolution.HOUR_8)) {
+                else if (resolution.equals(Resolution.MIN_30) || resolution.equals(Resolution.HOUR_1) ||
+                        resolution.equals(Resolution.HOUR_2) || resolution.equals(Resolution.HOUR_4) ||
+                        resolution.equals(Resolution.HOUR_8)) {
 
                     if(numericalTsByOrgs.size()>0) {
-                        dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, chartResolution, alarms);
+                        dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, resolution, alarms);
                     }
                 } else {
                     List<NumericalStatByOrg> numericalStatByOrgs = numericalStatByOrgRepository.findNumericDataDate(
@@ -314,7 +317,7 @@ public class DataService {
                     );
                     if(numericalStatByOrgs.size()>0) {
 //                        numericalStatByOrgs.sort(Comparator.comparing(o -> o.getPartitionKey().getDate()));
-                        dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, chartResolution,chartDto.getStartTime().toLocalDate(), alarms);
+                        dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, resolution,chartDto.getStartTime().toLocalDate(), alarms);
                     }
                 }
             }
@@ -325,45 +328,45 @@ public class DataService {
             idx += 1;
         }
 
-        for (DataPointDto dataPointDto: parameterDataDtos.get(0).getDataPointDtos()){
-            List<String> rowData = new ArrayList<>();
-            rowData.add(String.valueOf(Timestamp.valueOf(dataPointDto.getEventTime())));
-            switch (AggregateMethod.valueOf(chartDto.getAggregate())) {
-                case MAX:
-                    rowData.add(dataPointDto.getMax());
-                    break;
-                case MIN:
-                    rowData.add(dataPointDto.getMin());
-                    break;
-                case MEAN:
-                    rowData.add(dataPointDto.getMean());
-                    break;
-                case MEDIAN:
-                    rowData.add((dataPointDto.getMedian()));
-                    break;
-                default:
-                    break;
+        if (resolution.equals(Resolution.DEFAULT)) {
+            for (Map.Entry<String, List<String>> entry: response.entrySet()){
+                List<String> rowData = new ArrayList<>();
+                rowData.add(entry.getKey());
+                rowData.addAll(entry.getValue());
+                csvBody.add(rowData);
             }
-            csvBody.add(rowData);
-        }
 
-//        for (Map.Entry<String, List<String>> entry: response.entrySet()){
-//            List<String> rowData = new ArrayList<>();
-//            rowData.add(entry.getKey());
-//            rowData.addAll(entry.getValue());
-//            csvBody.add(rowData);
-//        }
-//
-//        Collections.sort(csvBody, new Comparator<List<String>>() {
-//            public int compare(List<String> o1, List<String> o2) {
-//                // 0 is datetime column
-//                if (o1.get(0) == null || o2.get(0) == null)
-//                    return 0;
-//                return o1.get(0).compareTo(o2.get(0));
-//            }
-//        });
-//
-//        csvBody.add(0, rowData1);
+            Collections.sort(csvBody, (o1, o2) -> {
+                // 0 is datetime column
+                if (o1.get(0) == null || o2.get(0) == null)
+                    return 0;
+                return o1.get(0).compareTo(o2.get(0));
+            });
+
+            csvBody.add(0, rowData1);
+        } else {
+            for (DataPointDto dataPointDto : parameterDataDtos.get(0).getDataPointDtos()) {
+                List<String> rowData = new ArrayList<>();
+                rowData.add(String.valueOf(Timestamp.valueOf(dataPointDto.getEventTime())));
+                switch (AggregateMethod.valueOf(chartDto.getAggregate())) {
+                    case MAX:
+                        rowData.add(dataPointDto.getMax());
+                        break;
+                    case MIN:
+                        rowData.add(dataPointDto.getMin());
+                        break;
+                    case MEAN:
+                        rowData.add(dataPointDto.getMean());
+                        break;
+                    case MEDIAN:
+                        rowData.add((dataPointDto.getMedian()));
+                        break;
+                    default:
+                        break;
+                }
+                csvBody.add(rowData);
+            }
+        }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CSVPrinter csvPrinter = new CSVPrinter(

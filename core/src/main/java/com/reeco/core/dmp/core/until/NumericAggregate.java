@@ -1,6 +1,6 @@
 package com.reeco.core.dmp.core.until;
 
-import com.reeco.core.dmp.core.dto.ChartResolution;
+import com.reeco.core.dmp.core.dto.Resolution;
 import com.reeco.core.dmp.core.dto.DataPointDto;
 import com.reeco.core.dmp.core.model.Alarm;
 import com.reeco.core.dmp.core.model.NumericalStatByOrg;
@@ -13,15 +13,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class NumericAggregate {
-    public static List<DataPointDto> calculateNumericData(List<NumericalTsByOrg> numericalTsByOrgs, ChartResolution chartResolution, List<Alarm> alarms){
+    public static List<DataPointDto> calculateNumericData(List<NumericalTsByOrg> numericalTsByOrgs, Resolution resolution, List<Alarm> alarms){
 //        Collections.reverse(numericalTsByOrgs);
         List<DataPointDto> dataPointDtoList = new ArrayList<>();
-        if (chartResolution.equals(ChartResolution.DEFAULT)){
+        if (resolution.equals(Resolution.DEFAULT)){
             return numericalTsByOrgs.stream().map(DataPointDto::new).sorted(Comparator.comparing(DataPointDto::getEventTime)).collect(Collectors.toList());
         }
         Map<Object, List<NumericalTsByOrg>> dataGroup = numericalTsByOrgs.stream().collect(Collectors.groupingBy(e -> {
             int minutes = e.getPartitionKey().getEventTime().getMinute();
-            int minutesOver = minutes % (int)(chartResolution.getValueFromEnum()*60);
+            int minutesOver = minutes % (int)(resolution.getValueFromEnum()*60);
             return e.getPartitionKey().getEventTime().truncatedTo(ChronoUnit.MINUTES).withMinute(minutes - minutesOver);
         }));
         for (Map.Entry<Object, List<NumericalTsByOrg>> entry: dataGroup.entrySet()){
@@ -91,14 +91,14 @@ public class NumericAggregate {
         return dataPointDtoList;
     }
 
-    public static List<DataPointDto> calculateNumericDataDate(List<NumericalStatByOrg> numericalStatByOrgs, ChartResolution chartResolution, LocalDate sDate, List<Alarm> alarms){
+    public static List<DataPointDto> calculateNumericDataDate(List<NumericalStatByOrg> numericalStatByOrgs, Resolution resolution, LocalDate sDate, List<Alarm> alarms){
         List<DataPointDto> dataPointDtoList = new ArrayList<>();
-        if(chartResolution.equals(ChartResolution.DAY_1)){
+        if(resolution.equals(Resolution.DAY_1)){
             return  numericalStatByOrgs.stream().map(DataPointDto::new).sorted(Comparator.comparing(DataPointDto::getEventTime)).collect(Collectors.toList());
         }
 //        LocalDate sDate = numericalStatByOrgs.get(0).getPartitionKey().getDate();
         Map<Object, List<NumericalStatByOrg>> groupDate = numericalStatByOrgs.stream().collect(Collectors.groupingBy(event ->
-                Math.floor((ChronoUnit.DAYS.between(sDate, event.getPartitionKey().getDate()))/(chartResolution.getValueFromEnum()/24))));
+                Math.floor((ChronoUnit.DAYS.between(sDate, event.getPartitionKey().getDate()))/(resolution.getValueFromEnum()/24))));
         for (Map.Entry<Object, List<NumericalStatByOrg>> entry: groupDate.entrySet()){
             Double sum = 0d;
             Double max = 0d;
@@ -112,7 +112,7 @@ public class NumericAggregate {
             }
             Double median = Comparison.median(entry.getValue().stream().map(NumericalStatByOrg::getMedian).collect(Collectors.toList()));
             DataPointDto dataPointDto = new DataPointDto();
-            dataPointDto.setEventTime(sDate.plusDays(Math.round((Double)entry.getKey() * (chartResolution.getValueFromEnum()/24))).atStartOfDay());
+            dataPointDto.setEventTime(sDate.plusDays(Math.round((Double)entry.getKey() * (resolution.getValueFromEnum()/24))).atStartOfDay());
             dataPointDto.setValue(Comparison.roundNum(sum/cnt,2).toString());
             for (Alarm alarm: alarms){
                 if(Comparison.checkMatchingAlarmCondition(alarm,Comparison.roundNum(sum/cnt,2))){
