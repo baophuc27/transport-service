@@ -241,8 +241,8 @@ public class DataService {
         List<List<String>> csvBody = new ArrayList<>();
         ByteArrayInputStream byteArrayOutputStream = null;
         String encodedString = "";
-        List<String> rowData1 = new ArrayList<>();
-        rowData1.add("Time event");
+        List<String> rowLabel = new ArrayList<>();
+        rowLabel.add("Time event");
 
         HashMap<String, List<String>> response = new HashMap<>();
         int idx = 0;
@@ -252,12 +252,15 @@ public class DataService {
         List<ParameterDataDto> parameterDataDtos = new ArrayList<>();
 
         for (ParameterDto parameterDto : chartDto.getParameterDtos()) {
-            ParamsByOrg paramsByOrg = paramsByOrgRepository.findByPartitionKeyOrganizationIdAndPartitionKeyParamId(parameterDto.getOrganizationId(), parameterDto.getParameterId())
+            ParamsByOrg paramsByOrg = paramsByOrgRepository
+                    .findByPartitionKeyOrganizationIdAndPartitionKeyParamId(parameterDto.getOrganizationId(), parameterDto.getParameterId())
                     .orElseThrow(() -> new Exception("Invalid Parameter!"));
-            Indicator indicator = indicatorInfoRepository.findByPartitionKeyIndicatorId(paramsByOrg.getIndicatorId()).orElseThrow(() -> new Exception("Invalid Indicator"));
+            Indicator indicator = indicatorInfoRepository
+                    .findByPartitionKeyIndicatorId(paramsByOrg.getIndicatorId())
+                    .orElseThrow(() -> new Exception("Invalid Indicator"));
+
             String standardUnit = indicator.getStandardUnit();
             String paramName = paramsByOrg.getParamName();
-            rowData1.add(standardUnit == null ? paramName : paramName + "(" + standardUnit + ")");
 
             // Aggregate
             ParameterDataDto parameterDataDto = new ParameterDataDto();
@@ -279,10 +282,13 @@ public class DataService {
                 List<Alarm> alarms = new ArrayList<>();
 
                 if (resolution.equals(Resolution.DEFAULT)) {
+                    rowLabel.add(standardUnit == null ? paramName : paramName + "(" + standardUnit + ")");
                     for (NumericalTsByOrg numericalTsByOrg : numericalTsByOrgs) {
                         List<String> data = new ArrayList<>();
-                        String key = numericalTsByOrg.getPartitionKey().getEventTime()
+                        String key = numericalTsByOrg.getPartitionKey()
+                                .getEventTime()
                                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
                         if (idx > 0) {
                             if (response.containsKey(key)) {
                                 for (int i = response.get(key).size(); i <= idx; i++) {
@@ -304,7 +310,6 @@ public class DataService {
                 else if (resolution.equals(Resolution.MIN_30) || resolution.equals(Resolution.HOUR_1) ||
                         resolution.equals(Resolution.HOUR_2) || resolution.equals(Resolution.HOUR_4) ||
                         resolution.equals(Resolution.HOUR_8)) {
-
                     if(numericalTsByOrgs.size()>0) {
                         dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, resolution, alarms);
                     }
@@ -316,8 +321,7 @@ public class DataService {
                             chartDto.getEndTime().toLocalDate()
                     );
                     if(numericalStatByOrgs.size()>0) {
-//                        numericalStatByOrgs.sort(Comparator.comparing(o -> o.getPartitionKey().getDate()));
-                        dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, resolution,chartDto.getStartTime().toLocalDate(), alarms);
+                        dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, resolution, chartDto.getStartTime().toLocalDate(), alarms);
                     }
                 }
             }
@@ -335,15 +339,12 @@ public class DataService {
                 rowData.addAll(entry.getValue());
                 csvBody.add(rowData);
             }
-
-            Collections.sort(csvBody, (o1, o2) -> {
+            csvBody.sort((o1, o2) -> {
                 // 0 is datetime column
                 if (o1.get(0) == null || o2.get(0) == null)
                     return 0;
                 return o1.get(0).compareTo(o2.get(0));
             });
-
-            csvBody.add(0, rowData1);
         } else {
             for (DataPointDto dataPointDto : parameterDataDtos.get(0).getDataPointDtos()) {
                 List<String> rowData = new ArrayList<>();
@@ -366,7 +367,10 @@ public class DataService {
                 }
                 csvBody.add(rowData);
             }
+            rowLabel.add(chartDto.getAggregate());
         }
+
+        csvBody.add(0, rowLabel);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CSVPrinter csvPrinter = new CSVPrinter(

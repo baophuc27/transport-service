@@ -52,7 +52,7 @@ public class NumericAggregate {
             dataPointDto.setMean(mean.toString());
             dataPointDtoList.add(dataPointDto);
         }
-        dataPointDtoList.sort(Comparator.comparing(o -> o.getEventTime()));
+        dataPointDtoList.sort(Comparator.comparing(DataPointDto::getEventTime));
 //        Timestamp sTime =  Timestamp.valueOf(numericalTsByOrgs.get(0).getPartitionKey().getEventTime());
 //        Long rangeTime = 0l;
 //        Double sumValue =0d;
@@ -94,38 +94,43 @@ public class NumericAggregate {
     public static List<DataPointDto> calculateNumericDataDate(List<NumericalStatByOrg> numericalStatByOrgs, Resolution resolution, LocalDate sDate, List<Alarm> alarms){
         List<DataPointDto> dataPointDtoList = new ArrayList<>();
         if(resolution.equals(Resolution.DAY_1)){
-            return  numericalStatByOrgs.stream().map(DataPointDto::new).sorted(Comparator.comparing(DataPointDto::getEventTime)).collect(Collectors.toList());
+            return numericalStatByOrgs.stream().map(DataPointDto::new).sorted(Comparator.comparing(DataPointDto::getEventTime)).collect(Collectors.toList());
         }
 //        LocalDate sDate = numericalStatByOrgs.get(0).getPartitionKey().getDate();
         Map<Object, List<NumericalStatByOrg>> groupDate = numericalStatByOrgs.stream().collect(Collectors.groupingBy(event ->
                 Math.floor((ChronoUnit.DAYS.between(sDate, event.getPartitionKey().getDate()))/(resolution.getValueFromEnum()/24))));
         for (Map.Entry<Object, List<NumericalStatByOrg>> entry: groupDate.entrySet()){
+            DoubleSummaryStatistics stats = entry.getValue().stream()
+                    .mapToDouble(NumericalStatByOrg::getMean)
+                    .summaryStatistics();
+            Double mean = Comparison.roundNum(stats.getAverage(),2);
             Double sum = 0d;
             Double max = 0d;
             Double min = Double.MAX_VALUE;
-            Long cnt = 0l;
+            Long count = 0L;
             for (NumericalStatByOrg numericalStatByOrg: entry.getValue()){
-                if(numericalStatByOrg.getMax()>max) max = numericalStatByOrg.getMax();
+                if(numericalStatByOrg.getMax() > max) max = numericalStatByOrg.getMax();
                 if(numericalStatByOrg.getMin() <= min) min =numericalStatByOrg.getMin();
                 sum += numericalStatByOrg.getMean();
-                cnt += 1;
+                count += 1;
             }
             Double median = Comparison.median(entry.getValue().stream().map(NumericalStatByOrg::getMedian).collect(Collectors.toList()));
             DataPointDto dataPointDto = new DataPointDto();
             dataPointDto.setEventTime(sDate.plusDays(Math.round((Double)entry.getKey() * (resolution.getValueFromEnum()/24))).atStartOfDay());
-            dataPointDto.setValue(Comparison.roundNum(sum/cnt,2).toString());
+            dataPointDto.setValue(Comparison.roundNum(sum/count,2).toString());
             for (Alarm alarm: alarms){
-                if(Comparison.checkMatchingAlarmCondition(alarm,Comparison.roundNum(sum/cnt,2))){
+                if(Comparison.checkMatchingAlarmCondition(alarm,Comparison.roundNum(sum/count,2))){
                     dataPointDto.setIsAlarm(Boolean.TRUE);
                     dataPointDto.setAlarmType(alarm.getAlarmType().toString());
                     dataPointDto.setAlarmId(alarm.getPartitionKey().getAlarmId());
                     break;
                 }
             }
-            dataPointDto.setCount(cnt);
+            dataPointDto.setCount(count);
             dataPointDto.setMax(max.toString());
             dataPointDto.setMin(min.toString());
             dataPointDto.setMedian(median.toString());
+            dataPointDto.setMean(mean.toString());
             dataPointDtoList.add(dataPointDto);
         }
         dataPointDtoList.sort(Comparator.comparing(DataPointDto::getEventTime));
