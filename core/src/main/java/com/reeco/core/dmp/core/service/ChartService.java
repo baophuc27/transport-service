@@ -1,13 +1,10 @@
 package com.reeco.core.dmp.core.service;
 
 
-import com.reeco.common.model.enumtype.AlarmType;
-import com.reeco.common.model.enumtype.ValueType;
 import com.reeco.core.dmp.core.dto.*;
 import com.reeco.core.dmp.core.model.*;
 import com.reeco.core.dmp.core.repo.*;
 import com.reeco.core.dmp.core.until.ApiResponse;
-import com.reeco.core.dmp.core.until.Comparison;
 import com.reeco.core.dmp.core.until.NumericAggregate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +17,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -157,7 +153,7 @@ public class ChartService {
                                 parameterDto.getParameterId(), chartDto.getStartTime().toLocalDate(), chartDto.getEndTime().toLocalDate());
                         if(numericalStatByOrgs.size()>0) {
 //                            numericalStatByOrgs.sort(Comparator.comparing(o -> o.getPartitionKey().getDate()));
-                            dataPointDtos = NumericAggregate.calulateNumericDataDate(numericalStatByOrgs, chartResolution,chartDto.getStartTime().toLocalDate(), alarms);
+                            dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, chartResolution,chartDto.getStartTime().toLocalDate(), alarms);
                         }
                     }
                 }
@@ -179,11 +175,11 @@ public class ChartService {
                             dataPointDtos = calculateCategoricalData(categoricalTsByOrgs, chartResolution);
                         }
                     } else {
-                        List<CategoricalStatByOrg> categoricalStatByOrgs = categoricalStatByOrgRepository.findCatelogicalDataDate(parameterDto.getOrganizationId(),
+                        List<CategoricalStatByOrg> categoricalStatByOrgs = categoricalStatByOrgRepository.findCategoricalDataDate(parameterDto.getOrganizationId(),
                                 parameterDto.getParameterId(), chartDto.getStartTime().toLocalDate(), chartDto.getEndTime().toLocalDate());
                         if(categoricalStatByOrgs.size()>0) {
                             categoricalStatByOrgs.sort(Comparator.comparing(o -> o.getPartitionKey().getDate()));
-                            dataPointDtos = calulateCatelogicalDataDate(categoricalStatByOrgs, chartResolution,chartDto.getStartTime().toLocalDate());
+                            dataPointDtos = calculateCategoricalDataDate(categoricalStatByOrgs, chartResolution,chartDto.getStartTime().toLocalDate());
                         }
                     }
                 }
@@ -262,7 +258,7 @@ public class ChartService {
         return dataPointDtoList;
     }
 
-    private List<DataPointDto> calulateCatelogicalDataDate(List<CategoricalStatByOrg> categoricalStatByOrgs, ChartResolution chartResolution,  LocalDate sDate){
+    private List<DataPointDto> calculateCategoricalDataDate(List<CategoricalStatByOrg> categoricalStatByOrgs, ChartResolution chartResolution, LocalDate sDate){
         List<DataPointDto> dataPointDtoList = new ArrayList<>();
         if(chartResolution.equals(ChartResolution.DAY_1)){
             return categoricalStatByOrgs.stream().map(DataPointDto::new).sorted(Comparator.comparing(DataPointDto::getEventTime)).collect(Collectors.toList());
@@ -359,7 +355,7 @@ public class ChartService {
                                 parameterDto.getParameterId(), chartDto.getStartTime().toLocalDate(), chartDto.getEndTime().toLocalDate());
                         if(numericalStatByOrgs.size()>0) {
 //                            numericalStatByOrgs.sort(Comparator.comparing(o -> o.getPartitionKey().getDate()));
-                            dataPointDtos = NumericAggregate.calulateNumericDataDate(numericalStatByOrgs, chartResolution,chartDto.getStartTime().toLocalDate(), alarms).stream().filter(DataPointDto::getIsAlarm).collect(Collectors.toList());
+                            dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, chartResolution,chartDto.getStartTime().toLocalDate(), alarms).stream().filter(DataPointDto::getIsAlarm).collect(Collectors.toList());
                         }
                     }
                 }
@@ -368,7 +364,7 @@ public class ChartService {
             }else{
                 if(chartDto.getStartTime().equals(chartDto.getEndTime())){
                     List<CategoricalTsByOrg> categoricalTsByOrgs = categoricalTsByOrgRepository.find2LatestRow(parameterDto.getOrganizationId(), parameterDto.getParameterId());
-                    dataPointDtos = calculateCategoricalData(categoricalTsByOrgs,ChartResolution.DEFAULT).stream().filter(DataPointDto::getIsAlarm).collect(Collectors.toList());;
+                    dataPointDtos = calculateCategoricalData(categoricalTsByOrgs,ChartResolution.DEFAULT).stream().filter(DataPointDto::getIsAlarm).collect(Collectors.toList());
                 }else {
                     ChartResolution chartResolution = ChartResolution.valueOf(chartDto.getResolution());
                     if (chartResolution.equals(ChartResolution.DEFAULT) || chartResolution.equals(ChartResolution.MIN_30) || chartResolution.equals(ChartResolution.HOUR_1)
@@ -382,11 +378,11 @@ public class ChartService {
 
                         }
                     } else {
-                        List<CategoricalStatByOrg> categoricalStatByOrgs = categoricalStatByOrgRepository.findCatelogicalDataDate(parameterDto.getOrganizationId(),
+                        List<CategoricalStatByOrg> categoricalStatByOrgs = categoricalStatByOrgRepository.findCategoricalDataDate(parameterDto.getOrganizationId(),
                                 parameterDto.getParameterId(), chartDto.getStartTime().toLocalDate(), chartDto.getEndTime().toLocalDate());
                         if(categoricalStatByOrgs.size()>0) {
                             categoricalStatByOrgs.sort(Comparator.comparing(o -> o.getPartitionKey().getDate()));
-                            dataPointDtos = calulateCatelogicalDataDate(categoricalStatByOrgs, chartResolution,chartDto.getStartTime().toLocalDate()).stream().filter(DataPointDto::getIsAlarm).collect(Collectors.toList());
+                            dataPointDtos = calculateCategoricalDataDate(categoricalStatByOrgs, chartResolution,chartDto.getStartTime().toLocalDate()).stream().filter(DataPointDto::getIsAlarm).collect(Collectors.toList());
 
                         }
                     }

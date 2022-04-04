@@ -49,6 +49,7 @@ public class NumericAggregate {
             dataPointDto.setMax(max.toString());
             dataPointDto.setMin(min.toString());
             dataPointDto.setMedian(median.toString());
+            dataPointDto.setMean(mean.toString());
             dataPointDtoList.add(dataPointDto);
         }
         dataPointDtoList.sort(Comparator.comparing(o -> o.getEventTime()));
@@ -90,7 +91,7 @@ public class NumericAggregate {
         return dataPointDtoList;
     }
 
-    public static List<DataPointDto> calulateNumericDataDate(List<NumericalStatByOrg> numericalStatByOrgs, ChartResolution chartResolution, LocalDate sDate, List<Alarm> alarms){
+    public static List<DataPointDto> calculateNumericDataDate(List<NumericalStatByOrg> numericalStatByOrgs, ChartResolution chartResolution, LocalDate sDate, List<Alarm> alarms){
         List<DataPointDto> dataPointDtoList = new ArrayList<>();
         if(chartResolution.equals(ChartResolution.DAY_1)){
             return  numericalStatByOrgs.stream().map(DataPointDto::new).sorted(Comparator.comparing(DataPointDto::getEventTime)).collect(Collectors.toList());

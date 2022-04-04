@@ -19,13 +19,8 @@ import java.io.*;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -54,7 +49,7 @@ public class DataService {
     IndicatorInfoRepository indicatorInfoRepository;
 
 
-    public ResponseMessage recieveDataCsv(MultipartFile file, Long orgId, Long stationId, List<ParameterDto> parameterDtoList) throws Exception{
+    public ResponseMessage receiveDataCsv(MultipartFile file, Long orgId, Long stationId, List<ParameterDto> parameterDtoList) throws Exception{
             byte[] bytes = file.getBytes();
 
             ByteArrayInputStream inputFilestream = new ByteArrayInputStream(bytes);
@@ -175,8 +170,6 @@ public class DataService {
                                 }
                                 categoricalTsByOrgs.add(categoricalTsByOrg);
                             }
-
-
                     }
                 }
             }
@@ -234,9 +227,6 @@ public class DataService {
             categoricalTsByOrgRepository.saveAll(categoricalTsByOrgs);
             numericalStatByOrgRepository.saveAll(numericalStatByOrgs);
             categoricalStatByOrgRepository.saveAll(categoricalStatByOrgs);
-//                numHasSet
-//            cateHasSet
-//        numericalStatByOrgs
 
 //            TimeUnit.SECONDS.sleep(5);
             return new ResponseMessage("Import data successful!");
@@ -249,7 +239,6 @@ public class DataService {
                 "Data Export"
         };
         List<List<String>> csvBody = new ArrayList<>();
-        List<List<String>> csvBodyQA = new ArrayList<>();
         ByteArrayInputStream byteArrayOutputStream = null;
         String encodedString = "";
         List<String> rowData1 = new ArrayList<>();
@@ -258,7 +247,7 @@ public class DataService {
         HashMap<String, List<String>> response = new HashMap<>();
         int idx = 0;
 
-        // Agreggate
+        // Aggregate
         List<ParameterDataDto> parameterDataDtos = new ArrayList<>();
 
         for (ParameterDto parameterDto : chartDto.getParameterDtos()) {
@@ -269,7 +258,7 @@ public class DataService {
             String paramName = paramsByOrg.getParamName();
             rowData1.add(standardUnit == null ? paramName : paramName + "(" + standardUnit + ")");
 
-            // Agreggate
+            // Aggregate
             ParameterDataDto parameterDataDto = new ParameterDataDto();
             parameterDto.setIndicatorType(indicator.getValueType());
             parameterDto.setIndicatorName(indicator.getIndicatorName());
@@ -279,11 +268,15 @@ public class DataService {
             List<DataPointDto> dataPointDtos = new ArrayList<>();
 
             if(chartDto.getStartTime().isBefore(chartDto.getEndTime())){
-                List<NumericalTsByOrg> numericalTsByOrgs = numericalTsByOrgRepository.findDataDetail(Timestamp.valueOf(chartDto.getStartTime()),
-                        Timestamp.valueOf(chartDto.getEndTime()), parameterDto.getOrganizationId(), parameterDto.getParameterId());
+                List<NumericalTsByOrg> numericalTsByOrgs = numericalTsByOrgRepository.findDataDetail(
+                        Timestamp.valueOf(chartDto.getStartTime()),
+                        Timestamp.valueOf(chartDto.getEndTime()),
+                        parameterDto.getOrganizationId(),
+                        parameterDto.getParameterId()
+                );
                 for (NumericalTsByOrg numericalTsByOrg: numericalTsByOrgs){
                     List<String> data = new ArrayList<>();
-                    String key = numericalTsByOrg.getPartitionKey().getEventTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toString();
+                    String key = numericalTsByOrg.getPartitionKey().getEventTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                     if (idx > 0) {
                         if (response.containsKey(key)){
                             for (int i = response.get(key).size(); i<= idx ; i++){
@@ -302,45 +295,55 @@ public class DataService {
                     }
                 }
 
-
                 // Aggregate
                 ChartResolution chartResolution = ChartResolution.valueOf(chartDto.getResolution());
-                List<Alarm> alarms = alarmRepository.findByPartitionKeyOrganizationIdAndPartitionKeyParamId(parameterDto.getOrganizationId(),parameterDto.getParameterId());
+                List<Alarm> alarms = new ArrayList<>();
                 if (chartResolution.equals(ChartResolution.DEFAULT) || chartResolution.equals(ChartResolution.MIN_30) ||
                     chartResolution.equals(ChartResolution.HOUR_1) || chartResolution.equals(ChartResolution.HOUR_2) ||
                     chartResolution.equals(ChartResolution.HOUR_4) || chartResolution.equals(ChartResolution.HOUR_8)) {
 
-                    List<NumericalTsByOrg> numericalTsByOrgsQA = numericalTsByOrgRepository.findDataDetail(Timestamp.valueOf(chartDto.getStartTime()),
-                            Timestamp.valueOf(chartDto.getEndTime()), parameterDto.getOrganizationId(), parameterDto.getParameterId());
-
-                    if(numericalTsByOrgsQA.size()>0) {
-                        dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgsQA, chartResolution, alarms);
+                    if(numericalTsByOrgs.size()>0) {
+                        dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, chartResolution, alarms);
                     }
                 } else {
-                    List<NumericalStatByOrg> numericalStatByOrgs = numericalStatByOrgRepository.findNumericDataDate(parameterDto.getOrganizationId(),
-                            parameterDto.getParameterId(), chartDto.getStartTime().toLocalDate(), chartDto.getEndTime().toLocalDate());
+                    List<NumericalStatByOrg> numericalStatByOrgs = numericalStatByOrgRepository.findNumericDataDate(
+                            parameterDto.getOrganizationId(),
+                            parameterDto.getParameterId(),
+                            chartDto.getStartTime().toLocalDate(),
+                            chartDto.getEndTime().toLocalDate()
+                    );
                     if(numericalStatByOrgs.size()>0) {
 //                        numericalStatByOrgs.sort(Comparator.comparing(o -> o.getPartitionKey().getDate()));
-                        dataPointDtos = NumericAggregate.calulateNumericDataDate(numericalStatByOrgs, chartResolution,chartDto.getStartTime().toLocalDate(), alarms);
+                        dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, chartResolution,chartDto.getStartTime().toLocalDate(), alarms);
                     }
                 }
             }
-            idx += 1;
-
-            // Agreggate
+            // Aggregate
             parameterDataDto.setDataPointDtos(dataPointDtos);
             parameterDataDtos.add(parameterDataDto);
+
+            idx += 1;
         }
 
         for (DataPointDto dataPointDto: parameterDataDtos.get(0).getDataPointDtos()){
             List<String> rowData = new ArrayList<>();
-            rowData.add(String.valueOf(dataPointDto.getEventTime()));
-            rowData.add(dataPointDto.getValue());
-            rowData.add(String.valueOf(dataPointDto.getIsAlarm()));
-            rowData.add(String.valueOf(dataPointDto.getCount()));
-            rowData.add(dataPointDto.getMax());
-            rowData.add(dataPointDto.getMin());
-            rowData.add((dataPointDto.getMedian()));
+            rowData.add(String.valueOf(Timestamp.valueOf(dataPointDto.getEventTime())));
+            switch (AggregateMethod.valueOf(chartDto.getAggregate())) {
+                case MAX:
+                    rowData.add(dataPointDto.getMax());
+                    break;
+                case MIN:
+                    rowData.add(dataPointDto.getMin());
+                    break;
+                case MEAN:
+                    rowData.add(dataPointDto.getMean());
+                    break;
+                case MEDIAN:
+                    rowData.add((dataPointDto.getMedian()));
+                    break;
+                default:
+                    break;
+            }
             csvBody.add(rowData);
         }
 
