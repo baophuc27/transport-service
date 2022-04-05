@@ -21,6 +21,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+import static java.lang.Math.abs;
+
 @RequiredArgsConstructor
 @Log4j2
 public class RuleEngineService implements RuleEngineUseCase {
@@ -63,7 +65,7 @@ public class RuleEngineService implements RuleEngineUseCase {
                                      AlarmRuleCache alarmRuleCache,
                                      IncomingTsEvent event) {
         long minutes = ChronoUnit.MINUTES.between(event.getEventTime(), alarmRuleCache.getLastMatchedTime());
-        return minutes >= (alarm.getFrequence() * alarm.getFrequenceType().getValueFromEnum());
+        return abs(minutes) >= (alarm.getFrequence() * alarm.getFrequenceType().getValueFromEnum());
     }
 
     public static boolean isInBracketRange(Alarm alarm, Double value) {
