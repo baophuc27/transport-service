@@ -19,18 +19,24 @@ public class NumericAggregate {
         if (resolution.equals(Resolution.DEFAULT)){
             return numericalTsByOrgs.stream().map(DataPointDto::new).sorted(Comparator.comparing(DataPointDto::getEventTime)).collect(Collectors.toList());
         }
+
         Map<Object, List<NumericalTsByOrg>> dataGroup = numericalTsByOrgs.stream().collect(Collectors.groupingBy(e -> {
             int minutes = e.getPartitionKey().getEventTime().getMinute();
+            int hours = e.getPartitionKey().getEventTime().getHour();
             int minutesOver = minutes % (int)(resolution.getValueFromEnum()*60);
-            return e.getPartitionKey().getEventTime().truncatedTo(ChronoUnit.MINUTES).withMinute(minutes - minutesOver);
+            int hoursOver = resolution.equals(Resolution.MIN_30) ? 0 : hours % (int)(resolution.getValueFromEnum()*1);
+            return e.getPartitionKey().getEventTime().truncatedTo(ChronoUnit.MINUTES).withMinute(minutes - minutesOver)
+                                                                                     .withHour(hours - hoursOver);
         }));
+
         for (Map.Entry<Object, List<NumericalTsByOrg>> entry: dataGroup.entrySet()){
             DoubleSummaryStatistics stats = entry.getValue().stream()
-                    .mapToDouble(NumericalTsByOrg::getValue)
-                    .summaryStatistics();
+                                                            .mapToDouble(NumericalTsByOrg::getValue)
+                                                            .summaryStatistics();
             Double mean = Comparison.roundNum(stats.getAverage(),2);
             Double max = stats.getMax();
             Double min = stats.getMin();
+            Double sum = stats.getSum();
             Double median = Comparison.median(entry.getValue().stream().map(NumericalTsByOrg::getValue).collect(Collectors.toList()));
             DataPointDto dataPointDto = new DataPointDto();
             dataPointDto.setEventTime((LocalDateTime)entry.getKey());
@@ -49,6 +55,7 @@ public class NumericAggregate {
             dataPointDto.setMax(max.toString());
             dataPointDto.setMin(min.toString());
             dataPointDto.setMedian(median.toString());
+            dataPointDto.setSum(sum.toString());
             dataPointDto.setMean(mean.toString());
             dataPointDtoList.add(dataPointDto);
         }
@@ -130,6 +137,7 @@ public class NumericAggregate {
             dataPointDto.setMax(max.toString());
             dataPointDto.setMin(min.toString());
             dataPointDto.setMedian(median.toString());
+            dataPointDto.setSum(sum.toString());
             dataPointDto.setMean(mean.toString());
             dataPointDtoList.add(dataPointDto);
         }

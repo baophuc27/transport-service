@@ -5,4 +5,6 @@ public enum AggregateMethod {
     MIN,
     MEAN,
     MEDIAN,
+    COUNT,
+    SUM,
 }

@@ -307,7 +307,7 @@ public class DataService {
                         resolution.equals(Resolution.HOUR_2) || resolution.equals(Resolution.HOUR_4) ||
                         resolution.equals(Resolution.HOUR_8)) {
 
-                    rowLabel.add(paramName + "(" + chartDto.getAggregate() + ")");
+                    rowLabel.add(paramName);
                     if(numericalTsByOrgs.size()>0) {
                         dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, resolution, alarms);
                     }
@@ -319,7 +319,7 @@ public class DataService {
                             chartDto.getEndTime().toLocalDate()
                     );
 
-                    rowLabel.add(paramName + "(" + chartDto.getAggregate() + ")");
+                    rowLabel.add(paramName);
                     if(numericalStatByOrgs.size()>0) {
                         dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, resolution, chartDto.getStartTime().toLocalDate(), alarms);
                     }
@@ -364,6 +364,12 @@ public class DataService {
                             break;
                         case MEDIAN:
                             rowData.add(dataPointDto.getMedian());
+                            break;
+                        case COUNT:
+                            rowData.add(String.valueOf(dataPointDto.getCount()));
+                            break;
+                        case SUM:
+                            rowData.add(dataPointDto.getSum());
                             break;
                         default:
                             break;

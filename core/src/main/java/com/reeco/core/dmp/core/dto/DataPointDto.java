@@ -37,7 +37,7 @@ public class DataPointDto {
 
     private String median;
 
-
+    private String sum;
 
 //    private String etime;
 
