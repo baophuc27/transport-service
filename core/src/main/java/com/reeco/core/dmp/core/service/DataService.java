@@ -371,6 +371,18 @@ public class DataService {
                         case SUM:
                             rowData.add(dataPointDto.getSum());
                             break;
+                        case RANGE:
+                            rowData.add(dataPointDto.getRange());
+                            break;
+                        case START:
+                            rowData.add(dataPointDto.getStart());
+                            break;
+                        case END:
+                            rowData.add(dataPointDto.getEnd());
+                            break;
+                        case DELTA:
+                            rowData.add(dataPointDto.getDelta());
+                            break;
                         default:
                             break;
                     }
@@ -446,7 +458,4 @@ public class DataService {
         apiResponse.setMessage("Successful!");
         return apiResponse;
     }
-
-
-
 }

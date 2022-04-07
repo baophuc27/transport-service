@@ -7,4 +7,11 @@ public enum AggregateMethod {
     MEDIAN,
     COUNT,
     SUM,
+    RANGE,
+    START,
+    END,
+    DELTA,
+//    INTERPOLATED,
+//    CHANGE,
+//    NONE,
 }

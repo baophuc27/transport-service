@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 public class NumericAggregate {
     public static List<DataPointDto> calculateNumericData(List<NumericalTsByOrg> numericalTsByOrgs, Resolution resolution, List<Alarm> alarms){
-//        Collections.reverse(numericalTsByOrgs);
         List<DataPointDto> dataPointDtoList = new ArrayList<>();
         if (resolution.equals(Resolution.DEFAULT)){
             return numericalTsByOrgs.stream().map(DataPointDto::new).sorted(Comparator.comparing(DataPointDto::getEventTime)).collect(Collectors.toList());
@@ -29,15 +28,24 @@ public class NumericAggregate {
                                                                                      .withHour(hours - hoursOver);
         }));
 
+
+//        Double start = numericalTsByOrgs.get(numericalTsByOrgs.size()-1).getValue();
+//        Double end = numericalTsByOrgs.get(0).getValue();
+
         for (Map.Entry<Object, List<NumericalTsByOrg>> entry: dataGroup.entrySet()){
             DoubleSummaryStatistics stats = entry.getValue().stream()
                                                             .mapToDouble(NumericalTsByOrg::getValue)
                                                             .summaryStatistics();
-            Double mean = Comparison.roundNum(stats.getAverage(),2);
+            Double mean = stats.getAverage();
             Double max = stats.getMax();
             Double min = stats.getMin();
             Double sum = stats.getSum();
             Double median = Comparison.median(entry.getValue().stream().map(NumericalTsByOrg::getValue).collect(Collectors.toList()));
+            Double range = max - min;
+            Double start = entry.getValue().get(entry.getValue().size()-1).getValue();
+            Double end = entry.getValue().get(0).getValue();
+            Double delta = start - end;
+
             DataPointDto dataPointDto = new DataPointDto();
             dataPointDto.setEventTime((LocalDateTime)entry.getKey());
             dataPointDto.setValue(mean.toString());
@@ -57,6 +65,10 @@ public class NumericAggregate {
             dataPointDto.setMedian(median.toString());
             dataPointDto.setSum(sum.toString());
             dataPointDto.setMean(mean.toString());
+            dataPointDto.setRange(range.toString());
+            dataPointDto.setStart(start.toString());
+            dataPointDto.setEnd(end.toString());
+            dataPointDto.setDelta(delta.toString());
             dataPointDtoList.add(dataPointDto);
         }
         dataPointDtoList.sort(Comparator.comparing(DataPointDto::getEventTime));
@@ -110,7 +122,7 @@ public class NumericAggregate {
             DoubleSummaryStatistics stats = entry.getValue().stream()
                     .mapToDouble(NumericalStatByOrg::getMean)
                     .summaryStatistics();
-            Double mean = Comparison.roundNum(stats.getAverage(),2);
+            Double mean = stats.getAverage();
             Double sum = 0d;
             Double max = 0d;
             Double min = Double.MAX_VALUE;
@@ -122,6 +134,11 @@ public class NumericAggregate {
                 count += 1;
             }
             Double median = Comparison.median(entry.getValue().stream().map(NumericalStatByOrg::getMedian).collect(Collectors.toList()));
+            Double range = max - min;
+            Double start = entry.getValue().get(entry.getValue().size()-1).getMean();
+            Double end = entry.getValue().get(0).getMean();
+            Double delta = start - end;
+
             DataPointDto dataPointDto = new DataPointDto();
             dataPointDto.setEventTime(sDate.plusDays(Math.round((Double)entry.getKey() * (resolution.getValueFromEnum()/24))).atStartOfDay());
             dataPointDto.setValue(Comparison.roundNum(sum/count,2).toString());
@@ -139,6 +156,10 @@ public class NumericAggregate {
             dataPointDto.setMedian(median.toString());
             dataPointDto.setSum(sum.toString());
             dataPointDto.setMean(mean.toString());
+            dataPointDto.setRange(range.toString());
+            dataPointDto.setStart(start.toString());
+            dataPointDto.setEnd(end.toString());
+            dataPointDto.setDelta(delta.toString());
             dataPointDtoList.add(dataPointDto);
         }
         dataPointDtoList.sort(Comparator.comparing(DataPointDto::getEventTime));
