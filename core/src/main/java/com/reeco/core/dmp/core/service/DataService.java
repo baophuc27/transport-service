@@ -264,10 +264,6 @@ public class DataService {
 
             // Aggregate
             ParameterDataDto parameterDataDto = new ParameterDataDto();
-            parameterDto.setIndicatorType(indicator.getValueType());
-            parameterDto.setIndicatorName(indicator.getIndicatorName());
-            parameterDto.setUnit(indicator.getStandardUnit());
-            parameterDto.setParameterName(indicator.getIndicatorName());
             parameterDataDto.setParameterDto(parameterDto);
             List<DataPointDto> dataPointDtos = new ArrayList<>();
 
@@ -310,6 +306,8 @@ public class DataService {
                 else if (resolution.equals(Resolution.MIN_30) || resolution.equals(Resolution.HOUR_1) ||
                         resolution.equals(Resolution.HOUR_2) || resolution.equals(Resolution.HOUR_4) ||
                         resolution.equals(Resolution.HOUR_8)) {
+
+                    rowLabel.add(paramName + "(" + chartDto.getAggregate() + ")");
                     if(numericalTsByOrgs.size()>0) {
                         dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, resolution, alarms);
                     }
@@ -320,6 +318,8 @@ public class DataService {
                             chartDto.getStartTime().toLocalDate(),
                             chartDto.getEndTime().toLocalDate()
                     );
+
+                    rowLabel.add(paramName + "(" + chartDto.getAggregate() + ")");
                     if(numericalStatByOrgs.size()>0) {
                         dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, resolution, chartDto.getStartTime().toLocalDate(), alarms);
                     }
@@ -346,28 +346,31 @@ public class DataService {
                 return o1.get(0).compareTo(o2.get(0));
             });
         } else {
-            for (DataPointDto dataPointDto : parameterDataDtos.get(0).getDataPointDtos()) {
+            List<DataPointDto> list = parameterDataDtos.get(0).getDataPointDtos();
+            for (int i = 0; i < list.size(); i++) {
                 List<String> rowData = new ArrayList<>();
-                rowData.add(String.valueOf(Timestamp.valueOf(dataPointDto.getEventTime())));
-                switch (AggregateMethod.valueOf(chartDto.getAggregate())) {
-                    case MAX:
-                        rowData.add(dataPointDto.getMax());
-                        break;
-                    case MIN:
-                        rowData.add(dataPointDto.getMin());
-                        break;
-                    case MEAN:
-                        rowData.add(dataPointDto.getMean());
-                        break;
-                    case MEDIAN:
-                        rowData.add((dataPointDto.getMedian()));
-                        break;
-                    default:
-                        break;
+                rowData.add(String.valueOf(Timestamp.valueOf(list.get(i).getEventTime())));
+                for (ParameterDataDto parameterDataDto : parameterDataDtos) {
+                    DataPointDto dataPointDto = parameterDataDto.getDataPointDtos().get(i);
+                    switch (AggregateMethod.valueOf(chartDto.getAggregate())) {
+                        case MAX:
+                            rowData.add(dataPointDto.getMax());
+                            break;
+                        case MIN:
+                            rowData.add(dataPointDto.getMin());
+                            break;
+                        case MEAN:
+                            rowData.add(dataPointDto.getMean());
+                            break;
+                        case MEDIAN:
+                            rowData.add(dataPointDto.getMedian());
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 csvBody.add(rowData);
             }
-            rowLabel.add(chartDto.getAggregate());
         }
 
         csvBody.add(0, rowLabel);
@@ -388,7 +391,6 @@ public class DataService {
         InputStreamResource template = new InputStreamResource(byteArrayOutputStream);
         encodedString = Base64.getEncoder().encodeToString(template.getInputStream().readAllBytes());
         return encodedString;
-
     }
 
     public ApiResponse getLatestDataConnection(Long orgId, List<Long> connectionIds) throws Exception{
