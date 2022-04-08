@@ -28,18 +28,15 @@ public class NumericAggregate {
                                                                                      .withHour(hours - hoursOver);
         }));
 
-
-//        Double start = numericalTsByOrgs.get(numericalTsByOrgs.size()-1).getValue();
-//        Double end = numericalTsByOrgs.get(0).getValue();
-
         for (Map.Entry<Object, List<NumericalTsByOrg>> entry: dataGroup.entrySet()){
             DoubleSummaryStatistics stats = entry.getValue().stream()
                                                             .mapToDouble(NumericalTsByOrg::getValue)
                                                             .summaryStatistics();
-            Double mean = stats.getAverage();
+            Long count = (long) entry.getValue().size();
             Double max = stats.getMax();
             Double min = stats.getMin();
             Double sum = stats.getSum();
+            Double mean = sum / count;
             Double median = Comparison.median(entry.getValue().stream().map(NumericalTsByOrg::getValue).collect(Collectors.toList()));
             Double range = max - min;
             Double start = entry.getValue().get(entry.getValue().size()-1).getValue();
@@ -59,7 +56,7 @@ public class NumericAggregate {
                     break;
                 }
             }
-            dataPointDto.setCount((long) entry.getValue().size());
+            dataPointDto.setCount(count);
             dataPointDto.setMax(max.toString());
             dataPointDto.setMin(min.toString());
             dataPointDto.setMedian(median.toString());
@@ -72,41 +69,6 @@ public class NumericAggregate {
             dataPointDtoList.add(dataPointDto);
         }
         dataPointDtoList.sort(Comparator.comparing(DataPointDto::getEventTime));
-//        Timestamp sTime =  Timestamp.valueOf(numericalTsByOrgs.get(0).getPartitionKey().getEventTime());
-//        Long rangeTime = 0l;
-//        Double sumValue =0d;
-//        Long count = 0l;
-//        dataPointDtoList.add(new DataPointDto(numericalTsByOrgs.get(0)));
-//        for (NumericalTsByOrg numericalTsByOrg: numericalTsByOrgs.subList(1,numericalTsByOrgs.size())){
-//            rangeTime = Timestamp.valueOf(numericalTsByOrg.getPartitionKey().getEventTime()).getTime() - sTime.getTime();
-//            sumValue += numericalTsByOrg.getValue();
-//            count +=1;
-//
-//            if (chartResolution.equals(ChartResolution.DEFAULT)){
-//                return numericalTsByOrgs.stream().map(DataPointDto::new).collect(Collectors.toList());
-//            }else {
-//                if (rangeTime >= (chartResolution.getValueFromEnum()*3600000L)){
-//                    DataPointDto dataPointDto = new DataPointDto();
-//                    dataPointDto.setEventTime(numericalTsByOrg.getPartitionKey().getEventTime());
-//                    Double value = sumValue/count;
-//                    dataPointDto.setValue(value.toString());
-//                    dataPointDtoList.add(dataPointDto);
-//                    sTime = Timestamp.valueOf(numericalTsByOrg.getPartitionKey().getEventTime());
-//                    sumValue = 0D;
-//                    count = 0L;
-//                }
-//            }
-//
-//        }
-//
-//        DataPointDto dataPointDto = new DataPointDto();
-//        if (count>0) {
-//            dataPointDto.setEventTime(numericalTsByOrgs.get(numericalTsByOrgs.size() - 1).getPartitionKey().getEventTime());
-//            Double value = sumValue / count;
-//            dataPointDto.setValue(value.toString());
-//            dataPointDtoList.add(dataPointDto);
-//        }
-//        dataPointDtoList.add(new DataPointDto(numericalTsByOrgs.get(numericalTsByOrgs.size()-1)));
         return dataPointDtoList;
     }
 
@@ -119,10 +81,6 @@ public class NumericAggregate {
         Map<Object, List<NumericalStatByOrg>> groupDate = numericalStatByOrgs.stream().collect(Collectors.groupingBy(event ->
                 Math.floor((ChronoUnit.DAYS.between(sDate, event.getPartitionKey().getDate()))/(resolution.getValueFromEnum()/24))));
         for (Map.Entry<Object, List<NumericalStatByOrg>> entry: groupDate.entrySet()){
-            DoubleSummaryStatistics stats = entry.getValue().stream()
-                    .mapToDouble(NumericalStatByOrg::getMean)
-                    .summaryStatistics();
-            Double mean = stats.getAverage();
             Double sum = 0d;
             Double max = 0d;
             Double min = Double.MAX_VALUE;
@@ -133,6 +91,7 @@ public class NumericAggregate {
                 sum += numericalStatByOrg.getMean();
                 count += 1;
             }
+            Double mean = sum / count;
             Double median = Comparison.median(entry.getValue().stream().map(NumericalStatByOrg::getMedian).collect(Collectors.toList()));
             Double range = max - min;
             Double start = entry.getValue().get(entry.getValue().size()-1).getMean();
@@ -163,36 +122,6 @@ public class NumericAggregate {
             dataPointDtoList.add(dataPointDto);
         }
         dataPointDtoList.sort(Comparator.comparing(DataPointDto::getEventTime));
-//        else{
-//            Timestamp sTime =  Timestamp.valueOf(numericalStatByOrgs.get(0).getPartitionKey().getDate().atStartOfDay());
-//            Long rangeTime = 0l;
-//            Double sumValue =0d;
-//            Long count = 0l;
-//            dataPointDtoList.add(new DataPointDto(numericalStatByOrgs.get(0)));
-//            for (NumericalStatByOrg numericalStatByOrg: numericalStatByOrgs){
-//                rangeTime = Timestamp.valueOf(numericalStatByOrg.getPartitionKey().getDate().atStartOfDay()).getTime() - sTime.getTime();
-//                sumValue += numericalStatByOrg.getMean();
-//                count +=1;
-//                if (rangeTime >= (chartResolution.getValueFromEnum()*3600000L)){
-//                    DataPointDto dataPointDto = new DataPointDto();
-//                    dataPointDto.setEventTime(numericalStatByOrg.getPartitionKey().getDate().atStartOfDay());
-//                    Double value = sumValue/count;
-//                    dataPointDto.setValue(value.toString());
-//                    dataPointDtoList.add(dataPointDto);
-//                    sTime = Timestamp.valueOf(numericalStatByOrg.getPartitionKey().getDate().atStartOfDay());
-//                    sumValue = 0D;
-//                    count = 0L;
-//                }
-//            }
-//            DataPointDto dataPointDto = new DataPointDto();
-//            if (count>0) {
-//                dataPointDto.setEventTime(numericalStatByOrgs.get(numericalStatByOrgs.size() - 1).getPartitionKey().getDate().atStartOfDay());
-//                Double value = sumValue / count;
-//                dataPointDto.setValue(value.toString());
-//                dataPointDtoList.add(dataPointDto);
-//            }
-//
-//        }
         return  dataPointDtoList;
     }
 }
