@@ -27,7 +27,8 @@ public class DataToKafkaMessageAdapter implements StreamingDataPort {
 
     @Override
     public void streamData(DataRecord dataRecord){
-        AttributeEntity mappedAttribute = attributeRepository.findMappingAttribute(dataRecord.getDeviceId(),dataRecord.getKey());
+//        AttributeEntity mappedAttribute = attributeRepository.findMappingAttributeQA(dataRecord.getDeviceId(),dataRecord.getKey());
+        AttributeEntity mappedAttribute = attributeRepository.findMappingAttributeQA(36,dataRecord.getKey());
         if (mappedAttribute != null){
             DataRecordMessage message = mapper.domainEntityToMessage(dataRecord,mappedAttribute);
             log.info("Sending message: {}",message.toString());

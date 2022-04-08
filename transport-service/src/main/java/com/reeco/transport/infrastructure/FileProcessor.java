@@ -59,10 +59,22 @@ public class FileProcessor {
     @PostConstruct
     private void watchAlarmLogs(){
         String relativePath = ALARM_LOGS_DIRECTORY;
-        log.info(relativePath);
+        createDirectory(relativePath);
+        observe(relativePath);
+    }
+
+    @PostConstruct
+    private void watchRegisteredFolder(){
+        List<Integer> registered_devices = postgresDeviceRepository.getRegisteredDevices();
+        for (Integer device_id : registered_devices){
+            createDirectory(FILE_DIRECTORY + device_id);
+            observe(FILE_DIRECTORY + device_id);
+        }
+    }
+
+    public void observe(String relativePath) {
         Path path = Paths.get(relativePath);
         try{
-
             path.register(
                     watchService,
                     StandardWatchEventKinds.ENTRY_CREATE
@@ -75,40 +87,16 @@ public class FileProcessor {
         }
     }
 
-    @PostConstruct
-    private void watchRegisteredFolder(){
-        List<Integer> registered_devices = postgresDeviceRepository.getRegisteredDevices();
-        for (Integer device_id : registered_devices){
-            createDirectory(String.valueOf(device_id));
-            observe(String.valueOf(device_id));
-        }
-    }
-
-    public void observe(String subFolder) {
-
-        String relativePath = FILE_DIRECTORY + subFolder;
-        Path path = Paths.get(relativePath);
-        try{
-            log.info("Observing files in: {}",subFolder);
-            path.register(
-                    watchService,
-                    StandardWatchEventKinds.ENTRY_CREATE
-            );
-        }
-        catch (IOException ex){
-            log.warn("Got an exception when register file watcher for: {}",subFolder);
-            throw new FileProcessingException(ex.getMessage());
-        }
-    }
-
-    public void createDirectory(String subFolder){
-        String relativePath = FILE_DIRECTORY + subFolder;
+    public void createDirectory(String relativePath){
+//        String relativePath = FILE_DIRECTORY + subFolder;
         File directoryCreator = new File(relativePath);
+        log.info(relativePath);
         if (directoryCreator.exists()){
             log.info("Folder {} is existed",relativePath);
+        } else {
+            directoryCreator.mkdirs();
+            log.info("Created new folder: {}", relativePath);
         }
-        directoryCreator.mkdir();
-        log.info("Created new folder: {}",relativePath);
     }
 
 
@@ -262,6 +250,9 @@ public class FileProcessor {
                 case 2:
                     readFile2(filePath,deviceId);
                     break;
+                case 3:
+                    readFile3(filePath,deviceId);
+                    break;
                 default:
                     log.warn("Invalid template");
                     break;
@@ -369,6 +360,32 @@ public class FileProcessor {
             throw new FileProcessingException(exception.getMessage());
         }
     }
+
+    private void readFile3(String filePath, int deviceId) {
+        try{
+            File file = new File(filePath);
+            file.setExecutable(true);
+            file.setReadable(true);
+            Thread.sleep(2000);
+            Scanner scanner = new Scanner(file);
+            scanner.useDelimiter("\n");
+            while(scanner.hasNext()){
+                String record = scanner.next();
+                String[] splitRecord = record.split("\t");
+                LocalDateTime timestamp = getTimeStamp(splitRecord[3]);
+                String key = splitRecord[0];
+                Double value = Double.valueOf(splitRecord[1]);
+                DataRecord dataRecord = new DataRecord(timestamp,key,value,deviceId,LocalDateTime.now().withNano(0),null,null);
+                log.info("Template 3 record: {}",dataRecord.toString());
+                dataManagementUseCase.receiveData(dataRecord);
+            }
+            scanner.close();
+        }
+        catch (InterruptedException | RuntimeException | IOException exception){
+            log.warn("Got an exception when reading file {} :{}", filePath,exception.getMessage());
+        }
+    }
+
     private LocalDateTime getTimeStamp(String timeString){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         return LocalDateTime.parse(timeString,formatter);
