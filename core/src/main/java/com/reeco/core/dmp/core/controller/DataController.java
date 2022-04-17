@@ -41,8 +41,8 @@ public class DataController {
             parameterDtoList.add(parameterDto);
             i=i+1;
         }
-        dataService.recieveDataCsv(importData.getCsvFile(), importData.getOrganizationId(), importData.getStationId(),parameterDtoList);
-//        file.flatMap(filee-> importDataService.recieveDataCsv(filee, orgId));
+        dataService.receiveDataCsv(importData.getCsvFile(), importData.getOrganizationId(), importData.getStationId(),parameterDtoList);
+//        file.flatMap(filee-> importDataService.receiveDataCsv(filee, orgId));
         return ResponseEntity.ok().body(new ResponseMessage("Import data successful!"));
     }
 

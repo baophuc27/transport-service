@@ -37,7 +37,12 @@ public class DataPointDto {
 
     private String median;
 
+    private String sum;
 
+    private String range;
+    private String start;
+    private String end;
+    private String delta;
 
 //    private String etime;
 
@@ -90,7 +95,7 @@ public class DataPointDto {
         }
     }
 
-    public  DataPointDto(NumericalStatByOrg numericalStatByOrg){
+    public DataPointDto(NumericalStatByOrg numericalStatByOrg){
         this.value = numericalStatByOrg.getMean().toString();
         this.max = numericalStatByOrg.getMax().toString();
         this.min = numericalStatByOrg.getMin().toString();
@@ -99,7 +104,7 @@ public class DataPointDto {
         this.eventTime = numericalStatByOrg.getPartitionKey().getDate().atStartOfDay();
     }
 
-    public  DataPointDto(CategoricalStatByOrg categoricalStatByOrg){
+    public DataPointDto(CategoricalStatByOrg categoricalStatByOrg){
         this.value = categoricalStatByOrg.getPartitionKey().getValue();
         this.count = categoricalStatByOrg.getValueCount();
         this.eventTime = categoricalStatByOrg.getPartitionKey().getDate().atStartOfDay();

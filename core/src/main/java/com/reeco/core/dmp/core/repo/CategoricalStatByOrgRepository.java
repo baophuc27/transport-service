@@ -16,7 +16,7 @@ public interface CategoricalStatByOrgRepository extends CassandraRepository<Cate
             "and date>= ?2\n" +
             "and date<= ?3\n" +
             "ALLOW FILTERING")
-    List<CategoricalStatByOrg> findCatelogicalDataDate(Long orgId, Long paramId, LocalDate startTime, LocalDate endTime);
+    List<CategoricalStatByOrg> findCategoricalDataDate(Long orgId, Long paramId, LocalDate startTime, LocalDate endTime);
 
 
 
