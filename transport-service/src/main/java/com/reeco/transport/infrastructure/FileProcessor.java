@@ -9,7 +9,6 @@ import com.reeco.transport.application.usecase.DataManagementUseCase;
 import com.reeco.transport.infrastructure.persistence.postgresql.PostgresDeviceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -21,7 +20,6 @@ import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.Scanner;
 
 @Infrastructure
@@ -114,9 +112,8 @@ public class FileProcessor {
                         String fileName = event.context().toString();
                         if (String.valueOf(watchedDir).equals(ALARM_LOGS_DIRECTORY)){
                             readLogsFile(fileName);
-                        }
-                        else{
-                            readDataFile(fileName,watchedDir);
+                        } else {
+                            readDataFile(fileName, watchedDir);
                         }
                     }
                 }
@@ -235,8 +232,8 @@ public class FileProcessor {
         }
     }
 
-    private void readDataFile(String fileName,Path deviceDir){
-        String filePath = deviceDir +"/" +fileName;
+    private void readDataFile(String fileName, Path deviceDir){
+        String filePath = deviceDir + "/" + fileName;
         String folderName = deviceDir.getFileName().toString();
         int deviceId = Integer.parseInt(folderName);
         int templateId = postgresDeviceRepository.findTemplateById(deviceId);

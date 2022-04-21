@@ -12,11 +12,11 @@ public interface PostgresAttributeRepository extends JpaRepository<AttributeEnti
     @Query(value = "SELECT * FROM public.attribute attr WHERE attr.device_id = ?1",nativeQuery = true)
     Collection<AttributeEntity> findRegisteredAttributes(Integer deviceId);
 
-    @Query(value = "SELECT * FROM public.attribute attr WHERE attr.device_id = ?1 AND attr.key_name = ?2 ORDER BY attr.id DESC LIMIT 1",nativeQuery = true)
-    AttributeEntity findMappingAttribute(Integer deviceId, String key);
+//    @Query(value = "SELECT * FROM public.attribute attr WHERE attr.device_id = ?1 AND attr.key_name = ?2 ORDER BY attr.id DESC LIMIT 1",nativeQuery = true)
+//    AttributeEntity findMappingAttribute(Integer deviceId, String key);
 
     @Query(value = "SELECT * FROM public.attribute attr WHERE attr.device_id = ?1 AND attr.english_name = ?2 ORDER BY attr.id DESC LIMIT 1",nativeQuery = true)
-    AttributeEntity findMappingAttributeQA(Integer deviceId, String key);
+    AttributeEntity findMappingAttribute(Integer deviceId, String key);
 
     @Query(value = "DELETE FROM public.attribute attr WHERE attr.device_id = ?1 AND attr.attribute_id = ?2",nativeQuery = true)
     void deleteAttribute(Integer deviceId, Integer attributeId);
