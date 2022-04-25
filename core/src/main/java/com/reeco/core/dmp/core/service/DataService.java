@@ -353,6 +353,9 @@ public class DataService {
                 for (ParameterDataDto parameterDataDto : parameterDataDtos) {
                     DataPointDto dataPointDto = parameterDataDto.getDataPointDtos().get(i);
                     switch (AggregateMethod.valueOf(chartDto.getAggregate())) {
+                        case INTERPOLATED:
+                            rowData.add(dataPointDto.getInterpolated());
+                            break;
                         case MAX:
                             rowData.add(dataPointDto.getMax());
                             break;
