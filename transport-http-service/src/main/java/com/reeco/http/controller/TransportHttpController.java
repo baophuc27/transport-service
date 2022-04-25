@@ -14,6 +14,7 @@ import com.reeco.http.model.dto.Connection;
 import com.reeco.http.model.dto.ParameterCache;
 import com.reeco.http.model.entity.ConnectionByOrg;
 import com.reeco.http.model.entity.ParamsByOrg;
+import com.reeco.http.model.repo.ConnectionByOrgRepository;
 import com.reeco.http.service.TransportHttpService;
 import com.reeco.http.until.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Optional;
 
 @CrossOrigin(value = {"*"})
 @RestController()
@@ -44,13 +46,16 @@ public class TransportHttpController {
     ConnectionCache connectionCache;
 
     @Autowired
+    ConnectionByOrgRepository connectionByOrgRepository;
+    @Autowired
     TransportHttpService transportHttpService;
 
 //    private final static ObjectMapper objectMapper = new ObjectMapper();
 
     @PostMapping("/receive-data")
-    public ResponseEntity<ApiResponse> receiveData(@RequestHeader("access_key") String accessKey, @RequestBody RequestDto requestDto) throws Exception{
-        ApiResponse apiResponse = transportHttpService.pushDataToKafka(requestDto, accessKey);
+    public ResponseEntity<ApiResponse> receiveData(@RequestHeader("access_key") String accessKey, @RequestHeader("connection_id") String id , @RequestBody RequestDto requestDto) throws Exception{
+        String key = id+"%"+accessKey;
+        ApiResponse apiResponse = transportHttpService.pushDataToKafka(requestDto, accessKey , id);
         return new ResponseEntity<>(apiResponse,apiResponse.getStatus());
     }
 
@@ -86,16 +91,24 @@ public class TransportHttpController {
                             parameter.getEnglishName(),
                             parameter.getStationId(),
                             parameter.getConnectionId(),
-                            parameter.getUnit()
+                            parameter.getUnit(),
+                            parameter.getKeyName()
                     );
                     ParameterCache parameterCache = new ParameterCache(paramsByOrg);
+                    Optional<ConnectionByOrg> conc = connectionByOrgRepository.getByIdAndTransportType(parameter.getConnectionId(), TransportType.HTTP);
+                    String key = conc.get().getPartitionKey().getConnectionId() + "%" +conc.get().getAccessToken();
                     switch (actionType) {
                         case UPSERT:
-                            connectionCache.put(parameterCache);
+
+                            if (!conc.isPresent()){
+                                log.error("Connection not exists!");
+                                throw new Exception("Connection not exists!");
+                            }
+                            connectionCache.put(parameterCache, key);
                             log.info("Saved to cache: " + parameterCache);
                             break;
                         case DELETE:
-                            connectionCache.evict(parameterCache);
+                            connectionCache.evict(parameterCache, key);
                             log.info("Evict paramId from cache: " + parameterCache.getParamId());
                             break;
                         default:
@@ -127,7 +140,7 @@ public class TransportHttpController {
                                 break;
 
                             case DELETE:
-                                connectionCache.evict(connection.getConnectionId().toString());
+                                connectionCache.evict(connection.getConnectionId() +"%"+ connection.getAccessToken());
                                 log.info("Evict connectionId cache: " + connection.getConnectionId());
                                 break;
                             default:

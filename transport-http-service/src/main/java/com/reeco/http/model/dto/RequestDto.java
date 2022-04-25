@@ -3,17 +3,24 @@ package com.reeco.http.model.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 public class RequestDto {
 
-    private Long paramId;
+    private String status;
 
-    private String value;
+    private List<Param> params;
 
-    private String eventTime;
+    @Data
+    @NoArgsConstructor
+    public class Param{
+        private String key;
 
-    private Double lat;
+        private String value;
 
-    private Double lon;
+        private String unit;
+
+    }
 }

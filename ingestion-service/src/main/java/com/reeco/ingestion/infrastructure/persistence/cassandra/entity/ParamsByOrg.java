@@ -73,4 +73,7 @@ public class ParamsByOrg {
     @Column("last_agg_time")
     @Setter
     private LocalDateTime lastAggTime;
+
+    @Column("key_name")
+    private String keyName;
 }

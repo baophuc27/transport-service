@@ -138,7 +138,7 @@ class ConfigEntityController {
             } else if (Protocol.HTTP.name().toLowerCase().equals(protocol)) {
                 HTTPConnection httpConnection = objectMapper.convertValue(connectionPayload, HTTPConnection.class);
                 String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~`!@#$?";
-                String access_token = httpConnection.getId() + "%" + RandomStringUtils.random(30, characters);
+                String access_token = httpConnection.getAccessToken();
                 httpConnection.setUpdatedAt(currentTimestamp);
                 log.info("Access_token: {}", access_token);
                 httpConnection.setAccessToken(AES.encrypt(access_token));

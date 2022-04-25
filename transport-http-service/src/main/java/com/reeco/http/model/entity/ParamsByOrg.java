@@ -46,6 +46,9 @@ public class ParamsByOrg {
     @Column("unit")
     private String unit;
 
+    @Column("key_name")
+    private String keyName;
+
 
 
 //    @Column("updated_at")

@@ -65,7 +65,7 @@ public class RuleEngineService implements RuleEngineUseCase {
                                      AlarmRuleCache alarmRuleCache,
                                      IncomingTsEvent event) {
         long minutes = ChronoUnit.MINUTES.between(event.getEventTime(), alarmRuleCache.getLastMatchedTime());
-        return abs(minutes) >= (alarm.getFrequence() * alarm.getFrequenceType().getValueFromEnum());
+        return abs(minutes) >= abs(alarm.getFrequence() * alarm.getFrequenceType().getValueFromEnum());
     }
 
     public static boolean isInBracketRange(Alarm alarm, Double value) {

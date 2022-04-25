@@ -66,6 +66,9 @@ public class Parameter {
 
     private String format;
 
+//    Using for https
+    private String token;
+
     @Valid
     private List<Alarm> alarms;
 

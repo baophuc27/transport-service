@@ -44,13 +44,13 @@ public class ConnectionCache {
 
     public void put(Connection connection){
         if(connection!=null){
-            getCache().put(connection.getConnectionId().toString(),connection);
+            getCache().put(connection.getConnectionId().toString() + "%" +connection.getAccessToken(),connection);
         }
     }
 
-    public void put(ParameterCache parameterCache){
+    public void put(ParameterCache parameterCache, String key){
         if (parameterCache!=null){
-            get(parameterCache.getConnectionId().toString()).getParameterList().add(parameterCache);
+            get(key).getParameterList().add(parameterCache);
         }
     }
 
@@ -64,13 +64,13 @@ public class ConnectionCache {
          getCache().evict(key);
     }
 
-    public void evict(ParameterCache parameterCache){
-        if (get(parameterCache.getConnectionId().toString()) == null){
+    public void evict(ParameterCache parameterCache, String key){
+        if (get(key) == null){
             return;
         }
-        ParameterCache parameterCache1 = get(parameterCache.getConnectionId().toString())
+        ParameterCache parameterCache1 = get(key)
                 .getParameterList().stream().filter(pr -> pr.getParamId().equals(parameterCache.getParamId()))
                         .findFirst().orElse(null);
-        get(parameterCache.getConnectionId().toString()).getParameterList().remove(parameterCache1);
+        get(key).getParameterList().remove(parameterCache1);
     }
 }

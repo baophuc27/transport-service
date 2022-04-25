@@ -37,8 +37,8 @@ public class PreInterceptor extends HandlerInterceptorAdapter {
 
         }
         String accessKey = request.getHeader("access_key");
-        String connectionId = accessKey.split("%")[0];
-        if (connectionCache.get(connectionId) == null || !request.getHeader("access_key").equals(connectionCache.get(connectionId).getAccessToken())){
+        String connectionId = request.getHeader("connection_id");
+        if (connectionCache.get(connectionId + "%" + accessKey) == null){
             response.getWriter().write("Invalid access key");
             response.setStatus(403);
             return false;
