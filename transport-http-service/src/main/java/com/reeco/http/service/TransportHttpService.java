@@ -5,6 +5,7 @@ import com.reeco.http.cache.ConnectionCache;
 import com.reeco.http.model.dto.Connection;
 import com.reeco.http.model.dto.RequestDto;
 import com.reeco.http.model.dto.ParameterCache;
+import com.reeco.http.model.dto.RequestParam;
 import com.reeco.http.model.repo.ParamsByOrgRepository;
 import com.reeco.http.until.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class TransportHttpService {
         ApiResponse apiResponse = ApiResponse.getSuccessResponse();
 //        Todo: Read param info from cache and push to Kafka
         Connection connection = connectionCache.get(connectionId+"%"+accessKey);
-        for (RequestDto.Param paramRequest: requestDto.getParams()) {
+        for (RequestParam paramRequest: requestDto.getParams()) {
             IncomingTsEvent msg = new IncomingTsEvent();
             LocalDateTime currTime = LocalDateTime.now();
             String requestDtoParamKey = paramRequest.getKey();
@@ -48,7 +49,7 @@ public class TransportHttpService {
 
             List<ParameterCache> paramList = connection.getParameterList();
             for (ParameterCache param : paramList) {
-                if (param.getParamKey() == requestDtoParamKey) {
+                if (param.getParamKey().equals(requestDtoParamKey)) {
                     msg.setOrganizationId(param.getOrgId());
                     msg.setWorkspaceId(param.getWorkspaceId());
                     msg.setStationId(param.getStationId());

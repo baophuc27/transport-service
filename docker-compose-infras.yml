@@ -41,7 +41,7 @@ services:
 
 
   kafdrop:
-    image: obsidiandynamics/kafdrop
+    image: obsidiandynamics/kafdrop:3.30.0-SNAPSHOT
     restart: "no"
     ports:
       - "19000:9000"

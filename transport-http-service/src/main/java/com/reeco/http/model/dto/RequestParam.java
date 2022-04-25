@@ -3,13 +3,12 @@ package com.reeco.http.model.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
-public class RequestDto {
+public class RequestParam {
+    private String key;
 
-    private String status;
+    private String value;
 
-    private List<RequestParam> params;
+    private String unit;
 }
