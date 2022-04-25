@@ -76,7 +76,7 @@ public class NumericAggregate {
             Double range = max - min;
             Double start = entry.getValue().get(entry.getValue().size()-1).getValue();
             Double end = entry.getValue().get(0).getValue();
-            Double delta = start - end;
+            Double delta = end - start;
 
 
             DataPointDto dataPointDto = new DataPointDto();
@@ -162,7 +162,7 @@ public class NumericAggregate {
             Double range = max - min;
             Double start = entry.getValue().get(entry.getValue().size()-1).getMean();
             Double end = entry.getValue().get(0).getMean();
-            Double delta = start - end;
+            Double delta = end - start;
 
             DataPointDto dataPointDto = new DataPointDto();
             dataPointDto.setEventTime(eventTime);
