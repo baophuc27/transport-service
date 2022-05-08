@@ -11,7 +11,5 @@ public enum AggregateMethod {
     START,
     END,
     DELTA,
-//    INTERPOLATED,
-//    CHANGE,
-//    NONE,
+    INTERPOLATED,
 }
