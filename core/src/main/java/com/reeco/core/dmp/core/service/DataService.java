@@ -285,19 +285,20 @@ public class DataService {
                                 .getEventTime()
                                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
+                        String numericalValue = numericalTsByOrg.getValue() != null ? numericalTsByOrg.getValue().toString() : "";
                         if (idx > 0) {
                             if (response.containsKey(key)) {
                                 for (int i = response.get(key).size(); i <= idx; i++) {
-                                    response.get(key).add(i == idx ? numericalTsByOrg.getValue().toString() : "");
+                                    response.get(key).add(i == idx ? numericalValue : "");
                                 }
                             } else {
                                 for (int i = 0; i <= idx; i++) {
-                                    data.add(i == idx ? numericalTsByOrg.getValue().toString() : "");
+                                    data.add(i == idx ? numericalValue : "");
                                 }
                                 response.put(key, data);
                             }
                         } else {
-                            data.add(numericalTsByOrg.getValue() != null ? numericalTsByOrg.getValue().toString() : "");
+                            data.add(numericalValue);
                             response.put(key, data);
                         }
                     }

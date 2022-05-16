@@ -59,11 +59,10 @@ public class NumericAggregate {
                 linearPoint = functionValuesY.get(pointIndex);
             }
 
-
             // Other Aggregate method
             DoubleSummaryStatistics stats = entry.getValue().stream()
+                    .filter(x -> x.getValue() != null)
                     .mapToDouble(NumericalTsByOrg::getValue)
-                    .filter(Objects::nonNull)
                     .summaryStatistics();
             Long count = (long) entry.getValue().size();
             Double max = stats.getMax();
