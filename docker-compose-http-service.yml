@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: dockerfile-http-transport-service
       args:
-        VERSION: 0.1.0
+        VERSION: ${VERSION}
     environment:
       CASSANDRA_KEYSPACE: ${CASSANDRA_KEYSPACE}
       CASSANDRA_USER: ${CASSANDRA_USER}
