@@ -28,16 +28,16 @@ public class DataPointDto {
     private Long alarmId;
 
     private Long count;
-
     private String max;
-
     private String min;
-
     private String mean;
-
     private String median;
-
-
+    private String sum;
+    private String range;
+    private String start;
+    private String end;
+    private String delta;
+    private String interpolated;
 
 //    private String etime;
 
@@ -50,7 +50,7 @@ public class DataPointDto {
     private Double lon;
 
     public DataPointDto(NumericalTsByOrg num){
-        this.value = num.getValue().toString();
+        this.value = String.valueOf(num.getValue());
         this.eventTime = num.getPartitionKey().getEventTime();
 //        this.etime = num.getPartitionKey().getEventTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
         if (num.getLat() != null){
@@ -90,7 +90,7 @@ public class DataPointDto {
         }
     }
 
-    public  DataPointDto(NumericalStatByOrg numericalStatByOrg){
+    public DataPointDto(NumericalStatByOrg numericalStatByOrg){
         this.value = numericalStatByOrg.getMean().toString();
         this.max = numericalStatByOrg.getMax().toString();
         this.min = numericalStatByOrg.getMin().toString();
@@ -99,7 +99,7 @@ public class DataPointDto {
         this.eventTime = numericalStatByOrg.getPartitionKey().getDate().atStartOfDay();
     }
 
-    public  DataPointDto(CategoricalStatByOrg categoricalStatByOrg){
+    public DataPointDto(CategoricalStatByOrg categoricalStatByOrg){
         this.value = categoricalStatByOrg.getPartitionKey().getValue();
         this.count = categoricalStatByOrg.getValueCount();
         this.eventTime = categoricalStatByOrg.getPartitionKey().getDate().atStartOfDay();
