@@ -1,5 +1,6 @@
 package com.reeco.core.dmp.core.until;
 
+import com.reeco.core.dmp.core.dto.AggregateMethod;
 import com.reeco.core.dmp.core.dto.Resolution;
 import com.reeco.core.dmp.core.dto.DataPointDto;
 import com.reeco.core.dmp.core.model.Alarm;
@@ -19,51 +20,58 @@ public class NumericAggregate {
 
     private static Interpolate interpolate = new Interpolate();
 
-    public static List<DataPointDto> calculateNumericData(List<NumericalTsByOrg> numericalTsByOrgs, Resolution resolution, List<Alarm> alarms){
+    public static List<DataPointDto> calculateNumericData(List<NumericalTsByOrg> numericalTsByOrgs, Resolution resolution, List<Alarm> alarms, AggregateMethod aggregate){
         List<DataPointDto> dataPointDtoList = new ArrayList<>();
 
         Map<Object, List<NumericalTsByOrg>> dataGroup = numericalTsByOrgs.stream().collect(Collectors.groupingBy(e -> {
             int minutes = e.getPartitionKey().getEventTime().getMinute();
             int hours = e.getPartitionKey().getEventTime().getHour();
             int minutesOver = minutes % (int)(resolution.getValueFromEnum()*60);
-            int hoursOver = resolution.equals(Resolution.MIN_30) ? 0 : hours % (int)(resolution.getValueFromEnum()*1);
+            int hoursOver = 0;
+            if (resolution != Resolution.MIN_30 && resolution != Resolution.DEFAULT) {
+                hoursOver = hours % (int) (resolution.getValueFromEnum() * 1);
+            }
             return e.getPartitionKey().getEventTime().truncatedTo(ChronoUnit.MINUTES).withMinute(minutes - minutesOver)
                     .withHour(hours - hoursOver);
         }));
 
         for (Map.Entry<Object, List<NumericalTsByOrg>> entry: dataGroup.entrySet()){
+            DataPointDto dataPointDto = new DataPointDto();
+
             // Interpolation
-            Double point = (double)((LocalDateTime) entry.getKey()).toEpochSecond(ZoneOffset.UTC);
-            List<Double> functionValuesX = numericalTsByOrgs.stream().map(DataPointDto::new)
-                    .filter(x -> !Objects.equals(x.getValue(), "null"))
-                    .map(DataPointDto::getEventTime)
-                    .map(eventTime -> (double) eventTime.toEpochSecond(ZoneOffset.UTC))
-                    .collect(Collectors.toList());
-            List<Double> functionValuesY = numericalTsByOrgs.stream().map(DataPointDto::new)
-                    .map(DataPointDto::getValue)
-                    .filter(value -> !Objects.equals(value, "null"))
-                    .map(Double::valueOf)
-                    .collect(Collectors.toList());
+            if (aggregate == AggregateMethod.INTERPOLATED) {
+                Double point = (double) ((LocalDateTime) entry.getKey()).toEpochSecond(ZoneOffset.UTC);
+                List<Double> functionValuesX = numericalTsByOrgs.stream().map(DataPointDto::new)
+                        .filter(x -> !Objects.equals(x.getValue(), "null"))
+                        .map(DataPointDto::getEventTime)
+                        .map(eventTime -> (double) eventTime.toEpochSecond(ZoneOffset.UTC))
+                        .collect(Collectors.toList());
+                List<Double> functionValuesY = numericalTsByOrgs.stream().map(DataPointDto::new)
+                        .map(DataPointDto::getValue)
+                        .filter(value -> !Objects.equals(value, "null"))
+                        .map(Double::valueOf)
+                        .collect(Collectors.toList());
 
-            Double linearPoint;
-            Integer pointIndex = functionValuesX.indexOf(point);
-            if (pointIndex == -1) {
-                Collections.reverse(functionValuesX);
-                Collections.reverse(functionValuesY);
-                try {
-                    linearPoint = interpolate.evaluateLinear(point, functionValuesX, functionValuesY);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+                Double linearPoint;
+                Integer pointIndex = functionValuesX.indexOf(point);
+                if (pointIndex == -1) {
+                    Collections.reverse(functionValuesX);
+                    Collections.reverse(functionValuesY);
+                    try {
+                        linearPoint = interpolate.evaluateLinear(point, functionValuesX, functionValuesY);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    linearPoint = functionValuesY.get(pointIndex);
                 }
-            } else {
-                linearPoint = functionValuesY.get(pointIndex);
+                dataPointDto.setInterpolated(linearPoint.toString());
             }
-
 
             // Other Aggregate method
             DoubleSummaryStatistics stats = entry.getValue().stream()
+                    .filter(x -> x.getValue() != null)
                     .mapToDouble(NumericalTsByOrg::getValue)
-                    .filter(Objects::nonNull)
                     .summaryStatistics();
             Long count = (long) entry.getValue().size();
             Double max = stats.getMax();
@@ -79,7 +87,6 @@ public class NumericAggregate {
             Double delta = end - start;
 
 
-            DataPointDto dataPointDto = new DataPointDto();
             dataPointDto.setEventTime((LocalDateTime)entry.getKey());
             dataPointDto.setValue(mean.toString());
             dataPointDto.setLat(entry.getValue().get(0).getLat());
@@ -92,7 +99,6 @@ public class NumericAggregate {
                     break;
                 }
             }
-            dataPointDto.setInterpolated(linearPoint.toString());
             dataPointDto.setMax(max.toString());
             dataPointDto.setMin(min.toString());
             dataPointDto.setMedian(median.toString());
@@ -109,40 +115,44 @@ public class NumericAggregate {
         return dataPointDtoList;
     }
 
-    public static List<DataPointDto> calculateNumericDataDate(List<NumericalStatByOrg> numericalStatByOrgs, Resolution resolution, LocalDate sDate, List<Alarm> alarms){
+    public static List<DataPointDto> calculateNumericDataDate(List<NumericalStatByOrg> numericalStatByOrgs, Resolution resolution, LocalDate sDate, List<Alarm> alarms, AggregateMethod aggregate){
         List<DataPointDto> dataPointDtoList = new ArrayList<>();
 
         Map<Object, List<NumericalStatByOrg>> groupDate = numericalStatByOrgs.stream().collect(Collectors.groupingBy(event ->
                 Math.floor((ChronoUnit.DAYS.between(sDate, event.getPartitionKey().getDate()))/(resolution.getValueFromEnum()/24))));
         for (Map.Entry<Object, List<NumericalStatByOrg>> entry: groupDate.entrySet()){
+            DataPointDto dataPointDto = new DataPointDto();
             LocalDateTime eventTime = sDate.plusDays(Math.round((Double)entry.getKey() * (resolution.getValueFromEnum()/24))).atStartOfDay();
+
             // Interpolation
-            Double point = (double)eventTime.toEpochSecond(ZoneOffset.UTC);
-            List<Double> functionValuesX = numericalStatByOrgs.stream().map(DataPointDto::new)
-                    .filter(x -> !Objects.equals(x.getValue(), "null"))
-                    .map(DataPointDto::getEventTime)
-                    .map(time -> (double) time.toEpochSecond(ZoneOffset.UTC))
-                    .collect(Collectors.toList());
-            List<Double> functionValuesY = numericalStatByOrgs.stream().map(DataPointDto::new)
-                    .map(DataPointDto::getMean)
-                    .filter(value -> !Objects.equals(value, "null"))
-                    .map(Double::valueOf)
-                    .collect(Collectors.toList());
+            if (aggregate == AggregateMethod.INTERPOLATED) {
+                Double point = (double) eventTime.toEpochSecond(ZoneOffset.UTC);
+                List<Double> functionValuesX = numericalStatByOrgs.stream().map(DataPointDto::new)
+                        .filter(x -> !Objects.equals(x.getValue(), "null"))
+                        .map(DataPointDto::getEventTime)
+                        .map(time -> (double) time.toEpochSecond(ZoneOffset.UTC))
+                        .collect(Collectors.toList());
+                List<Double> functionValuesY = numericalStatByOrgs.stream().map(DataPointDto::new)
+                        .map(DataPointDto::getMean)
+                        .filter(value -> !Objects.equals(value, "null"))
+                        .map(Double::valueOf)
+                        .collect(Collectors.toList());
 
-            Double linearPoints;
-            Integer pointIndex = functionValuesX.indexOf(point);
-            if (pointIndex == -1) {
-                Collections.reverse(functionValuesX);
-                Collections.reverse(functionValuesY);
-                try {
-                    linearPoints = interpolate.evaluateLinear(point, functionValuesX, functionValuesY);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+                Double linearPoints;
+                Integer pointIndex = functionValuesX.indexOf(point);
+                if (pointIndex == -1) {
+                    Collections.reverse(functionValuesX);
+                    Collections.reverse(functionValuesY);
+                    try {
+                        linearPoints = interpolate.evaluateLinear(point, functionValuesX, functionValuesY);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    linearPoints = functionValuesY.get(pointIndex);
                 }
-            } else {
-                linearPoints = functionValuesY.get(pointIndex);
+                dataPointDto.setInterpolated(linearPoints.toString());
             }
-
 
             // Other Aggregate method
             Double sum = 0d;
@@ -164,7 +174,7 @@ public class NumericAggregate {
             Double end = entry.getValue().get(0).getMean();
             Double delta = end - start;
 
-            DataPointDto dataPointDto = new DataPointDto();
+
             dataPointDto.setEventTime(eventTime);
             dataPointDto.setValue(mean.toString());
             for (Alarm alarm: alarms){
@@ -175,7 +185,6 @@ public class NumericAggregate {
                     break;
                 }
             }
-            dataPointDto.setInterpolated(linearPoints.toString());
             dataPointDto.setMax(max.toString());
             dataPointDto.setMin(min.toString());
             dataPointDto.setMedian(median.toString());

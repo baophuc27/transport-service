@@ -133,7 +133,7 @@ public class ChartService {
 
                 if(chartDto.getStartTime().equals(chartDto.getEndTime())){
                     List<NumericalTsByOrg> numericalTsByOrgs = numericalTsByOrgRepository.find2LatestRow(parameterDto.getOrganizationId(), parameterDto.getParameterId());
-                    dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, Resolution.DEFAULT, new ArrayList<>());
+                    dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, Resolution.DEFAULT, new ArrayList<>(), null);
                 }
                 else {
                     Resolution resolution = Resolution.valueOf(chartDto.getResolution());
@@ -151,7 +151,7 @@ public class ChartService {
 //                  dataPointDtos = numericalTsByOrgs.stream().map(DataPointDto::new).collect(Collectors.toList());
                         if(numericalTsByOrgs.size()>0) {
 //                            Collections.sort(numericalTsByOrgs, reverseComparator);
-                            dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, resolution, alarms);
+                            dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, resolution, alarms, null);
                         }
                     } else {
                         List<NumericalStatByOrg> numericalStatByOrgs = numericalStatByOrgRepository.findNumericDataDate(
@@ -162,7 +162,7 @@ public class ChartService {
                         );
                         if(numericalStatByOrgs.size()>0) {
 //                            numericalStatByOrgs.sort(Comparator.comparing(o -> o.getPartitionKey().getDate()));
-                            dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, resolution,chartDto.getStartTime().toLocalDate(), alarms);
+                            dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, resolution,chartDto.getStartTime().toLocalDate(), alarms, null);
                         }
                     }
                 }
@@ -347,7 +347,7 @@ public class ChartService {
 
                 if(chartDto.getStartTime().equals(chartDto.getEndTime())){
                     List<NumericalTsByOrg> numericalTsByOrgs = numericalTsByOrgRepository.find2LatestRow(parameterDto.getOrganizationId(), parameterDto.getParameterId());
-                    dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, Resolution.DEFAULT, new ArrayList<>());
+                    dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, Resolution.DEFAULT, new ArrayList<>(), null);
                 }
                 else {
                     Resolution resolution = Resolution.valueOf(chartDto.getResolution());
@@ -362,14 +362,14 @@ public class ChartService {
 
                         if(numericalTsByOrgs.size()>0) {
 //                            Collections.sort(numericalTsByOrgs, reverseComparator);
-                            dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, resolution, alarms).stream().filter(DataPointDto::getIsAlarm).collect(Collectors.toList());
+                            dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, resolution, alarms, null).stream().filter(DataPointDto::getIsAlarm).collect(Collectors.toList());
                         }
                     } else {
                         List<NumericalStatByOrg> numericalStatByOrgs = numericalStatByOrgRepository.findNumericDataDate(parameterDto.getOrganizationId(),
                                 parameterDto.getParameterId(), chartDto.getStartTime().toLocalDate(), chartDto.getEndTime().toLocalDate());
                         if(numericalStatByOrgs.size()>0) {
 //                            numericalStatByOrgs.sort(Comparator.comparing(o -> o.getPartitionKey().getDate()));
-                            dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, resolution,chartDto.getStartTime().toLocalDate(), alarms).stream().filter(DataPointDto::getIsAlarm).collect(Collectors.toList());
+                            dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, resolution,chartDto.getStartTime().toLocalDate(), alarms, null).stream().filter(DataPointDto::getIsAlarm).collect(Collectors.toList());
                         }
                     }
                 }
