@@ -310,7 +310,7 @@ public class DataService {
 
                     rowLabel.add(paramName);
                     if(numericalTsByOrgs.size()>0) {
-                        dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, resolution, alarms);
+                        dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, resolution, alarms, AggregateMethod.valueOf(chartDto.getAggregate()));
                     }
                 } else {
                     List<NumericalStatByOrg> numericalStatByOrgs = numericalStatByOrgRepository.findNumericDataDate(
@@ -322,7 +322,7 @@ public class DataService {
 
                     rowLabel.add(paramName);
                     if(numericalStatByOrgs.size()>0) {
-                        dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, resolution, chartDto.getStartTime().toLocalDate(), alarms);
+                        dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, resolution, chartDto.getStartTime().toLocalDate(), alarms, AggregateMethod.valueOf(chartDto.getAggregate()));
                     }
                 }
             }
