@@ -129,9 +129,8 @@ public class ChartService {
             parameterDto.setParameterName(indicator.getIndicatorName());
             parameterDataDto.setParameterDto(parameterDto);
             List<DataPointDto> dataPointDtos = new ArrayList<>();
-            if (indicator.getValueType().equals(ConfigData.NUMBER.toString())){
-
-                if(chartDto.getStartTime().equals(chartDto.getEndTime())){
+            if (indicator.getValueType().equals(ConfigData.NUMBER.toString())) {
+                if (chartDto.getStartTime().equals(chartDto.getEndTime())) {
                     List<NumericalTsByOrg> numericalTsByOrgs = numericalTsByOrgRepository.find2LatestRow(parameterDto.getOrganizationId(), parameterDto.getParameterId());
                     dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, Resolution.DEFAULT, new ArrayList<>(), null);
                 }
@@ -160,35 +159,36 @@ public class ChartService {
                                 chartDto.getStartTime().toLocalDate(),
                                 chartDto.getEndTime().toLocalDate()
                         );
-                        if(numericalStatByOrgs.size()>0) {
+                        if (numericalStatByOrgs.size()>0) {
 //                            numericalStatByOrgs.sort(Comparator.comparing(o -> o.getPartitionKey().getDate()));
-                            dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, resolution,chartDto.getStartTime().toLocalDate(), alarms, null);
+                            dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, resolution, chartDto.getStartTime().toLocalDate(), alarms, null);
                         }
                     }
                 }
-
-
             } else {
-                if(chartDto.getStartTime().equals(chartDto.getEndTime())){
+                if (chartDto.getStartTime().equals(chartDto.getEndTime())) {
                     List<CategoricalTsByOrg> categoricalTsByOrgs = categoricalTsByOrgRepository.find2LatestRow(parameterDto.getOrganizationId(), parameterDto.getParameterId());
                     dataPointDtos = calculateCategoricalData(categoricalTsByOrgs, Resolution.DEFAULT);
                 } else {
                     Resolution resolution = Resolution.valueOf(chartDto.getResolution());
-                    if (resolution.equals(Resolution.DEFAULT) || resolution.equals(Resolution.MIN_30) || resolution.equals(
-                            Resolution.HOUR_1)
-                            || resolution.equals(Resolution.HOUR_2) || resolution.equals(Resolution.HOUR_4) || resolution.equals(
-                            Resolution.HOUR_8)) {
-                        List<CategoricalTsByOrg> categoricalTsByOrgs = categoricalTsByOrgRepository.findDataDetail(Timestamp.valueOf(chartDto.getStartTime()),
-                                Timestamp.valueOf(chartDto.getEndTime()), parameterDto.getOrganizationId(), parameterDto.getParameterId());
+                    if (resolution.equals(Resolution.DEFAULT) || resolution.equals(Resolution.MIN_30) ||
+                        resolution.equals(Resolution.HOUR_1) || resolution.equals(Resolution.HOUR_2) ||
+                        resolution.equals(Resolution.HOUR_4) || resolution.equals(Resolution.HOUR_8)) {
+                        List<CategoricalTsByOrg> categoricalTsByOrgs = categoricalTsByOrgRepository.findDataDetail(
+                                Timestamp.valueOf(chartDto.getStartTime()),
+                                Timestamp.valueOf(chartDto.getEndTime()),
+                                parameterDto.getOrganizationId(),
+                                parameterDto.getParameterId()
+                        );
 //                  dataPointDtos = numericalTsByOrgs.stream().map(DataPointDto::new).collect(Collectors.toList());
-                        if(categoricalTsByOrgs.size()>0) {
-//                            Collections.sort(categoricalTsByOrgs, reverseComparator1);
+                        if (categoricalTsByOrgs.size()>0) {
+//                          Collections.sort(categoricalTsByOrgs, reverseComparator1);
                             dataPointDtos = calculateCategoricalData(categoricalTsByOrgs, resolution);
                         }
                     } else {
                         List<CategoricalStatByOrg> categoricalStatByOrgs = categoricalStatByOrgRepository.findCategoricalDataDate(parameterDto.getOrganizationId(),
                                 parameterDto.getParameterId(), chartDto.getStartTime().toLocalDate(), chartDto.getEndTime().toLocalDate());
-                        if(categoricalStatByOrgs.size()>0) {
+                        if (categoricalStatByOrgs.size()>0) {
                             categoricalStatByOrgs.sort(Comparator.comparing(o -> o.getPartitionKey().getDate()));
                             dataPointDtos = calculateCategoricalDataDate(categoricalStatByOrgs,
                                     resolution,chartDto.getStartTime().toLocalDate());
@@ -213,9 +213,9 @@ public class ChartService {
     };
 
 
-    private List<DataPointDto> calculateCategoricalData(List<CategoricalTsByOrg> categoricalTsByOrgs, Resolution resolution){
+    private List<DataPointDto> calculateCategoricalData(List<CategoricalTsByOrg> categoricalTsByOrgs, Resolution resolution) {
 //        Collections.reverse(categoricalTsByOrgs);
-        if (resolution.equals(Resolution.DEFAULT)){
+        if (resolution.equals(Resolution.DEFAULT)) {
                 return categoricalTsByOrgs.stream().map(DataPointDto::new).sorted(Comparator.comparing(DataPointDto::getEventTime)).collect(Collectors.toList());
         }
         List<DataPointDto> dataPointDtoList = new ArrayList<>();
@@ -225,10 +225,10 @@ public class ChartService {
             int minutesOver = minutes % (int)(resolution.getValueFromEnum()*60);
             return e.getPartitionKey().getEventTime().truncatedTo(ChronoUnit.MINUTES).withMinute(minutes - minutesOver);
         }));
-        for (Map.Entry<Object, List<CategoricalTsByOrg>> entry: dataGroup.entrySet()){
+        for (Map.Entry<Object, List<CategoricalTsByOrg>> entry: dataGroup.entrySet()) {
             Map<String, List<CategoricalTsByOrg>> groupDataByValue = entry.getValue().stream()
                     .collect(Collectors.groupingBy(event->event.getPartitionKey().getValue()));
-            for (Map.Entry<String, List<CategoricalTsByOrg>> subEntry: groupDataByValue.entrySet()){
+            for (Map.Entry<String, List<CategoricalTsByOrg>> subEntry: groupDataByValue.entrySet()) {
                 DataPointDto dataPointDto = new DataPointDto();
                 dataPointDto.setValue(subEntry.getKey());
                 dataPointDto.setCount((long) subEntry.getValue().size());
@@ -241,15 +241,15 @@ public class ChartService {
 //        Long rangeTime = 0l;
 //        Long count = 0l;
 //        dataPointDtoList.add(new DataPointDto(categoricalTsByOrgs.get(0)));
-//        for (CategoricalTsByOrg categoricalTsByOrg: categoricalTsByOrgs){
+//        for (CategoricalTsByOrg categoricalTsByOrg: categoricalTsByOrgs) {
 //            rangeTime = Timestamp.valueOf(categoricalTsByOrg.getPartitionKey().getEventTime()).getTime() - sTime.getTime();
 //
 //            count +=1;
 //
-//            if (chartResolution.equals(ChartResolution.DEFAULT)){
+//            if (chartResolution.equals(ChartResolution.DEFAULT)) {
 //                return categoricalTsByOrgs.stream().map(DataPointDto::new).collect(Collectors.toList());
 //            } else {
-//                if (rangeTime >= (chartResolution.getValueFromEnum()*3600000L)){
+//                if (rangeTime >= (chartResolution.getValueFromEnum()*3600000L)) {
 //                    DataPointDto dataPointDto = new DataPointDto();
 //                    dataPointDto.setEventTime(categoricalTsByOrg.getPartitionKey().getEventTime());
 //                    dataPointDto.setValue(categoricalTsByOrg.getPartitionKey().getValue());
@@ -270,18 +270,18 @@ public class ChartService {
         return dataPointDtoList;
     }
 
-    private List<DataPointDto> calculateCategoricalDataDate(List<CategoricalStatByOrg> categoricalStatByOrgs, Resolution resolution, LocalDate sDate){
+    private List<DataPointDto> calculateCategoricalDataDate(List<CategoricalStatByOrg> categoricalStatByOrgs, Resolution resolution, LocalDate sDate) {
         List<DataPointDto> dataPointDtoList = new ArrayList<>();
-        if(resolution.equals(Resolution.DAY_1)){
+        if (resolution.equals(Resolution.DAY_1)) {
             return categoricalStatByOrgs.stream().map(DataPointDto::new).sorted(Comparator.comparing(DataPointDto::getEventTime)).collect(Collectors.toList());
         }
 //        LocalDate sDate = categoricalStatByOrgs.get(0).getPartitionKey().getDate();
         Map<Object, List<CategoricalStatByOrg>> groupDate = categoricalStatByOrgs.stream().collect(Collectors.groupingBy(event ->
                 Math.floor((ChronoUnit.DAYS.between(sDate, event.getPartitionKey().getDate()))/(resolution.getValueFromEnum()/24))));
-        for (Map.Entry<Object, List<CategoricalStatByOrg>> entry: groupDate.entrySet()){
+        for (Map.Entry<Object, List<CategoricalStatByOrg>> entry: groupDate.entrySet()) {
             Map<String, List<CategoricalStatByOrg>> groupDataByValue = entry.getValue().stream()
                     .collect(Collectors.groupingBy(event->event.getPartitionKey().getValue()));
-            for (Map.Entry<String, List<CategoricalStatByOrg>> subEntry: groupDataByValue.entrySet()){
+            for (Map.Entry<String, List<CategoricalStatByOrg>> subEntry: groupDataByValue.entrySet()) {
                 DataPointDto dataPointDto = new DataPointDto();
                 dataPointDto.setValue(subEntry.getKey());
                 dataPointDto.setCount((long) subEntry.getValue().size());
@@ -298,11 +298,11 @@ public class ChartService {
 //
 //            Long count = 0l;
 //            dataPointDtoList.add(new DataPointDto(categoricalStatByOrgs.get(0)));
-//            for (CategoricalStatByOrg categoricalStatByOrg: categoricalStatByOrgs){
+//            for (CategoricalStatByOrg categoricalStatByOrg: categoricalStatByOrgs) {
 //                rangeTime = Timestamp.valueOf(categoricalStatByOrg.getPartitionKey().getDate().atStartOfDay()).getTime() - sTime.getTime();
 //
 //                count +=1;
-//                if (rangeTime >= (chartResolution.getValueFromEnum()*3600000L)){
+//                if (rangeTime >= (chartResolution.getValueFromEnum()*3600000L)) {
 //                    DataPointDto dataPointDto = new DataPointDto();
 //                    dataPointDto.setEventTime(categoricalStatByOrg.getPartitionKey().getDate().atStartOfDay());
 //                    dataPointDto.setValue(categoricalStatByOrg.getPartitionKey().getValue());
@@ -343,9 +343,9 @@ public class ChartService {
             parameterDto.setParameterName(indicator.getIndicatorName());
             parameterDataDto.setParameterDto(parameterDto);
             List<DataPointDto> dataPointDtos = new ArrayList<>();
-            if (indicator.getValueType().equals(ConfigData.NUMBER.toString())){
+            if (indicator.getValueType().equals(ConfigData.NUMBER.toString())) {
 
-                if(chartDto.getStartTime().equals(chartDto.getEndTime())){
+                if (chartDto.getStartTime().equals(chartDto.getEndTime())) {
                     List<NumericalTsByOrg> numericalTsByOrgs = numericalTsByOrgRepository.find2LatestRow(parameterDto.getOrganizationId(), parameterDto.getParameterId());
                     dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, Resolution.DEFAULT, new ArrayList<>(), null);
                 }
@@ -360,14 +360,14 @@ public class ChartService {
                                 Timestamp.valueOf(chartDto.getEndTime()), parameterDto.getOrganizationId(), parameterDto.getParameterId());
 //                  dataPointDtos = numericalTsByOrgs.stream().map(DataPointDto::new).collect(Collectors.toList());
 
-                        if(numericalTsByOrgs.size()>0) {
+                        if (numericalTsByOrgs.size()>0) {
 //                            Collections.sort(numericalTsByOrgs, reverseComparator);
                             dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, resolution, alarms, null).stream().filter(DataPointDto::getIsAlarm).collect(Collectors.toList());
                         }
                     } else {
                         List<NumericalStatByOrg> numericalStatByOrgs = numericalStatByOrgRepository.findNumericDataDate(parameterDto.getOrganizationId(),
                                 parameterDto.getParameterId(), chartDto.getStartTime().toLocalDate(), chartDto.getEndTime().toLocalDate());
-                        if(numericalStatByOrgs.size()>0) {
+                        if (numericalStatByOrgs.size()>0) {
 //                            numericalStatByOrgs.sort(Comparator.comparing(o -> o.getPartitionKey().getDate()));
                             dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, resolution,chartDto.getStartTime().toLocalDate(), alarms, null).stream().filter(DataPointDto::getIsAlarm).collect(Collectors.toList());
                         }
@@ -376,7 +376,7 @@ public class ChartService {
 
 
             } else {
-                if(chartDto.getStartTime().equals(chartDto.getEndTime())){
+                if (chartDto.getStartTime().equals(chartDto.getEndTime())) {
                     List<CategoricalTsByOrg> categoricalTsByOrgs = categoricalTsByOrgRepository.find2LatestRow(parameterDto.getOrganizationId(), parameterDto.getParameterId());
                     dataPointDtos = calculateCategoricalData(categoricalTsByOrgs, Resolution.DEFAULT).stream().filter(DataPointDto::getIsAlarm).collect(Collectors.toList());
                 } else {
@@ -388,7 +388,7 @@ public class ChartService {
                         List<CategoricalTsByOrg> categoricalTsByOrgs = categoricalTsByOrgRepository.findDataDetail(Timestamp.valueOf(chartDto.getStartTime()),
                                 Timestamp.valueOf(chartDto.getEndTime()), parameterDto.getOrganizationId(), parameterDto.getParameterId());
 //                  dataPointDtos = numericalTsByOrgs.stream().map(DataPointDto::new).collect(Collectors.toList());
-                        if(categoricalTsByOrgs.size()>0) {
+                        if (categoricalTsByOrgs.size()>0) {
 //                            Collections.sort(categoricalTsByOrgs, reverseComparator1);
                             dataPointDtos = calculateCategoricalData(categoricalTsByOrgs, resolution).stream().filter(DataPointDto::getIsAlarm).collect(Collectors.toList());
 
@@ -396,7 +396,7 @@ public class ChartService {
                     } else {
                         List<CategoricalStatByOrg> categoricalStatByOrgs = categoricalStatByOrgRepository.findCategoricalDataDate(parameterDto.getOrganizationId(),
                                 parameterDto.getParameterId(), chartDto.getStartTime().toLocalDate(), chartDto.getEndTime().toLocalDate());
-                        if(categoricalStatByOrgs.size()>0) {
+                        if (categoricalStatByOrgs.size()>0) {
                             categoricalStatByOrgs.sort(Comparator.comparing(o -> o.getPartitionKey().getDate()));
                             dataPointDtos = calculateCategoricalDataDate(categoricalStatByOrgs,
                                     resolution,chartDto.getStartTime().toLocalDate()).stream().filter(DataPointDto::getIsAlarm).collect(Collectors.toList());

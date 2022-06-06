@@ -21,6 +21,10 @@ public class NumericAggregate {
     private static Interpolate interpolate = new Interpolate();
 
     public static List<DataPointDto> calculateNumericData(List<NumericalTsByOrg> numericalTsByOrgs, Resolution resolution, List<Alarm> alarms, AggregateMethod aggregate){
+        if (resolution.equals(Resolution.DEFAULT)) {
+            return numericalTsByOrgs.stream().map(DataPointDto::new).sorted(Comparator.comparing(DataPointDto::getEventTime)).collect(Collectors.toList());
+        }
+
         List<DataPointDto> dataPointDtoList = new ArrayList<>();
 
         Map<Object, List<NumericalTsByOrg>> dataGroup = numericalTsByOrgs.stream().collect(Collectors.groupingBy(e -> {
@@ -88,9 +92,9 @@ public class NumericAggregate {
 
 
             dataPointDto.setEventTime((LocalDateTime)entry.getKey());
-            dataPointDto.setValue(mean.toString());
-            dataPointDto.setLat(entry.getValue().get(0).getLat());
-            dataPointDto.setLon(entry.getValue().get(0).getLon());
+//            dataPointDto.setValue(mean.toString());
+//            dataPointDto.setLat(entry.getValue().get(0).getLat());
+//            dataPointDto.setLon(entry.getValue().get(0).getLon());
             for (Alarm alarm: alarms){
                 if(Comparison.checkMatchingAlarmCondition(alarm,mean)){
                     dataPointDto.setIsAlarm(Boolean.TRUE);
