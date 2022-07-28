@@ -1,4 +1,4 @@
-package com.reeco.core.dmp.core.dto;
+package com.reeco.transport.domain;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

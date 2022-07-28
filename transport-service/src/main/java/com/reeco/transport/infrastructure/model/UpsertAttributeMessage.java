@@ -44,6 +44,9 @@ public class UpsertAttributeMessage {
 
     @JsonProperty("indicatorId")
     int indicatorId;
+
+    @JsonProperty("sourceParamName")
+    String sourceParamName;
     
     public String getEnglishName() {
         return englishName;
@@ -150,6 +153,14 @@ public class UpsertAttributeMessage {
         this.indicatorId = indicatorId;
     }
 
+    public String getSourceParamName() {
+        return sourceParamName;
+    }
+
+    public void setSourceParamName(String sourceParamName) {
+        this.sourceParamName = sourceParamName;
+    }
+
     @Override
     public String toString() {
         return "UpsertAttributeMessage{" +
@@ -166,6 +177,7 @@ public class UpsertAttributeMessage {
                 ", organizationId=" + organizationId +
                 ", workspaceId=" + workspaceId +
                 ", indicatorId=" + indicatorId +
+                ", sourceParamName=" + sourceParamName +
                 '}';
     }
 }

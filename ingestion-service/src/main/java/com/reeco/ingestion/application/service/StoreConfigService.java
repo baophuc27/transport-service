@@ -148,6 +148,9 @@ public class StoreConfigService implements StoreConfigUseCase {
         else if (connection instanceof FTPConnection){
             storeConnection((FTPConnection) connection);
         }
+        else if (connection instanceof DataSharingConnection){
+            storeConnection((DataSharingConnection) connection);
+        }
     }
 
     public void storeConnection(HTTPConnection httpConnection){
@@ -170,4 +173,8 @@ public class StoreConfigService implements StoreConfigUseCase {
         connectionInfoRepository.save(connectionInfo).subscribe(v -> log.info("Saved connection: {}", v));
     }
 
+    public void storeConnection(DataSharingConnection dataSharingConnection){
+        ConnectionInfo connectionInfo = connectionMapper.toPersistence(dataSharingConnection);
+        connectionInfoRepository.save(connectionInfo).subscribe(v -> log.info("Saved connection: {}", v));
+    }
 }

@@ -37,7 +37,7 @@ public class DeviceManagementService implements DeviceManagementUseCase {
     private ConnectionMapper connectionMapper;
 
     @Override
-    public void registerDevice(RegisterDeviceCommand command){
+    public void registerConnection(RegisterDeviceCommand command){
         DeviceConnection deviceConnection = connectionMapper.registerCommandToFTPDeviceConnection(command);
         try{
             storeConfigurationPort.save(deviceConnection);
@@ -49,7 +49,7 @@ public class DeviceManagementService implements DeviceManagementUseCase {
     }
 
     @Override
-    public void deleteDevice(DeleteDeviceCommand command){
+    public void deleteConnection(DeleteDeviceCommand command){
         deleteDevicePort.deleteDevice(command);
     }
 
@@ -63,5 +63,19 @@ public class DeviceManagementService implements DeviceManagementUseCase {
         saveAttributePort.delete(message);
     }
 
+    @Override
+    public void registerDevice(RegisterDeviceCommand command){
+        DeviceConnection deviceConnection = connectionMapper.registerCommandToFTPDeviceConnection(command);
+        try{
+            storeConfigurationPort.saveDevice(deviceConnection);
+        }
+        catch (EventProcessingException exception){
+            log.warn("Error when saving configuration : {}",exception.getMessage());
+        }
+    }
 
+    @Override
+    public void deleteDevice(DeleteDeviceCommand command){
+        deleteDevicePort.deleteDevice(command);
+    }
 }
