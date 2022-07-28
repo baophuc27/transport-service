@@ -46,6 +46,7 @@ dependencies {
 	implementation('org.springframework.integration:spring-integration-sftp:5.5.2')
 	implementation('org.springframework.integration:spring-integration-ftp:5.5.2')
 	implementation('org.springframework.integration:spring-integration-event:5.5.2')
+	implementation('org.apache.commons:commons-csv:1.8')
 	implementation(group: 'org.apache.ftpserver', name: 'ftpserver-core', version: '1.0.5')
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'

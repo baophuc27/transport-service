@@ -1,4 +1,5 @@
-package com.reeco.core.dmp.core.dto;
+package com.reeco.transport.domain;
+
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 

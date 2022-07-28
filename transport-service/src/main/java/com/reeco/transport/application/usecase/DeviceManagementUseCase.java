@@ -5,13 +5,15 @@ import com.reeco.transport.infrastructure.model.UpsertAttributeMessage;
 
 public interface DeviceManagementUseCase {
 
-    void registerDevice(RegisterDeviceCommand command);
+    void registerConnection(RegisterDeviceCommand command);
 
-    void deleteDevice(DeleteDeviceCommand command);
+    void deleteConnection(DeleteDeviceCommand command);
 
     void registerAttribute(UpsertAttributeMessage message);
 
     void deleteAttribute(DeleteAttributeMessage message);
 
+    void registerDevice(RegisterDeviceCommand command);
 
+    void deleteDevice(DeleteDeviceCommand command);
 }
