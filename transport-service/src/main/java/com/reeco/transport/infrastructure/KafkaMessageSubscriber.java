@@ -8,10 +8,7 @@ import com.reeco.transport.application.usecase.RegisterDeviceCommand;
 import com.reeco.transport.domain.DeviceConnection;
 import com.reeco.transport.infrastructure.kafka.ActionType;
 import com.reeco.transport.infrastructure.kafka.EntityType;
-import com.reeco.transport.infrastructure.model.DeleteAttributeMessage;
-import com.reeco.transport.infrastructure.model.UpsertAttributeMessage;
-import com.reeco.transport.infrastructure.model.UpsertConnectionMessage;
-import com.reeco.transport.infrastructure.model.DeleteConnectionMessage;
+import com.reeco.transport.infrastructure.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTP;
@@ -26,6 +23,8 @@ import com.reeco.common.model.dto.FTPConnection;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Map;
+
+import static com.reeco.common.model.enumtype.EntityType.CUSTOMID;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -56,7 +55,7 @@ public class KafkaMessageSubscriber {
 //    @KafkaListener(topicPartitions = @TopicPartition(
 //            topic = "reeco_config_event",
 //            partitionOffsets = { @PartitionOffset(
-//                    partition = "1",
+//                    partition = "0",
 //                    initialOffset = "0") }),containerFactory = "connectionListener")
     @KafkaListener(topics = "reeco_config_event",containerFactory = "connectionListener")
     public void process(@Headers Map<String,byte[]> header,@Payload ConsumerRecord<String,byte[]> message) {
@@ -73,6 +72,7 @@ public class KafkaMessageSubscriber {
         catch (RuntimeException exception){
             log.info("No problem");
         }
+        log.info(entityType.name().toString());
 
         switch (entityType){
             case CONNECTION:
@@ -119,7 +119,21 @@ public class KafkaMessageSubscriber {
                         break;
                 }
                 break;
-            case ALARM: break;
+            case CUSTOMID:
+                switch (actionType){
+                    case UPSERT:
+                        UpsertCustomIdMessage upsertCustomIdMessage = parseObject(message.value(), UpsertCustomIdMessage.class);
+                        assert upsertCustomIdMessage != null;
+                        log.info("Received CUSTOM ID message: {}", upsertCustomIdMessage.toString());
+                        deviceManagementUseCase.upsertCustomId(upsertCustomIdMessage);
+                        break;
+                    case DELETE:
+                        DeleteCustomIdMessage deleteCustomIdMessage = parseObject(message.value(),DeleteCustomIdMessage.class);
+                        assert deleteCustomIdMessage != null;
+                        log.info("Received DELETE CUSTOM_ID message: {}",deleteCustomIdMessage.toString());
+                        deviceManagementUseCase.deleteCustomId(deleteCustomIdMessage);
+                        break;
+                }
             case DEVICE: break;
             case DASHBOARD: break;
             default: break;

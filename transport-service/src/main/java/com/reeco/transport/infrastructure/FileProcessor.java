@@ -125,9 +125,11 @@ public class FileProcessor {
                         log.info(String.valueOf(watchedDir));
                         String fileName = event.context().toString();
                         if (String.valueOf(watchedDir).equals(ALARM_LOGS_DIRECTORY)){
+                            log.info("Passing logs");
                             readLogsFile(fileName);
                         }
                         else{
+                            log.info("Passing data");
                             readDataFile(fileName,watchedDir);
                         }
                     }

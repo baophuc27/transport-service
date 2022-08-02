@@ -2,7 +2,7 @@ version: '3.0'
 
 services:
   transport:
-    build: .
+#    build: .
     image: arihub/transport-service
     mem_limit: 500m
     environment:

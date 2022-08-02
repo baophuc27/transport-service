@@ -2,10 +2,13 @@ package com.reeco.transport.application.service;
 
 import com.reeco.transport.application.port.in.DeleteDevicePort;
 import com.reeco.transport.application.port.in.RegisterDevicePort;
+import com.reeco.transport.application.port.out.UpdateCustomIdPort;
 import com.reeco.transport.application.usecase.DeleteDeviceCommand;
 import com.reeco.transport.application.usecase.DeviceManagementUseCase;
 import com.reeco.transport.application.usecase.RegisterDeviceCommand;
 import com.reeco.transport.domain.DeviceConnection;
+import com.reeco.transport.infrastructure.model.DeleteCustomIdMessage;
+import com.reeco.transport.infrastructure.model.UpsertCustomIdMessage;
 import com.reeco.transport.utils.annotators.UseCase;
 import com.reeco.transport.utils.exception.EventProcessingException;
 import com.reeco.transport.application.mapper.ConnectionMapper;
@@ -32,6 +35,8 @@ public class DeviceManagementService implements DeviceManagementUseCase {
     private final DeleteDevicePort deleteDevicePort;
 
     private final SaveAttributePort saveAttributePort;
+
+    private final UpdateCustomIdPort updateCustomIdPort;
 
     @Autowired
     private ConnectionMapper connectionMapper;
@@ -61,6 +66,16 @@ public class DeviceManagementService implements DeviceManagementUseCase {
     @Override
     public void deleteAttribute(DeleteAttributeMessage message) {
         saveAttributePort.delete(message);
+    }
+
+    @Override
+    public void upsertCustomId(UpsertCustomIdMessage message) {
+        updateCustomIdPort.save(message);
+    }
+
+    @Override
+    public void deleteCustomId(DeleteCustomIdMessage message) {
+        updateCustomIdPort.delete(message);
     }
 
 

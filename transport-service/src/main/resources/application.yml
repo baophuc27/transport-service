@@ -1,10 +1,10 @@
 
-server.port: 8000
+server.port: 8111
 server.error.include-message: always
 
 spring:
   datasource:
-    url: jdbc:postgresql://103.88.122.104:5432/configuration
+    url: jdbc:postgresql://localhost:5432/configuration
     username: admin
     password: admin123
   jpa:
@@ -12,7 +12,7 @@ spring:
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:http://localhost:29092}
     consumer:
-      group-id: core
+      group-id: transport
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
@@ -34,8 +34,6 @@ spring:
         name: "reeco-alarm-test"
         partition: 1
         replication-factor: 1
-      consume:
-        name: "reeco-core-backend"
 
 
 application:
@@ -47,16 +45,22 @@ logging:
   level:
     root: INFO
     com.reeco: DEBUG
+    org:
+      springframework:
+        jdbc:
+          core:
+            JdbcTemplate: DEBUG
+            StatementCreatorUtils: TRACE
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
-
-hdfs:
-  configuration:
-    server: hdfs://localhost:9000
-    rootDirectory: /data
 
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka
+
+hdfs:
+  configuration:
+    server: hdfs://localhost:9000
+    rootDirectory: /data
 
