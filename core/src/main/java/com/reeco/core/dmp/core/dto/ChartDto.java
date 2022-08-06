@@ -23,6 +23,8 @@ public class ChartDto {
 
     private String resolution;
 
+    private String aggregate;
+
     private List<ParameterDataDto> parameterDatas = new ArrayList<>();
 
     private List<ParameterDto> parameterDtos = new ArrayList<>();

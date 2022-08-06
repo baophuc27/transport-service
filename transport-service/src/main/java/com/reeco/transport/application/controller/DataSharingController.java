@@ -1,10 +1,10 @@
-package com.reeco.core.dmp.core.controller;
+package com.reeco.transport.application.controller;
 
-
-import com.reeco.core.dmp.core.dto.ResponseMessage;
-import com.reeco.core.dmp.core.dto.SharingDataDTO;
-import com.reeco.core.dmp.core.dto.SharingRequestDTO;
-import com.reeco.core.dmp.core.service.DataSharingService;
+import com.reeco.transport.application.service.DataSharingService;
+import com.reeco.transport.domain.DetailSharingDataDTO;
+import com.reeco.transport.domain.ResponseMessage;
+import com.reeco.transport.domain.SharingDataDTO;
+import com.reeco.transport.domain.SharingRequestDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,4 +74,14 @@ public class DataSharingController {
         String response = String.format("File uploaded: %s",fileName);
         return ResponseEntity.ok().body(new ResponseMessage(response));
     }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    @PostMapping(value = "/accept")
+    private ResponseEntity<ResponseMessage> acceptDataFile(@RequestBody DetailSharingDataDTO detailSharingDataDTO) {
+        dataSharingService.acceptData(detailSharingDataDTO);
+        String response = "success";
+        return ResponseEntity.ok().body(new ResponseMessage(response));
+    }
 }
+

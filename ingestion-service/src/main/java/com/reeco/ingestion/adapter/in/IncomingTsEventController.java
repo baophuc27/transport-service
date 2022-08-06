@@ -137,6 +137,8 @@ public class IncomingTsEventController {
                         connection = objectMapper.readValue(config, HTTPConnection.class);
                     } else if (protocol.equals(Protocol.FTP) || protocol.equals(Protocol.FTPS)) {
                         connection = objectMapper.readValue(config, FTPConnection.class);
+                    } else if (protocol.equals(Protocol.DATA_SHARING)) {
+                        connection = objectMapper.readValue(config, DataSharingConnection.class);
                     } else {
                         log.error("Received Unsupported protocol: {}", proto);
                     }

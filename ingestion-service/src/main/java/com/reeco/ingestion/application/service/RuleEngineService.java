@@ -21,6 +21,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+import static java.lang.Math.abs;
+
 @RequiredArgsConstructor
 @Log4j2
 public class RuleEngineService implements RuleEngineUseCase {
@@ -63,18 +65,18 @@ public class RuleEngineService implements RuleEngineUseCase {
                                      AlarmRuleCache alarmRuleCache,
                                      IncomingTsEvent event) {
         long minutes = ChronoUnit.MINUTES.between(event.getEventTime(), alarmRuleCache.getLastMatchedTime());
-        return minutes >= (alarm.getFrequence() * alarm.getFrequenceType().getValueFromEnum());
+        return abs(minutes) >= abs(alarm.getFrequence() * alarm.getFrequenceType().getValueFromEnum());
     }
 
-    private boolean isInSquareRange(Alarm alarm, Double value) {
-        return value >= Double.parseDouble(alarm.getMinValue())
-                && value <= Double.parseDouble(alarm.getMaxValue());
+    public static boolean isInBracketRange(Alarm alarm, Double value) {
+        return ((alarm.getMinValue()==null) || value > Double.parseDouble(alarm.getMinValue()))
+                && ((alarm.getMaxValue()==null) || value < Double.parseDouble(alarm.getMaxValue()));
+    }
+    public static boolean isInSquareRange(Alarm alarm, Double value) {
+        return  ((alarm.getMinValue()==null) || value >= Double.parseDouble(alarm.getMinValue()))
+                &&((alarm.getMaxValue()==null) || value <= Double.parseDouble(alarm.getMaxValue()));
     }
 
-    private boolean isInBracketRange(Alarm alarm, Double value) {
-        return value > Double.parseDouble(alarm.getMinValue())
-                && value < Double.parseDouble(alarm.getMaxValue());
-    }
 
     private boolean isExactEqualNumber(Alarm alarm, Double value) {
         return value.equals(Double.valueOf(alarm.getMinValue()));

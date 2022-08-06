@@ -1,22 +1,20 @@
 package com.reeco.transport.infrastructure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.reeco.common.model.dto.DataSharingConnection;
+import com.reeco.common.model.enumtype.Protocol;
 import com.reeco.transport.application.mapper.ConnectionMapper;
 import com.reeco.transport.application.usecase.DeleteDeviceCommand;
 import com.reeco.transport.application.usecase.DeviceManagementUseCase;
 import com.reeco.transport.application.usecase.RegisterDeviceCommand;
-import com.reeco.transport.domain.DeviceConnection;
 import com.reeco.transport.infrastructure.kafka.ActionType;
 import com.reeco.transport.infrastructure.kafka.EntityType;
 import com.reeco.transport.infrastructure.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.net.ftp.FTP;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.annotation.PartitionOffset;
-import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import com.reeco.common.model.dto.FTPConnection;
@@ -87,7 +85,7 @@ public class KafkaMessageSubscriber {
                             log.info("Received message : {}", upsertConnectionMessage.toString());
                             RegisterDeviceCommand registerCommand =  connectionMapper.messageToRegisterCommand(upsertConnectionMessage);
                             log.info("Received message : {}", registerCommand.toString());
-                            deviceManagementUseCase.registerDevice(registerCommand);
+                            deviceManagementUseCase.registerConnection(registerCommand);
                             break;
 
                         case DELETE:
@@ -95,13 +93,34 @@ public class KafkaMessageSubscriber {
                             assert deleteConnectionMessage != null;
                             log.info("Received message: {}",deleteConnectionMessage.toString());
                             DeleteDeviceCommand deleteDeviceCommand = connectionMapper.messageToDeleteCommand(deleteConnectionMessage);
-                            deviceManagementUseCase.deleteDevice(deleteDeviceCommand);
+                            deviceManagementUseCase.deleteConnection(deleteDeviceCommand);
                             break;
                         default: break;
                     }
                     break;
+                } else if (protocol.equals("DATA_SHARING")) {
+                    switch (actionType){
+                        case UPSERT:
+                            FTPConnection upsertConnectionMessage = parseObject(message.value(), FTPConnection.class);
+                            if (upsertConnectionMessage.getNotificationType() != ""){
+                                upsertConnectionMessage.setNotificationType("NEVER");
+                            }
+                            assert upsertConnectionMessage != null;
+                            log.info("Received message : {}", upsertConnectionMessage.toString());
+                            RegisterDeviceCommand registerCommand =  connectionMapper.messageToRegisterCommand(upsertConnectionMessage);
+                            log.info("Received message : {}", registerCommand.toString());
+                            deviceManagementUseCase.registerDevice(registerCommand);
+                            break;
+                        case DELETE:
+                            DeleteConnectionMessage deleteConnectionMessage = parseObject(message.value(), DeleteConnectionMessage.class);
+                            assert deleteConnectionMessage != null;
+                            log.info("Received message: {}",deleteConnectionMessage.toString());
+                            DeleteDeviceCommand deleteDeviceCommand = connectionMapper.messageToDeleteCommand(deleteConnectionMessage);
+                            deviceManagementUseCase.deleteDevice(deleteDeviceCommand);
+                            break;
+                    }
                 }
-            break;
+                break;
 
             case PARAM:
                 switch (actionType){
@@ -139,6 +158,4 @@ public class KafkaMessageSubscriber {
             default: break;
         }
     }
-
-
 }

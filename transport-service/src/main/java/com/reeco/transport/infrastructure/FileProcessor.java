@@ -9,20 +9,19 @@ import com.reeco.transport.application.usecase.DataManagementUseCase;
 import com.reeco.transport.infrastructure.persistence.postgresql.PostgresDeviceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Scheduled;
+
+import java.util.*;
 import java.util.regex.*;
 import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Locale;
-import java.util.Scanner;
 
 @Infrastructure
 @RequiredArgsConstructor
@@ -59,10 +58,22 @@ public class FileProcessor {
     @PostConstruct
     private void watchAlarmLogs(){
         String relativePath = ALARM_LOGS_DIRECTORY;
-        log.info(relativePath);
+        createDirectory(relativePath);
+        observe(relativePath);
+    }
+
+    @PostConstruct
+    private void watchRegisteredFolder(){
+        List<Integer> registered_devices = postgresDeviceRepository.getRegisteredDevices();
+        for (Integer device_id : registered_devices){
+            createDirectory(FILE_DIRECTORY + device_id);
+            observe(FILE_DIRECTORY + device_id);
+        }
+    }
+
+    public void observe(String relativePath) {
         Path path = Paths.get(relativePath);
         try{
-
             path.register(
                     watchService,
                     StandardWatchEventKinds.ENTRY_CREATE
@@ -75,40 +86,16 @@ public class FileProcessor {
         }
     }
 
-    @PostConstruct
-    private void watchRegisteredFolder(){
-        List<Integer> registered_devices = postgresDeviceRepository.getRegisteredDevices();
-        for (Integer device_id : registered_devices){
-            createDirectory(String.valueOf(device_id));
-            observe(String.valueOf(device_id));
-        }
-    }
-
-    public void observe(String subFolder) {
-
-        String relativePath = FILE_DIRECTORY + subFolder;
-        Path path = Paths.get(relativePath);
-        try{
-            log.info("Observing files in: {}",subFolder);
-            path.register(
-                    watchService,
-                    StandardWatchEventKinds.ENTRY_CREATE
-            );
-        }
-        catch (IOException ex){
-            log.warn("Got an exception when register file watcher for: {}",subFolder);
-            throw new FileProcessingException(ex.getMessage());
-        }
-    }
-
-    public void createDirectory(String subFolder){
-        String relativePath = FILE_DIRECTORY + subFolder;
+    public void createDirectory(String relativePath){
+//        String relativePath = FILE_DIRECTORY + subFolder;
         File directoryCreator = new File(relativePath);
+        log.info(relativePath);
         if (directoryCreator.exists()){
             log.info("Folder {} is existed",relativePath);
+        } else {
+            directoryCreator.mkdirs();
+            log.info("Created new folder: {}", relativePath);
         }
-        directoryCreator.mkdir();
-        log.info("Created new folder: {}",relativePath);
     }
 
 
@@ -131,6 +118,7 @@ public class FileProcessor {
                         else{
                             log.info("Passing data");
                             readDataFile(fileName,watchedDir);
+
                         }
                     }
                 }
@@ -249,8 +237,8 @@ public class FileProcessor {
         }
     }
 
-    private void readDataFile(String fileName,Path deviceDir){
-        String filePath = deviceDir +"/" +fileName;
+    private void readDataFile(String fileName, Path deviceDir){
+        String filePath = deviceDir + "/" + fileName;
         String folderName = deviceDir.getFileName().toString();
         int deviceId = Integer.parseInt(folderName);
         int templateId = postgresDeviceRepository.findTemplateById(deviceId);
@@ -264,6 +252,9 @@ public class FileProcessor {
                 case 2:
                     readFile2(filePath,deviceId);
                     break;
+                case 3:
+                    readFile3(filePath,deviceId);
+                    break;
                 default:
                     log.warn("Invalid template");
                     break;
@@ -272,57 +263,57 @@ public class FileProcessor {
     }
 
     private void readFile2(String filePath, int deviceId) {
-            try{
-                File file = new File(filePath);
-                file.setReadable(true);
-                Scanner scanner = new Scanner(file);
-                LocalDateTime timeStamp = LocalDateTime.MIN;
+        try{
+            File file = new File(filePath);
+            file.setReadable(true);
+            Scanner scanner = new Scanner(file);
+            LocalDateTime timeStamp = LocalDateTime.MIN;
 
-                scanner.useDelimiter(",");
-                Thread.sleep(2000);
-                Double lat = 0.;
-                Double lon = 0.;
-                while(scanner.hasNext()) {
-                    String record = scanner.next();
-                    String[] splitRecord = record.split(":");
-                    if (splitRecord.length == 2) {
-                        String key = splitRecord[0];
-                        if (key.strip().equals("Lat")) {
-                            lat = Double.valueOf(splitRecord[1]);
-                        }
-                        if (key.strip().equals("Long")) {
-                            lon = Double.valueOf(splitRecord[1]);
-                        }
+            scanner.useDelimiter(",");
+            Thread.sleep(2000);
+            Double lat = 0.;
+            Double lon = 0.;
+            while(scanner.hasNext()) {
+                String record = scanner.next();
+                String[] splitRecord = record.split(":");
+                if (splitRecord.length == 2) {
+                    String key = splitRecord[0];
+                    if (key.strip().equals("Lat")) {
+                        lat = Double.valueOf(splitRecord[1]);
+                    }
+                    if (key.strip().equals("Long")) {
+                        lon = Double.valueOf(splitRecord[1]);
                     }
                 }
-                scanner.close();
+            }
+            scanner.close();
 
-                Scanner scanner2 = new Scanner(file);
-                scanner2.useDelimiter(",");
-                Thread.sleep(2000);
+            Scanner scanner2 = new Scanner(file);
+            scanner2.useDelimiter(",");
+            Thread.sleep(2000);
 
-                while(scanner2.hasNext()){
-                    String record = scanner2.next();
-                    String[] splitRecord = record.split(":");
-                    if (splitRecord.length == 1){
-                        timeStamp = getTimeStamp(splitRecord[0]);
-                    }
-                    if (splitRecord.length == 2){
-                        String key = splitRecord[0];
-                        String[] valueRecord = splitRecord[1].split(" ");
-                        if (valueRecord.length == 2){
-                            Double value = Double.valueOf(valueRecord[0]);
-                            DataRecord dataRecord = new DataRecord(timeStamp,key,value,deviceId,LocalDateTime.now().withNano(0),lat,lon);
-                            log.info("Template 2 record: {}",dataRecord.toString());
-                            dataManagementUseCase.receiveData(dataRecord);
-                        }
+            while(scanner2.hasNext()){
+                String record = scanner2.next();
+                String[] splitRecord = record.split(":");
+                if (splitRecord.length == 1){
+                    timeStamp = getTimeStamp(splitRecord[0]);
+                }
+                if (splitRecord.length == 2){
+                    String key = splitRecord[0];
+                    String[] valueRecord = splitRecord[1].split(" ");
+                    if (valueRecord.length == 2){
+                        Double value = Double.valueOf(valueRecord[0]);
+                        DataRecord dataRecord = new DataRecord(timeStamp,key,value,deviceId,LocalDateTime.now().withNano(0),lat,lon);
+                        log.info("Template 2 record: {}",dataRecord.toString());
+                        dataManagementUseCase.receiveData(dataRecord);
                     }
                 }
-                scanner2.close();
             }
-            catch (InterruptedException | RuntimeException | IOException exception){
-                log.warn("Got an exception when reading file {} :{}", filePath,exception.getMessage());
-            }
+            scanner2.close();
+        }
+        catch (InterruptedException | RuntimeException | IOException exception){
+            log.warn("Got an exception when reading file {} :{}", filePath,exception.getMessage());
+        }
     }
 
     private void readFile1(String filePath, int deviceId) {
@@ -371,6 +362,68 @@ public class FileProcessor {
             throw new FileProcessingException(exception.getMessage());
         }
     }
+
+    private void readFile3(String filePath, int deviceId) {
+        try{
+            File file = new File(filePath);
+            file.setExecutable(true);
+            file.setReadable(true);
+            Thread.sleep(2000);
+            Scanner scanner = new Scanner(file);
+            scanner.useDelimiter("\n");
+            while(scanner.hasNext()){
+                String record = scanner.next();
+                String[] splitRecord = record.split("\t");
+                LocalDateTime timestamp = getTimeStamp(splitRecord[3]);
+                String key = splitRecord[0];
+                Double value = Double.valueOf(splitRecord[1]);
+                DataRecord dataRecord = new DataRecord(timestamp,key,value,deviceId,LocalDateTime.now().withNano(0),null,null);
+                log.info("Template 3 record: {}",dataRecord.toString());
+                dataManagementUseCase.receiveData(dataRecord);
+            }
+            scanner.close();
+        }
+        catch (InterruptedException | RuntimeException | IOException exception){
+            log.warn("Got an exception when reading file {} :{}", filePath,exception.getMessage());
+        }
+    }
+
+    @Scheduled(cron = "0 0 0 */3 * *")
+    private void scheduledClean() {
+        List<Integer> registered_devices = postgresDeviceRepository.getRegisteredDevices();
+        for (Integer device_id : registered_devices) {
+            File dataFolder = new File(FILE_DIRECTORY + device_id);
+            try {
+                if (dataFolder.isDirectory()) {
+                    File[] files = dataFolder.listFiles();
+                    if (files != null && files.length > 0) {
+                        log.info("Start cleaning FTP data folder " + dataFolder);
+                        DeviceEntity device = postgresDeviceRepository.findDeviceById(device_id);
+                        List<String> deletedFile = new ArrayList<>();
+
+                        long maximumTimeoutDate = System.currentTimeMillis() - device.getMaximumTimeout() * 86400000L;
+                        Arrays.stream(files)
+                                .filter(file -> (file.lastModified() < maximumTimeoutDate))
+                                .forEach(file -> {
+                                    if (file.delete()) deletedFile.add(file.getName());
+                                });
+
+                        int maximumAttachment = device.getMaximumAttachment();
+                        while (files.length > maximumAttachment) {
+                            File oldestFile = Arrays.stream(files).min(Comparator.comparing(File::lastModified)).get();
+                            if (oldestFile.delete()) deletedFile.add(oldestFile.getName());
+                            files = dataFolder.listFiles();
+                        }
+                        log.info("Deleted total " + deletedFile.size() + " files: " + deletedFile);
+                    }
+                }
+            }
+            catch (RuntimeException exception) {
+                log.warn("Got an exception when cleaning folder {} :{}", dataFolder, exception.getMessage());
+            }
+        }
+    }
+
     private LocalDateTime getTimeStamp(String timeString){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         return LocalDateTime.parse(timeString,formatter);

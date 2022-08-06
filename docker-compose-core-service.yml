@@ -1,0 +1,23 @@
+version: '3.9'
+
+# Define services
+services:
+  # App backend service
+  coreservice:
+    build:
+      context: .
+      dockerfile: dockerfile-core-service
+      args:
+        VERSION: ${VERSION}
+#    network_mode: host
+    volumes:
+      - ../uploads:$PWD/uploads
+#    environment:
+#      CASSANDRA_KEYSPACE: ${CASSANDRA_KEYSPACE}
+#      CASSANDRA_USER: ${CASSANDRA_USER}
+#      CASSANDRA_PASSWORD: ${CASSANDRA_PASSWORD}
+#      CASSANDRA_CONTACT_POINTS: ${CASSANDRA_CONTACT_POINTS}
+#      CASSANDRA_PORT: ${CASSANDRA_PORT}
+#    restart: always
+    ports:
+      - 7001:7001

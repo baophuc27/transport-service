@@ -1,5 +1,6 @@
 package com.reeco.transport.application.mapper;
 
+import com.reeco.common.model.dto.DataSharingConnection;
 import com.reeco.transport.application.usecase.DeleteDeviceCommand;
 import com.reeco.transport.application.usecase.RegisterDeviceCommand;
 import com.reeco.transport.domain.DeviceConnection;
@@ -21,7 +22,7 @@ public interface ConnectionMapper {
             @Mapping(source = "vietnameseName", target = "vietnameseName"),
             @Mapping(source = "englishName",target = "englishName"),
             @Mapping(source = "port",  target = "protocolConfiguration.hostPort"),
-            @Mapping(source= "userName", target = "protocolConfiguration.userName"),
+            @Mapping(source = "userName", target = "protocolConfiguration.userName"),
             @Mapping(source = "hostName", target = "protocolConfiguration.hostAddress"),
             @Mapping(source = "password", target = "protocolConfiguration.password"),
             @Mapping(source = "key", target = "protocolConfiguration.key"),

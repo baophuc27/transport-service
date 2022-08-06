@@ -66,6 +66,9 @@ public class Parameter {
 
     private String format;
 
+//    Using for https
+    private String token;
+
     @Valid
     private List<Alarm> alarms;
 
@@ -78,6 +81,8 @@ public class Parameter {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
     private LocalDateTime updatedAt;
+
+    private String sourceParamName;
 
     public Parameter() {
     }
@@ -96,7 +101,8 @@ public class Parameter {
                      String format,
                      Long workspaceId,
                      @Valid List<Alarm> alarms,
-                     LocalDateTime receivedAt) {
+                     LocalDateTime receivedAt,
+                     String sourceParamName) {
         this.id = id;
         this.workspaceId = workspaceId;
         this.connectionId = connectionId;
@@ -112,6 +118,7 @@ public class Parameter {
         this.format = format;
         this.alarms = alarms;
         this.receivedAt = receivedAt;
+        this.sourceParamName = sourceParamName;
     }
 
     @Override
@@ -134,11 +141,12 @@ public class Parameter {
                 Objects.equals(getFormat(), parameter.getFormat()) &&
                 Objects.equals(getAlarms(), parameter.getAlarms()) &&
                 Objects.equals(getReceivedAt(), parameter.getReceivedAt()) &&
-                Objects.equals(getUpdatedAt(), parameter.getUpdatedAt());
+                Objects.equals(getUpdatedAt(), parameter.getUpdatedAt()) &&
+                Objects.equals(getSourceParamName(), parameter.getSourceParamName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getConnectionId(), getWorkspaceId(), getOrganizationId(), getStationId(), getEnglishName(), getVietnameseName(), getParameterType(), getIndicatorId(), getKeyName(), getDisplayType(), getUnit(), getFormat(), getAlarms(), getReceivedAt(), getUpdatedAt());
+        return Objects.hash(getId(), getConnectionId(), getWorkspaceId(), getOrganizationId(), getStationId(), getEnglishName(), getVietnameseName(), getParameterType(), getIndicatorId(), getKeyName(), getDisplayType(), getUnit(), getFormat(), getAlarms(), getReceivedAt(), getUpdatedAt(), getSourceParamName());
     }
 }

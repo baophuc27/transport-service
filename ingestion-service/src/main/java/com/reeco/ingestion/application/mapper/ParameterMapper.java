@@ -43,7 +43,8 @@ public interface ParameterMapper extends DomainEntityMapper<Parameter, ParamsByO
             @Mapping(source = "parameterType", target = "parameterType"),
             @Mapping(source = "displayType", target = "displayType"),
             @Mapping(source = "format", target = "format"),
-            @Mapping(source = "unit", target = "unit")
+            @Mapping(source = "unit", target = "unit"),
+            @Mapping(source = "keyName", target = "keyName")
     })
     ParamsByOrg toPersistence(Parameter parameter);
 

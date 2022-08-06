@@ -5,6 +5,8 @@ import com.reeco.core.dmp.core.model.*;
 import com.reeco.core.dmp.core.repo.*;
 import com.reeco.core.dmp.core.until.ApiResponse;
 import com.reeco.core.dmp.core.until.Comparison;
+import com.reeco.core.dmp.core.until.NumericAggregate;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,17 +19,15 @@ import java.io.*;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
+@Slf4j
 public class DataService {
 
     @Autowired
     NumericalTsByOrgRepository numericalTsByOrgRepository;
-
 
     @Autowired
     ParamsByOrgRepository paramsByOrgRepository;
@@ -48,7 +48,7 @@ public class DataService {
     IndicatorInfoRepository indicatorInfoRepository;
 
 
-    public ResponseMessage recieveDataCsv(MultipartFile file, Long orgId, Long stationId, List<ParameterDto> parameterDtoList) throws Exception{
+    public ResponseMessage receiveDataCsv(MultipartFile file, Long orgId, Long stationId, List<ParameterDto> parameterDtoList) throws Exception{
             byte[] bytes = file.getBytes();
 
             ByteArrayInputStream inputFilestream = new ByteArrayInputStream(bytes);
@@ -169,8 +169,6 @@ public class DataService {
                                 }
                                 categoricalTsByOrgs.add(categoricalTsByOrg);
                             }
-
-
                     }
                 }
             }
@@ -228,9 +226,6 @@ public class DataService {
             categoricalTsByOrgRepository.saveAll(categoricalTsByOrgs);
             numericalStatByOrgRepository.saveAll(numericalStatByOrgs);
             categoricalStatByOrgRepository.saveAll(categoricalStatByOrgs);
-//                numHasSet
-//            cateHasSet
-//        numericalStatByOrgs
 
 //            TimeUnit.SECONDS.sleep(5);
             return new ResponseMessage("Import data successful!");
@@ -245,30 +240,161 @@ public class DataService {
         List<List<String>> csvBody = new ArrayList<>();
         ByteArrayInputStream byteArrayOutputStream = null;
         String encodedString = "";
-        csvBody.add(Arrays.asList("Time event", "Value", "Param", "Indicator", "Unit", "Lat","Lon"));
+        List<String> rowLabel = new ArrayList<>();
+        rowLabel.add("Time event");
+
+        HashMap<String, List<String>> response = new HashMap<>();
+        int idx = 0;
+
+
+        Resolution resolution = Resolution.valueOf(chartDto.getResolution());
+        List<ParameterDataDto> parameterDataDtos = new ArrayList<>();
+
         for (ParameterDto parameterDto : chartDto.getParameterDtos()) {
-            ParamsByOrg paramsByOrg = paramsByOrgRepository.findByPartitionKeyOrganizationIdAndPartitionKeyParamId(parameterDto.getOrganizationId(), parameterDto.getParameterId())
+            ParamsByOrg paramsByOrg = paramsByOrgRepository
+                    .findByPartitionKeyOrganizationIdAndPartitionKeyParamId(parameterDto.getOrganizationId(), parameterDto.getParameterId())
                     .orElseThrow(() -> new Exception("Invalid Parameter!"));
-            Indicator indicator = indicatorInfoRepository.findByPartitionKeyIndicatorId(paramsByOrg.getIndicatorId()).orElseThrow(() -> new Exception("Invalid Indicator"));
+            Indicator indicator = indicatorInfoRepository
+                    .findByPartitionKeyIndicatorId(paramsByOrg.getIndicatorId())
+                    .orElseThrow(() -> new Exception("Invalid Indicator"));
+
+            String standardUnit = indicator.getStandardUnit();
+            String paramName = paramsByOrg.getParamName();
+
+            // Aggregate
+            ParameterDataDto parameterDataDto = new ParameterDataDto();
+            parameterDataDto.setParameterDto(parameterDto);
+            List<DataPointDto> dataPointDtos = new ArrayList<>();
+
             if(chartDto.getStartTime().isBefore(chartDto.getEndTime())){
-                List<NumericalTsByOrg> numericalTsByOrgs = numericalTsByOrgRepository.findDataDetail(Timestamp.valueOf(chartDto.getStartTime()),
-                        Timestamp.valueOf(chartDto.getEndTime()), parameterDto.getOrganizationId(), parameterDto.getParameterId());
-                for (NumericalTsByOrg numericalTsByOrg: numericalTsByOrgs){
-                    List<String> rowData = new ArrayList<>();
-                    rowData.add(numericalTsByOrg.getPartitionKey().getEventTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-                    rowData.add(numericalTsByOrg.getValue().toString());
-                    rowData.add(paramsByOrg.getParamName());
-                    rowData.add(indicator.getIndicatorName());
-                    rowData.add(indicator.getStandardUnit());
-                    rowData.add((numericalTsByOrg.getLat()!= null)? numericalTsByOrg.getLat().toString() : null);
-                    rowData.add((numericalTsByOrg.getLon()!= null)? numericalTsByOrg.getLon().toString() : null);
-                    csvBody.add(rowData);
+                List<NumericalTsByOrg> numericalTsByOrgs = numericalTsByOrgRepository.findDataDetail(
+                        Timestamp.valueOf(chartDto.getStartTime()),
+                        Timestamp.valueOf(chartDto.getEndTime()),
+                        parameterDto.getOrganizationId(),
+                        parameterDto.getParameterId()
+                );
+
+                List<Alarm> alarms = new ArrayList<>();
+
+                if (resolution.equals(Resolution.DEFAULT)) {
+                    rowLabel.add(standardUnit == null ? paramName : paramName + "(" + standardUnit + ")");
+                    for (NumericalTsByOrg numericalTsByOrg : numericalTsByOrgs) {
+                        List<String> data = new ArrayList<>();
+                        String key = numericalTsByOrg.getPartitionKey()
+                                .getEventTime()
+                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+                        String numericalValue = numericalTsByOrg.getValue() != null ? numericalTsByOrg.getValue().toString() : "";
+                        if (idx > 0) {
+                            if (response.containsKey(key)) {
+                                for (int i = response.get(key).size(); i <= idx; i++) {
+                                    response.get(key).add(i == idx ? numericalValue : "");
+                                }
+                            } else {
+                                for (int i = 0; i <= idx; i++) {
+                                    data.add(i == idx ? numericalValue : "");
+                                }
+                                response.put(key, data);
+                            }
+                        } else {
+                            data.add(numericalValue);
+                            response.put(key, data);
+                        }
+                    }
                 }
+                // Aggregate
+                else if (resolution.equals(Resolution.MIN_30) || resolution.equals(Resolution.HOUR_1) ||
+                        resolution.equals(Resolution.HOUR_2) || resolution.equals(Resolution.HOUR_4) ||
+                        resolution.equals(Resolution.HOUR_8)) {
 
+                    rowLabel.add(paramName);
+                    if(numericalTsByOrgs.size()>0) {
+                        dataPointDtos = NumericAggregate.calculateNumericData(numericalTsByOrgs, resolution, alarms, AggregateMethod.valueOf(chartDto.getAggregate()));
+                    }
+                } else {
+                    List<NumericalStatByOrg> numericalStatByOrgs = numericalStatByOrgRepository.findNumericDataDate(
+                            parameterDto.getOrganizationId(),
+                            parameterDto.getParameterId(),
+                            chartDto.getStartTime().toLocalDate(),
+                            chartDto.getEndTime().toLocalDate()
+                    );
 
+                    rowLabel.add(paramName);
+                    if(numericalStatByOrgs.size()>0) {
+                        dataPointDtos = NumericAggregate.calculateNumericDataDate(numericalStatByOrgs, resolution, chartDto.getStartTime().toLocalDate(), alarms, AggregateMethod.valueOf(chartDto.getAggregate()));
+                    }
+                }
             }
+            // Aggregate
+            parameterDataDto.setDataPointDtos(dataPointDtos);
+            parameterDataDtos.add(parameterDataDto);
 
+            idx += 1;
         }
+
+        if (resolution.equals(Resolution.DEFAULT)) {
+            for (Map.Entry<String, List<String>> entry: response.entrySet()){
+                List<String> rowData = new ArrayList<>();
+                rowData.add(entry.getKey());
+                rowData.addAll(entry.getValue());
+                csvBody.add(rowData);
+            }
+            csvBody.sort((o1, o2) -> {
+                // 0 is datetime column
+                if (o1.get(0) == null || o2.get(0) == null)
+                    return 0;
+                return o1.get(0).compareTo(o2.get(0));
+            });
+        } else {
+            List<DataPointDto> list = parameterDataDtos.get(0).getDataPointDtos();
+            for (int i = 0; i < list.size(); i++) {
+                List<String> rowData = new ArrayList<>();
+                rowData.add(String.valueOf(Timestamp.valueOf(list.get(i).getEventTime())));
+                for (ParameterDataDto parameterDataDto : parameterDataDtos) {
+                    DataPointDto dataPointDto = parameterDataDto.getDataPointDtos().get(i);
+                    switch (AggregateMethod.valueOf(chartDto.getAggregate())) {
+                        case INTERPOLATED:
+                            rowData.add(dataPointDto.getInterpolated());
+                            break;
+                        case MAX:
+                            rowData.add(dataPointDto.getMax());
+                            break;
+                        case MIN:
+                            rowData.add(dataPointDto.getMin());
+                            break;
+                        case MEAN:
+                            rowData.add(dataPointDto.getMean());
+                            break;
+                        case MEDIAN:
+                            rowData.add(dataPointDto.getMedian());
+                            break;
+                        case COUNT:
+                            rowData.add(String.valueOf(dataPointDto.getCount()));
+                            break;
+                        case SUM:
+                            rowData.add(dataPointDto.getSum());
+                            break;
+                        case RANGE:
+                            rowData.add(dataPointDto.getRange());
+                            break;
+                        case START:
+                            rowData.add(dataPointDto.getStart());
+                            break;
+                        case END:
+                            rowData.add(dataPointDto.getEnd());
+                            break;
+                        case DELTA:
+                            rowData.add(dataPointDto.getDelta());
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                csvBody.add(rowData);
+            }
+        }
+
+        csvBody.add(0, rowLabel);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CSVPrinter csvPrinter = new CSVPrinter(
@@ -286,7 +412,6 @@ public class DataService {
         InputStreamResource template = new InputStreamResource(byteArrayOutputStream);
         encodedString = Base64.getEncoder().encodeToString(template.getInputStream().readAllBytes());
         return encodedString;
-
     }
 
     public ApiResponse getLatestDataConnection(Long orgId, List<Long> connectionIds) throws Exception{
@@ -336,7 +461,4 @@ public class DataService {
         apiResponse.setMessage("Successful!");
         return apiResponse;
     }
-
-
-
 }

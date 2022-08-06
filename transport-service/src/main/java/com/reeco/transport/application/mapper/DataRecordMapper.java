@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 public interface DataRecordMapper {
     @Mappings({
             @Mapping(source = "data.deviceId", target = "connectionId"),
-            @Mapping(source = "data.key", target = "paramName"),
+            @Mapping(source = "attribute.englishName", target = "paramName"),
             @Mapping(source = "data.value", target = "value"),
             @Mapping(source = "data.timeStamp", target = "eventTime", qualifiedBy = FormatLocalDateTime.class),
             @Mapping(source = "data.receivedAt", target = "receivedAt", qualifiedBy = FormatLocalDateTime.class),

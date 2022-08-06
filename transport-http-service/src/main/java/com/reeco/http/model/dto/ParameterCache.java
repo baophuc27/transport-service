@@ -24,6 +24,10 @@ public class ParameterCache {
 
     private Long indicatorId;
 
+    private String token;
+
+    private String paramKey;
+
 
     public ParameterCache(ParamsByOrg paramsByOrg){
         this.paramId = paramsByOrg.getPartitionKey().getParamId();
@@ -33,5 +37,6 @@ public class ParameterCache {
         this.stationId = paramsByOrg.getStationId();
         this.workspaceId = paramsByOrg.getStationId();
         this.indicatorId = paramsByOrg.getIndicatorId();
+        this.paramKey = paramsByOrg.getKeyName();
     }
 }

@@ -11,4 +11,9 @@ public class InMemoryConfigurationAdapter implements StoreConfigurationPort {
         ServiceConnection serviceConnection = ServiceConnection.getInstance();
         serviceConnection.insert(deviceConnection);
     }
+
+    public void saveDevice(DeviceConnection deviceConnection){
+        ServiceConnection serviceConnection = ServiceConnection.getInstance();
+        serviceConnection.insert(deviceConnection);
+    }
 }

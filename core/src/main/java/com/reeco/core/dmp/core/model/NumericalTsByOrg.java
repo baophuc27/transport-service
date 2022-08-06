@@ -88,7 +88,7 @@ public class NumericalTsByOrg {
                 "partitionKey=" + partitionKey.toString() +
                 ", indicatorName='" + indicatorName + '\'' +
                 ", paramName='" + paramName + '\'' +
-                ",date=" + date.toString() +
+                ", date=" + date.toString() +
                 ", stationId=" + stationId +
                 ", connectionId=" + connectionId +
                 ", value=" + value +
