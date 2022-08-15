@@ -166,8 +166,8 @@ public class NumericAggregate {
             for (NumericalStatByOrg numericalStatByOrg: entry.getValue()){
                 if(numericalStatByOrg.getMax() > max) max = numericalStatByOrg.getMax();
                 if(numericalStatByOrg.getMin() <= min) min =numericalStatByOrg.getMin();
-                sum += numericalStatByOrg.getMean();
-                count += 1;
+                sum += numericalStatByOrg.getAcc();
+                count += numericalStatByOrg.getCount();
             }
             Double mean = sum / count;
             Double median = Comparison.median(entry.getValue().stream().map(NumericalStatByOrg::getMedian)
