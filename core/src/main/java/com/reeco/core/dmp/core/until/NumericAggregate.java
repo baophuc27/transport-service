@@ -92,7 +92,7 @@ public class NumericAggregate {
 
 
             dataPointDto.setEventTime((LocalDateTime)entry.getKey());
-//            dataPointDto.setValue(mean.toString());
+            dataPointDto.setValue(mean.toString());
 //            dataPointDto.setLat(entry.getValue().get(0).getLat());
 //            dataPointDto.setLon(entry.getValue().get(0).getLon());
             for (Alarm alarm: alarms){
