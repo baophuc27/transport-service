@@ -23,7 +23,8 @@ public interface AttributeMapper {
             @Mapping(source = "stationId", target = "stationId"),
             @Mapping(source = "organizationId", target = "organizationId"),
             @Mapping(source = "workspaceId",target = "workspaceId"),
-            @Mapping(source = "indicatorId", target = "indicatorId")
+            @Mapping(source = "indicatorId", target = "indicatorId"),
+            @Mapping(source = "sourceParamName", target = "sourceParamName"),
     })
     AttributeEntity messageToAttributeEntity(UpsertAttributeMessage upsertAttributeMessage);
 

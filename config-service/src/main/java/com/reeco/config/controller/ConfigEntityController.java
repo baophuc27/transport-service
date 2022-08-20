@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reeco.common.model.dto.*;
 import com.reeco.common.model.enumtype.ActionType;
+import com.reeco.common.model.enumtype.CustomIdType;
 import com.reeco.common.model.enumtype.EntityType;
 import com.reeco.common.model.enumtype.Protocol;
 import com.reeco.common.utils.AES;
@@ -159,6 +160,94 @@ class ConfigEntityController {
             responseWriter.setResult(new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST));
         }
         return responseWriter;
+    }
+
+    @PostMapping("config/customid")
+    private DeferredResult<ResponseEntity<String>> createCustomId(
+            @RequestBody CustomId customIdPayload
+    ){
+        log.info("Custom ID create payload: {}", customIdPayload);
+        DeferredResult<ResponseEntity<String>> responseWriter = new DeferredResult<>();
+        LocalDateTime currentTimestamp = LocalDateTime.now();
+        String customIdType = customIdPayload.getCustomIdType().name().toLowerCase();
+        log.debug(customIdPayload.getCustomIdType().name().toLowerCase());
+        try{
+            if (!CustomIdType.CONNECTION.name().toLowerCase().equals(customIdType)
+                && !CustomIdType.WORKSPACE.name().toLowerCase().equals(customIdType)
+                && !CustomIdType.PARAMETER.name().toLowerCase().equals(customIdType)
+                && !CustomIdType.ORGANIZATION.name().toLowerCase().equals(customIdType)
+                && !CustomIdType.STATION.name().toLowerCase().equals(customIdType)){
+                String message = "Unsupported custom Id type for " + customIdPayload.getCustomIdType();
+                responseWriter.setResult(new ResponseEntity<>(message, HttpStatus.BAD_REQUEST));
+                log.error(message);
+                return responseWriter;
+            }
+
+//            if (!CustomIdType.)
+            ReecoRequestParamValidator<CustomId> validator = new ReecoRequestParamValidator<>();
+            responseWriter = validator.getResponseMessage(customIdPayload);
+
+            if (responseWriter.getResult() != null){
+                return responseWriter;
+            }
+
+            ProducerRecord<String, byte[]> msg = new ProducerRecord<>(TOPIC_NAME, customIdPayload.getOriginalId().toString(),
+                    objectMapper.writeValueAsString(customIdPayload).getBytes());
+            msg.headers()
+                    .add("customIdType",customIdPayload.getCustomIdType().name().getBytes())
+                    .add("actionType", ActionType.UPSERT.name().getBytes())
+                    .add("entityType", EntityType.CUSTOMID.name().getBytes());
+
+            producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
+        } catch (IllegalArgumentException | JsonProcessingException ex){
+            ex.printStackTrace();
+            responseWriter.setResult(new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST));
+        }
+
+        return responseWriter;
+    }
+
+    @DeleteMapping("config/customid/{customIdType}/{id}")
+    private DeferredResult<ResponseEntity<String>> deleteCustomId(
+            @PathVariable(value = "customIdType") String idType,
+            @PathVariable(value = "id") Integer originalId
+    ){
+        DeferredResult<ResponseEntity<String>> responseWriter = new DeferredResult<>();
+        String customIdType = idType.toUpperCase();
+        log.info("Delete custom id: {} in {}", originalId,customIdType);
+
+
+        try{
+            if (!CustomIdType.CONNECTION.name().toUpperCase().equals(customIdType)
+                    && !CustomIdType.WORKSPACE.name().toUpperCase().equals(customIdType)
+                    && !CustomIdType.PARAMETER.name().toUpperCase().equals(customIdType)
+                    && !CustomIdType.ORGANIZATION.name().toUpperCase().equals(customIdType)
+                    && !CustomIdType.STATION.name().toUpperCase().equals(customIdType)){
+                String message = "Unsupported custom Id type for " + customIdType;
+                responseWriter.setResult(new ResponseEntity<>(message, HttpStatus.BAD_REQUEST));
+                log.error(message);
+                return responseWriter;
+            }
+            CustomId customIdPayload = new CustomId();
+            customIdPayload.setOriginalId(String.valueOf(originalId));
+            customIdPayload.setCustomIdType(CustomIdType.valueOf(customIdType));
+
+            ProducerRecord<String, byte[]> msg = new ProducerRecord<>(TOPIC_NAME, String.valueOf(originalId),
+                    objectMapper.writeValueAsString(customIdPayload).getBytes());
+            msg.headers()
+                    .add("actionType", ActionType.DELETE.name().getBytes())
+                    .add("entityType", EntityType.CUSTOMID.name().getBytes());
+            producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
+
+//
+        } catch (IllegalArgumentException | JsonProcessingException ex){
+            ex.printStackTrace();
+            responseWriter.setResult(new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST));
+        }
+
+        return responseWriter;
+
+
     }
 
     @DeleteMapping("config/connection/{protocol}/{orgId}/{id}")

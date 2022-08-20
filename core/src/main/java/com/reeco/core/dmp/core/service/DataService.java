@@ -29,7 +29,6 @@ public class DataService {
     @Autowired
     NumericalTsByOrgRepository numericalTsByOrgRepository;
 
-
     @Autowired
     ParamsByOrgRepository paramsByOrgRepository;
 
@@ -247,7 +246,7 @@ public class DataService {
         HashMap<String, List<String>> response = new HashMap<>();
         int idx = 0;
 
-        // Aggregate
+
         Resolution resolution = Resolution.valueOf(chartDto.getResolution());
         List<ParameterDataDto> parameterDataDtos = new ArrayList<>();
 

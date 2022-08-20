@@ -55,6 +55,7 @@ public class AlarmManagementService implements AlarmManagementUsecase {
         if (device != null){
             String message = "AUTHENTICATION FAILED";
             AlarmMessage alarmMessage = mapper.fromDeviceEntity(device,message,eventTime);
+            log.info("[ALARM] Send message: ");
             sendAlarmPort.send(alarmMessage);
         }
 

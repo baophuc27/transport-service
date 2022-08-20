@@ -21,7 +21,6 @@ public class AttributeAdapter implements SaveAttributePort {
     @Override
     public void save(UpsertAttributeMessage message) {
         AttributeEntity  attributeEntity = attributeMapper.messageToAttributeEntity(message);
-        log.info("Entity : {}",attributeEntity.toString());
         try{
             attributeRepository.save(attributeEntity);
         }

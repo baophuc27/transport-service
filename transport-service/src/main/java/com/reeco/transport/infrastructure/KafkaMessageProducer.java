@@ -29,7 +29,7 @@ public class KafkaMessageProducer {
     @Value(value = "${spring.kafka.topic.response.name}")
     private String sendResponseTopicName;
 
-    @Value(value = "reeco_connection_noti_event")
+    @Value(value = "reeco_connection_noti_event_test")
     private String sendAlarmTopicName;
 
 

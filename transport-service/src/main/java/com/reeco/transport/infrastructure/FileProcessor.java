@@ -13,14 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Scheduled;
+
+import java.util.*;
 import java.util.regex.*;
 import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Scanner;
 
 @Infrastructure
 @RequiredArgsConstructor
@@ -111,9 +112,13 @@ public class FileProcessor {
                         log.info(String.valueOf(watchedDir));
                         String fileName = event.context().toString();
                         if (String.valueOf(watchedDir).equals(ALARM_LOGS_DIRECTORY)){
+                            log.info("Passing logs");
                             readLogsFile(fileName);
-                        } else {
-                            readDataFile(fileName, watchedDir);
+                        }
+                        else{
+                            log.info("Passing data");
+                            readDataFile(fileName,watchedDir);
+
                         }
                     }
                 }
@@ -258,57 +263,57 @@ public class FileProcessor {
     }
 
     private void readFile2(String filePath, int deviceId) {
-            try{
-                File file = new File(filePath);
-                file.setReadable(true);
-                Scanner scanner = new Scanner(file);
-                LocalDateTime timeStamp = LocalDateTime.MIN;
+        try{
+            File file = new File(filePath);
+            file.setReadable(true);
+            Scanner scanner = new Scanner(file);
+            LocalDateTime timeStamp = LocalDateTime.MIN;
 
-                scanner.useDelimiter(",");
-                Thread.sleep(2000);
-                Double lat = 0.;
-                Double lon = 0.;
-                while(scanner.hasNext()) {
-                    String record = scanner.next();
-                    String[] splitRecord = record.split(":");
-                    if (splitRecord.length == 2) {
-                        String key = splitRecord[0];
-                        if (key.strip().equals("Lat")) {
-                            lat = Double.valueOf(splitRecord[1]);
-                        }
-                        if (key.strip().equals("Long")) {
-                            lon = Double.valueOf(splitRecord[1]);
-                        }
+            scanner.useDelimiter(",");
+            Thread.sleep(2000);
+            Double lat = 0.;
+            Double lon = 0.;
+            while(scanner.hasNext()) {
+                String record = scanner.next();
+                String[] splitRecord = record.split(":");
+                if (splitRecord.length == 2) {
+                    String key = splitRecord[0];
+                    if (key.strip().equals("Lat")) {
+                        lat = Double.valueOf(splitRecord[1]);
+                    }
+                    if (key.strip().equals("Long")) {
+                        lon = Double.valueOf(splitRecord[1]);
                     }
                 }
-                scanner.close();
+            }
+            scanner.close();
 
-                Scanner scanner2 = new Scanner(file);
-                scanner2.useDelimiter(",");
-                Thread.sleep(2000);
+            Scanner scanner2 = new Scanner(file);
+            scanner2.useDelimiter(",");
+            Thread.sleep(2000);
 
-                while(scanner2.hasNext()){
-                    String record = scanner2.next();
-                    String[] splitRecord = record.split(":");
-                    if (splitRecord.length == 1){
-                        timeStamp = getTimeStamp(splitRecord[0]);
-                    }
-                    if (splitRecord.length == 2){
-                        String key = splitRecord[0];
-                        String[] valueRecord = splitRecord[1].split(" ");
-                        if (valueRecord.length == 2){
-                            Double value = Double.valueOf(valueRecord[0]);
-                            DataRecord dataRecord = new DataRecord(timeStamp,key,value,deviceId,LocalDateTime.now().withNano(0),lat,lon);
-                            log.info("Template 2 record: {}",dataRecord.toString());
-                            dataManagementUseCase.receiveData(dataRecord);
-                        }
+            while(scanner2.hasNext()){
+                String record = scanner2.next();
+                String[] splitRecord = record.split(":");
+                if (splitRecord.length == 1){
+                    timeStamp = getTimeStamp(splitRecord[0]);
+                }
+                if (splitRecord.length == 2){
+                    String key = splitRecord[0];
+                    String[] valueRecord = splitRecord[1].split(" ");
+                    if (valueRecord.length == 2){
+                        Double value = Double.valueOf(valueRecord[0]);
+                        DataRecord dataRecord = new DataRecord(timeStamp,key,value,deviceId,LocalDateTime.now().withNano(0),lat,lon);
+                        log.info("Template 2 record: {}",dataRecord.toString());
+                        dataManagementUseCase.receiveData(dataRecord);
                     }
                 }
-                scanner2.close();
             }
-            catch (InterruptedException | RuntimeException | IOException exception){
-                log.warn("Got an exception when reading file {} :{}", filePath,exception.getMessage());
-            }
+            scanner2.close();
+        }
+        catch (InterruptedException | RuntimeException | IOException exception){
+            log.warn("Got an exception when reading file {} :{}", filePath,exception.getMessage());
+        }
     }
 
     private void readFile1(String filePath, int deviceId) {
@@ -380,6 +385,42 @@ public class FileProcessor {
         }
         catch (InterruptedException | RuntimeException | IOException exception){
             log.warn("Got an exception when reading file {} :{}", filePath,exception.getMessage());
+        }
+    }
+
+    @Scheduled(cron = "0 0 0 */3 * *")
+    private void scheduledClean() {
+        List<Integer> registered_devices = postgresDeviceRepository.getRegisteredDevices();
+        for (Integer device_id : registered_devices) {
+            File dataFolder = new File(FILE_DIRECTORY + device_id);
+            try {
+                if (dataFolder.isDirectory()) {
+                    File[] files = dataFolder.listFiles();
+                    if (files != null && files.length > 0) {
+                        log.info("Start cleaning FTP data folder " + dataFolder);
+                        DeviceEntity device = postgresDeviceRepository.findDeviceById(device_id);
+                        List<String> deletedFile = new ArrayList<>();
+
+                        long maximumTimeoutDate = System.currentTimeMillis() - device.getMaximumTimeout() * 86400000L;
+                        Arrays.stream(files)
+                                .filter(file -> (file.lastModified() < maximumTimeoutDate))
+                                .forEach(file -> {
+                                    if (file.delete()) deletedFile.add(file.getName());
+                                });
+
+                        int maximumAttachment = device.getMaximumAttachment();
+                        while (files.length > maximumAttachment) {
+                            File oldestFile = Arrays.stream(files).min(Comparator.comparing(File::lastModified)).get();
+                            if (oldestFile.delete()) deletedFile.add(oldestFile.getName());
+                            files = dataFolder.listFiles();
+                        }
+                        log.info("Deleted total " + deletedFile.size() + " files: " + deletedFile);
+                    }
+                }
+            }
+            catch (RuntimeException exception) {
+                log.warn("Got an exception when cleaning folder {} :{}", dataFolder, exception.getMessage());
+            }
         }
     }
 

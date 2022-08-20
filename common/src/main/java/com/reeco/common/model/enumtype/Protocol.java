@@ -1,5 +1,5 @@
 package com.reeco.common.model.enumtype;
 
 public enum Protocol {
-    FTP, FTPS, TCP , HTTP
+    FTP, FTPS, TCP , HTTP, DATA_SHARING
 }

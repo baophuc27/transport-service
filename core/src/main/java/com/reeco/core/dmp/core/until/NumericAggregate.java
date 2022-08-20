@@ -92,7 +92,7 @@ public class NumericAggregate {
 
 
             dataPointDto.setEventTime((LocalDateTime)entry.getKey());
-//            dataPointDto.setValue(mean.toString());
+            dataPointDto.setValue(mean.toString());
 //            dataPointDto.setLat(entry.getValue().get(0).getLat());
 //            dataPointDto.setLon(entry.getValue().get(0).getLon());
             for (Alarm alarm: alarms){
@@ -166,8 +166,8 @@ public class NumericAggregate {
             for (NumericalStatByOrg numericalStatByOrg: entry.getValue()){
                 if(numericalStatByOrg.getMax() > max) max = numericalStatByOrg.getMax();
                 if(numericalStatByOrg.getMin() <= min) min =numericalStatByOrg.getMin();
-                sum += numericalStatByOrg.getMean();
-                count += 1;
+                sum += numericalStatByOrg.getAcc();
+                count += numericalStatByOrg.getCount();
             }
             Double mean = sum / count;
             Double median = Comparison.median(entry.getValue().stream().map(NumericalStatByOrg::getMedian)

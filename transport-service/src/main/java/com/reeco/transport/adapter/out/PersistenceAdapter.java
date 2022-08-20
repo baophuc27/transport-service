@@ -49,4 +49,16 @@ public class PersistenceAdapter implements StoreConfigurationPort {
             throw new EventProcessingException(exception.getMessage());
         }
     }
+
+    public void saveDevice(DeviceConnection deviceConnection) throws EventProcessingException {
+        DeviceEntity deviceEntity = connectionMapper.domainToDeviceEntity(deviceConnection);
+        deviceEntity.setProtocolType("FTP");
+        try{
+            postgresDeviceRepository.save(deviceEntity);
+        }
+        catch (RuntimeException exception){
+            log.warn("Error when register new device");
+            throw new EventProcessingException(exception.getMessage());
+        }
+    }
 }

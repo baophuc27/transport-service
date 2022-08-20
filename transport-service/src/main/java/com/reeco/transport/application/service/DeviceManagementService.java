@@ -2,10 +2,13 @@ package com.reeco.transport.application.service;
 
 import com.reeco.transport.application.port.in.DeleteDevicePort;
 import com.reeco.transport.application.port.in.RegisterDevicePort;
+import com.reeco.transport.application.port.out.UpdateCustomIdPort;
 import com.reeco.transport.application.usecase.DeleteDeviceCommand;
 import com.reeco.transport.application.usecase.DeviceManagementUseCase;
 import com.reeco.transport.application.usecase.RegisterDeviceCommand;
 import com.reeco.transport.domain.DeviceConnection;
+import com.reeco.transport.infrastructure.model.DeleteCustomIdMessage;
+import com.reeco.transport.infrastructure.model.UpsertCustomIdMessage;
 import com.reeco.transport.utils.annotators.UseCase;
 import com.reeco.transport.utils.exception.EventProcessingException;
 import com.reeco.transport.application.mapper.ConnectionMapper;
@@ -33,11 +36,13 @@ public class DeviceManagementService implements DeviceManagementUseCase {
 
     private final SaveAttributePort saveAttributePort;
 
+    private final UpdateCustomIdPort updateCustomIdPort;
+
     @Autowired
     private ConnectionMapper connectionMapper;
 
     @Override
-    public void registerDevice(RegisterDeviceCommand command){
+    public void registerConnection(RegisterDeviceCommand command){
         DeviceConnection deviceConnection = connectionMapper.registerCommandToFTPDeviceConnection(command);
         try{
             storeConfigurationPort.save(deviceConnection);
@@ -49,7 +54,7 @@ public class DeviceManagementService implements DeviceManagementUseCase {
     }
 
     @Override
-    public void deleteDevice(DeleteDeviceCommand command){
+    public void deleteConnection(DeleteDeviceCommand command){
         deleteDevicePort.deleteDevice(command);
     }
 
@@ -63,5 +68,28 @@ public class DeviceManagementService implements DeviceManagementUseCase {
         saveAttributePort.delete(message);
     }
 
+    @Override
+    public void upsertCustomId(UpsertCustomIdMessage message) {
+        updateCustomIdPort.save(message);
+    }
 
+    @Override
+    public void deleteCustomId(DeleteCustomIdMessage message) {
+        updateCustomIdPort.delete(message);
+    }
+
+    public void registerDevice(RegisterDeviceCommand command){
+        DeviceConnection deviceConnection = connectionMapper.registerCommandToFTPDeviceConnection(command);
+        try{
+            storeConfigurationPort.saveDevice(deviceConnection);
+        }
+        catch (EventProcessingException exception){
+            log.warn("Error when saving configuration : {}",exception.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteDevice(DeleteDeviceCommand command){
+        deleteDevicePort.deleteDevice(command);
+    }
 }

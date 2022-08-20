@@ -49,6 +49,9 @@ public class AttributeEntity {
    @Column(name = "indicator_id")
     private int indicatorId;
 
+    @Column(name = "source_param_name")
+    private String sourceParamName;
+
     public int getId() {
         return id;
     }
@@ -163,6 +166,14 @@ public class AttributeEntity {
         this.paramId = paramId;
     }
 
+    public String getSourceParamName() {
+        return sourceParamName;
+    }
+
+    public void setSourceParamName(String sourceParamName) {
+        this.sourceParamName = sourceParamName;
+    }
+
     public AttributeEntity() {
     }
 
@@ -183,6 +194,7 @@ public class AttributeEntity {
                 ", stationId=" + stationId +
                 ", workspaceId=" + workspaceId +
                 ", indicatorId=" + indicatorId +
+                ", sourceParamName=" + sourceParamName +
                 '}';
     }
 }

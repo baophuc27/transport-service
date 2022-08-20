@@ -51,8 +51,9 @@ public class TransportConfiguration {
                                                     BeginReceivingDataPort beginReceivingDataPort,
                                                     StoreConfigurationPort storeConfigurationPort,
                                                     DeleteDevicePort deleteDevicePort,
-                                                    SaveAttributePort saveAttributePort){
-        return new DeviceManagementService(registerDevicePort,beginReceivingDataPort,storeConfigurationPort,deleteDevicePort,saveAttributePort);
+                                                    SaveAttributePort saveAttributePort,
+                                                    UpdateCustomIdPort updateCustomIdPort){
+        return new DeviceManagementService(registerDevicePort,beginReceivingDataPort,storeConfigurationPort,deleteDevicePort,saveAttributePort, updateCustomIdPort);
     }
 
     @Bean
@@ -94,6 +95,11 @@ public class TransportConfiguration {
     @Bean
     DeleteDevicePort deleteDevicePort(){
         return new DeleteDeviceAdapter();
+    }
+
+    @Bean
+    UpdateCustomIdPort updateCustomIdPort(){
+        return new CustomIdAdapter();
     }
 
     @Bean
