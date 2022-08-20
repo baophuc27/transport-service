@@ -81,7 +81,25 @@ public class StoreConfigService implements StoreConfigUseCase {
                     LocalDateTime.now().minusDays(2L)
             )).subscribe(v->log.info("Update Event Statistic Meta Info {}", v));
         }
+//      delete old alarm
+        List<AlarmInfo> alarmInfOLdo = alarmInfoRepository
+                .findByOrgAndParam(parameter.getOrganizationId(), parameter.getId())
+                .switchIfEmpty(Mono.defer(() -> {
+                    log.warn("Create param", parameter.toString());
+                    return Mono.empty();
+                }))
+                .collectList().block();
 
+        if (alarmInfOLdo != null) {
+            if (alarmInfOLdo.size() > 0) {
+                alarmInfoRepository.deleteAll(alarmInfOLdo).subscribe();
+                log.info("Deleted old alarms: {}", alarmInfOLdo.toString());
+                List<String> evictKeys = alarmInfOLdo.stream().map(v -> v.getPartitionKey().getAlarmId().toString()).collect(Collectors.toList());
+                ruleEngineCacheUseCase.evict(evictKeys);
+            }
+            alarmCacheUseCase.evict(parameter.getId().toString());
+            log.info("Evict Old Alarms From Cache: [{}]", parameter.getId().toString());
+        }
         List<Alarm> alarms = parameter
                 .getAlarms()
                 .stream()

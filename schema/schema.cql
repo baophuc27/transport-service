@@ -283,7 +283,7 @@ AND read_repair_chance = 0.0
 AND speculative_retry = '99.0PERCENTILE';
 
 
-alter table params_by_organization
+alter table reecotech.params_by_organization
     add key_name text;
 
 INSERT INTO reecotech.indicators (indicator_id, created_at, group_id, indicator_name, indicator_name_vi, standard_unit, updated_at, value_type) VALUES (111, '2021-10-22 18:07:33.000', 39, 'Maximum Water Temperature', 'Nhiệt Độ Nước Tối Cao', null, '2021-10-22 18:07:33.000', 'NUMBER');

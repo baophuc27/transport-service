@@ -24,7 +24,7 @@
 - Create .env file in the same root folder reco-dmp. That contain multiple env variables need to be configured:
 
 ```# cassandra config
-   CASSANDRA_KEYSPACE=reecotech
+   CASSANDRA_KEYSPACE=reecotec
    CASSANDRA_USER=yourpassword
    CASSANDRA_PASSWORD=yourpassword
    CASSANDRA_CONTACT_POINTS=localhost
