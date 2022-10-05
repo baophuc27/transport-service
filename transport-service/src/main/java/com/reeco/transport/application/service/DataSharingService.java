@@ -129,12 +129,11 @@ public class DataSharingService {
         } else {
             log.info("No directory!");
         }
-
         Integer deviceId = Math.toIntExact(detailSharingDataDTO.getConnectionId());
 
         ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
         String finalFileName = fileName;
-        exec.schedule(() -> readSharingFile(finalFileName, deviceId), 15, TimeUnit.SECONDS);
+        exec.schedule(() -> readSharingFile(finalFileName, deviceId), 10, TimeUnit.SECONDS);
     }
 
     private void readSharingFile(String fileName, Integer deviceId) {
@@ -151,14 +150,16 @@ public class DataSharingService {
                         String requestTitle = scanner.next();
                         break;
                     case 1:
+                        // Unused headers
+                        scanner.next();
                         break;
                     case 2:
                         String[] request = scanner.next().split(",");
-                        String requestId =String.valueOf(request[0]);
+                        String requestId = String.valueOf(request[0]);
                         String userId = String.valueOf(request[1]);
                         String userName = request[2];
+                        break;
                     case 3:
-                        // Unused headers
                         columnName = scanner.next().split(",");
                         break;
                     default:

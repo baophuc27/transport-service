@@ -30,6 +30,15 @@ public class DataSharingConnection extends BaseConnection{
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DataSharingConnection)) return false;
+        if (!super.equals(o)) return false;
+        DataSharingConnection that = (DataSharingConnection) o;
+        return Objects.equals(getUpdatedAt(), that.getUpdatedAt());
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), getUpdatedAt());
     }
