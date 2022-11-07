@@ -5,6 +5,7 @@ import com.reeco.core.dmp.core.dto.*;
 import com.reeco.core.dmp.core.service.ChartService;
 import com.reeco.core.dmp.core.service.DataService;
 import com.reeco.core.dmp.core.until.ApiResponse;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +64,18 @@ public class DataController {
     public ResponseEntity<ApiResponse> getLatestDataConnection(@RequestParam Long orgId,@RequestParam List<Long> connectionIds) throws Exception{
         ApiResponse apiResponse = dataService.getLatestDataConnection(orgId,connectionIds);
         return new ResponseEntity<>(apiResponse, apiResponse.getStatus());
+    }
+
+    @GetMapping("/connection/history")
+    public ResponseEntity<ApiResponse> getConnectionHistory(@RequestParam Long orgId, @RequestParam Long connectionId,@RequestParam(required = false) String status, @RequestParam(required = false) Integer startIndex, @RequestParam(required = false) Integer endIndex, @RequestParam(required = false) Long startTime, @RequestParam(required = false) Long endTime, @RequestParam(required = false) Long alarmId) throws Exception{
+        ApiResponse apiResponse = dataService.getConnectionHistory(orgId,connectionId,status,startIndex,endIndex,startTime,endTime,alarmId);
+        return new ResponseEntity<>(apiResponse,apiResponse.getStatus());
+    }
+
+    @DeleteMapping("/connection/history")
+    public ResponseEntity<ApiResponse> deleteConnectionHistory(@RequestParam Long orgId, @RequestParam Long connectionId, @RequestParam(required = false) Long index){
+        ApiResponse apiResponse = dataService.deleteConnectionHistory(orgId,connectionId,index);
+        return new ResponseEntity<>(apiResponse,apiResponse.getStatus());
     }
 
     @PostMapping("/dataAlarm")

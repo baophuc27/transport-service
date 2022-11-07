@@ -24,9 +24,5 @@ public class DetailSharingDataDTO {
 
     ParamType parameterType;
 
-    String displayType;
-
-    String format;
-
     DetailSharingDataParamDTO[] params;
 }

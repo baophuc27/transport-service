@@ -19,6 +19,7 @@ import java.io.*;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -46,6 +47,10 @@ public class DataService {
 
     @Autowired
     IndicatorInfoRepository indicatorInfoRepository;
+
+    @Autowired
+    ConnectionAlarmInfoRepository connectionAlarmInfoRepository;
+
 
 
     public ResponseMessage receiveDataCsv(MultipartFile file, Long orgId, Long stationId, List<ParameterDto> parameterDtoList) throws Exception{
@@ -461,4 +466,99 @@ public class DataService {
         apiResponse.setMessage("Successful!");
         return apiResponse;
     }
+
+    public ApiResponse getConnectionHistory(Long orgId, Long connectionId, String status, Integer startIndex, Integer endIndex, Long startTime, Long endTime, Long aLarmId){
+//        if (!status.equals("CONNECTED") & status.equals("DISCONNECTED")){
+//            ApiResponse apiResponse = ApiResponse.getFailureResponse("Invalid status");
+//            return apiResponse;
+//        }
+
+        ApiResponse apiResponse = ApiResponse.getSuccessResponse();
+        List<ConnectionAlarmInfo> historyConnection = connectionAlarmInfoRepository.findHistoryByConnection(orgId,connectionId);
+
+        List<ConnectionHistory> result = new ArrayList<>();
+        Long index = 0L;
+        for (ConnectionAlarmInfo info: historyConnection){
+            Long timestamp = info.getAlarmTime().atZone(ZoneId.of("GMT+7")).toEpochSecond();
+            index += 1;
+
+            ConnectionHistory connectionHistory = new ConnectionHistory(
+                    info.getPartitionKey().getOrganizationId(),
+                    info.getPartitionKey().getConnectionId(),
+                    Math.toIntExact(index),
+                    timestamp,
+                    info.getAlarmType(),
+                    info.getConnectionProtocol().toString(),
+                    info.getDescription()
+            );
+
+            if (info.getDeleted()!= null && info.getDeleted() == true){
+                continue;
+            }
+
+            if (status != null && status.equals("CONNECTED")){
+                if (!info.getAlarmType().toString().equals("CONNECTED")){
+                    continue;
+                }
+            }
+
+            if (status != null && status.equals("DISCONNECTED")){
+                if (!info.getAlarmType().toString().equals("DISCONNECTED") & !info.getAlarmType().toString().equals("AUTHENTICATION_FAILED")){
+                    continue;
+                }
+            }
+
+            if (startIndex != null && startIndex > index){
+                continue;
+            }
+
+            if (endIndex != null && endIndex < index){
+                continue;
+            }
+
+            if (aLarmId != null && aLarmId != index){
+                continue;
+            }
+
+            if (startTime != null && startTime > timestamp)
+            {
+                continue;
+            }
+
+            if (endTime != null && endTime < timestamp){
+                continue;
+            }
+
+
+            result.add(connectionHistory);
+        }
+
+        apiResponse.setMessage("Successful!");
+        apiResponse.setData(result);
+        return apiResponse;
+    }
+    public ApiResponse deleteConnectionHistory(Long orgId, Long connectionId, Long index){
+
+        ApiResponse apiResponse = ApiResponse.getSuccessResponse();
+        List<ConnectionAlarmInfo> historyConnection = connectionAlarmInfoRepository.findHistoryByConnection(orgId,connectionId);
+
+        Long count = 0L;
+        if (index == null){
+            for (ConnectionAlarmInfo info : historyConnection){
+                info.setDeleted(true);
+                connectionAlarmInfoRepository.save(info);
+            }
+        } else {
+            for (ConnectionAlarmInfo info : historyConnection) {
+                count += 1;
+                if (count == index){
+                    info.setDeleted(true);
+                    connectionAlarmInfoRepository.save(info);
+                }
+            }
+        }
+        apiResponse.setMessage("Successful!");
+        return apiResponse;
+    }
+
 }

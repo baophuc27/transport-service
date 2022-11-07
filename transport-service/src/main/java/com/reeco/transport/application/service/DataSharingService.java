@@ -173,7 +173,7 @@ public class DataSharingService {
                             Double value = Double.valueOf(record[i]);
                             LocalDateTime receivedAt = LocalDateTime.now().withNano(0);
                             DataRecord dataRecord = new DataRecord(timeStamp,keyName,value,deviceId,receivedAt,lat,lon);
-                            dataManagementUseCase.receiveData(dataRecord);
+                            dataManagementUseCase.receiveData(dataRecord,false);
                         }
                         break;
                 }
@@ -190,8 +190,8 @@ public class DataSharingService {
         parameter.setWorkspaceId(detailSharingDataDTO.getWorkspaceId());
         parameter.setOrganizationId(detailSharingDataDTO.getOrganizationId());
         parameter.setStationId(detailSharingDataDTO.getStationId());
-        parameter.setDisplayType(detailSharingDataDTO.getDisplayType());
-        parameter.setFormat(detailSharingDataDTO.getFormat());
+        parameter.setDisplayType("Value");
+        parameter.setFormat("#.##");
         parameter.setAlarms(Collections.emptyList());
         for (DetailSharingDataParamDTO param : detailSharingDataDTO.getParams()) {
             parameter.setId(param.getParamId());

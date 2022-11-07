@@ -101,6 +101,111 @@ class ConfigEntityController {
         return responseWriter;
     }
 
+    @PostMapping("config/api/api-key")
+    private DeferredResult<ResponseEntity<String>> upsertAPIKey(
+            @RequestBody Map<String, Object> apiKeyPayload
+    ){
+
+        DeferredResult<ResponseEntity<String>> responseWriter = new DeferredResult<>();
+        log.info("Upsert API Key payload: {}", apiKeyPayload);
+        try{
+            APIKey apiKey = objectMapper.convertValue(apiKeyPayload, APIKey.class);
+
+            ProducerRecord<String, byte[]> msg = new ProducerRecord<>(TOPIC_NAME, "1",
+                    objectMapper.writeValueAsString(apiKeyPayload).getBytes()
+                    );
+            msg.headers()
+                    .add("actionType", ActionType.UPSERT.name().getBytes())
+                    .add("entityType", EntityType.APIKEY.name().getBytes());
+
+            producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
+
+        } catch (IllegalArgumentException | JsonProcessingException ex){
+            ex.printStackTrace();
+            responseWriter.setResult(new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST));
+        }
+        return responseWriter;
+
+    }
+
+    @PostMapping("config/api/mqtt-sender")
+    private DeferredResult<ResponseEntity<String>> upsertMQTTShare(
+            @RequestBody Map<String, Object> mqttPayload
+    ){
+
+        DeferredResult<ResponseEntity<String>> responseWriter = new DeferredResult<>();
+        log.info("Upsert MQTT Share payload: {}", mqttPayload);
+        try{
+            MQTTShare mqtt = objectMapper.convertValue(mqttPayload, MQTTShare.class);
+
+            ProducerRecord<String, byte[]> msg = new ProducerRecord<>(TOPIC_NAME, "1",
+                    objectMapper.writeValueAsString(mqtt).getBytes()
+            );
+            msg.headers()
+                    .add("actionType", ActionType.UPSERT.name().getBytes())
+                    .add("entityType", EntityType.MQTTSHARE.name().getBytes());
+
+            producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
+
+        } catch (IllegalArgumentException | JsonProcessingException ex){
+            ex.printStackTrace();
+            responseWriter.setResult(new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST));
+        }
+        return responseWriter;
+
+    }
+
+    @DeleteMapping("config/api/mqtt-sender/{id}")
+    private DeferredResult<ResponseEntity<String>> deleteMqttShare(
+            @PathVariable(value = "id") String id
+    ){
+        DeferredResult<ResponseEntity<String>> responseWriter = new DeferredResult<>();
+
+        log.info("Delete MQTT Share: {}",id);
+        MQTTShare mqtt = new MQTTShare();
+        mqtt.setId(id);
+
+        try{
+            ProducerRecord<String, byte[]> msg = new ProducerRecord<>(TOPIC_NAME, "1", objectMapper.writeValueAsString(mqtt).getBytes());
+            msg.headers()
+                    .add("actionType",ActionType.DELETE.name().getBytes())
+                    .add("entityType",EntityType.MQTTSHARE.name().getBytes());
+            producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
+        }
+        catch (JsonProcessingException ex){
+//            ex.printStackTrace();
+            log.warn("Error when delete mqtt share {}",ex.getMessage());
+            responseWriter.setResult(new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST));
+        }
+
+        return responseWriter;
+    }
+    @DeleteMapping("config/api/api-key/{id}")
+    private DeferredResult<ResponseEntity<String>> deleteApiKey(
+            @PathVariable(value = "id") String id
+    ){
+        DeferredResult<ResponseEntity<String>> responseWriter = new DeferredResult<>();
+
+        log.info("Delete API Key: {}",id);
+        APIKey apiKey = new APIKey();
+        apiKey.setId(id);
+
+        try{
+            ProducerRecord<String, byte[]> msg = new ProducerRecord<>(TOPIC_NAME, "1", objectMapper.writeValueAsString(apiKey).getBytes());
+            msg.headers()
+                    .add("actionType",ActionType.DELETE.name().getBytes())
+                    .add("entityType",EntityType.APIKEY.name().getBytes());
+            producerTemplate.send(msg).addCallback(new HttpOkCallback(responseWriter));
+        }
+        catch (JsonProcessingException ex){
+//            ex.printStackTrace();
+            log.warn("Error when delete api key {}",ex.getMessage());
+            responseWriter.setResult(new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST));
+        }
+
+        return responseWriter;
+    }
+
     @PostMapping("config/connection/{protocol}")
     private DeferredResult<ResponseEntity<String>> createConnection(
             @PathVariable("protocol") String protocol,

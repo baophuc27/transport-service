@@ -6,6 +6,7 @@ import com.reeco.common.model.enumtype.ActionType;
 import com.reeco.common.model.enumtype.EntityType;
 import com.reeco.common.model.enumtype.Protocol;
 import com.reeco.ingestion.application.port.in.RuleEngineEvent;
+import com.reeco.ingestion.application.usecase.ManageAlarmMessageUseCase;
 import com.reeco.ingestion.application.usecase.RuleEngineUseCase;
 import com.reeco.ingestion.application.usecase.StoreConfigUseCase;
 import com.reeco.ingestion.application.usecase.StoreTsEventUseCase;
@@ -45,6 +46,8 @@ public class IncomingTsEventController {
 
     private final RuleEngineCacheUseCase ruleEngineCacheUseCase;
 
+    private final ManageAlarmMessageUseCase manageAlarmMessageUseCase;
+
     private static ObjectMapper objectMapper;
 
 
@@ -60,6 +63,12 @@ public class IncomingTsEventController {
             log.warn("Error when parsing message object: {}", e.getMessage());
             return null;
         }
+    }
+
+    @KafkaListener(topics = "reeco_connection_noti_event",containerFactory = "alarmMessageListener")
+    public void listen(@Payload AlarmMessage alarmMessage){
+        log.info(String.valueOf(alarmMessage));
+        manageAlarmMessageUseCase.storeAlarmMessage(alarmMessage);
     }
 
     @KafkaListener(topics = "reeco_time_series_event", containerFactory = "timeSeriesEventListener")

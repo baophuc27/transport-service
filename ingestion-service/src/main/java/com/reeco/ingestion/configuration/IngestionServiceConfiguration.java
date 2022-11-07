@@ -35,6 +35,10 @@ public class IngestionServiceConfiguration {
     }
 
     @Bean
+    ManageAlarmMessageUseCase manageAlarmMessageUseCase(){
+        return new ManageAlarmMessageService();
+    }
+    @Bean
     public CacheManager cacheManager() {
         String[] cacheNames = {
                 "alarm_cache", "indicator_cache", "alarm_rule_cache"

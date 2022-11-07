@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @Data
-public class SharingRequestDTO {
+public class    SharingRequestDTO {
     @NotNull
     Long userId;
 

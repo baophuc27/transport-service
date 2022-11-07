@@ -1,8 +1,10 @@
 package com.reeco.ingestion.configuration;
 
+import com.reeco.common.model.dto.AlarmMessage;
 import com.reeco.common.model.dto.IncomingTsEvent;
 import lombok.extern.log4j.Log4j2;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.serialization.BytesDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,6 +56,20 @@ public class KafkaConsumerConfiguration {
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
+    @Bean
+    public ConsumerFactory<String, AlarmMessage> alarmMessageConsumerFactory(){
+        List<String> bootstrapServers = new ArrayList<>(Collections.singletonList(bootstrapAddress));
+        Map<String,Object> props = new HashMap<>();
+
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, eventCg);
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, eventCgResetOffset);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, BytesDeserializer.class);
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, AlarmMessage.class);
+        return new DefaultKafkaConsumerFactory<>(props);
+    }
 
     @Bean
     public ConsumerFactory<String, String> configEventConsumerFactory(){
@@ -86,6 +102,17 @@ public class KafkaConsumerConfiguration {
         ConcurrentKafkaListenerContainerFactory<String, String> factory
                 = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(configEventConsumerFactory());
+        factory.setAckDiscarded(true);
+        factory.setErrorHandler(new SeekToCurrentErrorHandler());
+        return factory;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, AlarmMessage> alarmMessageListener()
+    {
+        ConcurrentKafkaListenerContainerFactory<String, AlarmMessage> factory
+                = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(alarmMessageConsumerFactory());
         factory.setAckDiscarded(true);
         factory.setErrorHandler(new SeekToCurrentErrorHandler());
         return factory;

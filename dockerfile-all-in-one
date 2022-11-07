@@ -2,18 +2,23 @@ FROM gradle:7.1.1-jdk11 AS build
 ARG VERSION
 COPY --chown=gradle:gradle . /home/gradle/src/
 WORKDIR /home/gradle/src
-RUN gradle :ingestion-service:build -Pversion=${VERSION} --no-daemon
-RUN gradle :config-service:build -Pversion=${VERSION} --no-daemon
-RUN gradle :core:build -Pversion=${VERSION} --no-daemon
+#RUN gradle :ingestion-service:build -Pversion=${VERSION} --no-daemon
+#RUN gradle :config-service:build -Pversion=${VERSION} --no-daemon
+#RUN gradle :core:build -Pversion=${VERSION} --no-daemon
 
 FROM openjdk:11
 ARG VERSION
 EXPOSE 8986
 EXPOSE 7001
 
-COPY --from=build /home/gradle/src/ingestion-service/build/libs/ingestion-service-${VERSION}.jar reeco-ingestion-service.jar
-COPY --from=build /home/gradle/src/config-service/build/libs/config-service-${VERSION}.jar reeco-config-service.jar
-COPY --from=build /home/gradle/src/core/build/libs/core-${VERSION}.jar reeco-core.jar
+#COPY --from=build /home/gradle/src/ingestion-service/build/libs/ingestion-service-${VERSION}.jar reeco-ingestion-service.jar
+#COPY --from=build /home/gradle/src/config-service/build/libs/config-service-${VERSION}.jar reeco-config-service.jar
+#COPY --from=build /home/gradle/src/core/build/libs/core-${VERSION}.jar reeco-core.jar
+
+ADD core/build/libs/core.jar reeco-core.jar
+ADD config-service/build/libs/config-service.jar reeco-config-service.jar
+ADD ingestion-service/build/libs/ingestion-service.jar reeco-ingestion-service.jar
+
 ADD start_reeco_services.sh .
 RUN chmod +x start_reeco_services.sh
 CMD ["bash", "start_reeco_services.sh"]

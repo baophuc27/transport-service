@@ -1,6 +1,6 @@
 package com.reeco.transport.application.mapper;
 
-import com.reeco.transport.infrastructure.model.AlarmMessage;
+import com.reeco.common.model.dto.AlarmMessage;
 import com.reeco.transport.infrastructure.persistence.postgresql.DeviceEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,11 +18,12 @@ public interface AlarmMapper {
             @Mapping(source = "device.id", target = "connectionId"),
             @Mapping(source = "device.stationId", target = "stationId"),
             @Mapping(source = "device.stationId", target = "organizationId"),
+            @Mapping(source = "ipAddress", target = "ipAddress"),
             @Mapping(source = "message", target = "message"),
             @Mapping(source = "eventTime", target = "lastEventTime"),
             @Mapping(expression = "java(getNowTime())", target = "sentAt")
     })
-    AlarmMessage fromDeviceEntity(DeviceEntity device, String message, String eventTime);
+    AlarmMessage fromDeviceEntity(DeviceEntity device, String message, String eventTime, String ipAddress);
 
     default String getNowTime(){
         LocalDateTime time = LocalDateTime.now();

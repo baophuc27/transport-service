@@ -162,6 +162,7 @@ public class DeviceEntity {
                 ", protocolType='" + protocolType + '\'' +
                 ", templateFormat=" + templateFormat +
                 ", active=" + active +
+                ", lastActive=" + lastActive +
                 '}';
     }
 }

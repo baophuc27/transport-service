@@ -45,9 +45,9 @@ public class UpsertAttributeMessage {
     @JsonProperty("indicatorId")
     int indicatorId;
 
-    @JsonProperty("sourceParamName")
-    String sourceParamName;
-    
+//    @JsonProperty("sourceParamName")
+//    String sourceParamName;
+//
     public String getEnglishName() {
         return englishName;
     }
@@ -153,13 +153,13 @@ public class UpsertAttributeMessage {
         this.indicatorId = indicatorId;
     }
 
-    public String getSourceParamName() {
-        return sourceParamName;
-    }
-
-    public void setSourceParamName(String sourceParamName) {
-        this.sourceParamName = sourceParamName;
-    }
+//    public String getSourceParamName() {
+//        return sourceParamName;
+//    }
+//
+//    public void setSourceParamName(String sourceParamName) {
+//        this.sourceParamName = sourceParamName;
+//    }
 
     @Override
     public String toString() {
@@ -177,7 +177,7 @@ public class UpsertAttributeMessage {
                 ", organizationId=" + organizationId +
                 ", workspaceId=" + workspaceId +
                 ", indicatorId=" + indicatorId +
-                ", sourceParamName=" + sourceParamName +
+//                ", sourceParamName=" + sourceParamName +
                 '}';
     }
 }

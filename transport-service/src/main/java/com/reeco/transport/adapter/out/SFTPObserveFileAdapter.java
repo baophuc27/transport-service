@@ -12,7 +12,7 @@ public class SFTPObserveFileAdapter implements BeginReceivingDataPort {
 
     @Override
     public void beginReceivingData(DeviceConnection deviceConnection){
-        String folderName = deviceConnection.getDeviceId();
+        String folderName = "/data/"+deviceConnection.getDeviceId();
         fileProcessor.createDirectory(folderName);
         if (deviceConnection.getActive()){
             fileProcessor.observe(folderName);

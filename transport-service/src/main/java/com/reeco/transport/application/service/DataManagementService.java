@@ -28,8 +28,10 @@ public class DataManagementService implements DataManagementUseCase {
         streamingDataPort.streamData(dataRecord);
     }
 
+
+
     @Override
-    public void receiveData(DataRecord dataRecord){
+    public void receiveData(DataRecord dataRecord,boolean isSyncData){
         transferData(dataRecord);
     }
 

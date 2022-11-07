@@ -149,6 +149,25 @@ public class FileProcessor {
         }
     }
 
+    private String getIPFromLog(String logLine){
+        String regex = "\\((.*@.*)\\)";
+        Pattern p = Pattern.compile(regex);
+
+        Matcher m = p.matcher(logLine);
+        String ip = "";
+        while (m.find()){
+            ip = m.group(1);
+        }
+        if (ip.equals("")){
+            return ip;
+        }
+        else {
+            String[] addressInfo = ip.split("@");
+            return addressInfo[1];
+        }
+
+
+    }
     private void authFailedAlarm(String filePath){
         log.info("auth failed ALARM");
         String regex = "\\[(.*?)\\]";
@@ -168,7 +187,9 @@ public class FileProcessor {
                 while (m.find()){
                     String userName = m.group(1);
                     if  (!userName.equals("WARNING")){
-                        alarmManagementUsecase.alarmAuthenticationFailed(userName,getNowTime());
+
+                        String ipAddress = getIPFromLog(record);
+                        alarmManagementUsecase.alarmAuthenticationFailed(userName,getNowTime(),ipAddress);
                     }
                 }
             }
@@ -180,33 +201,34 @@ public class FileProcessor {
     }
 
     private void logoutAlarm(String filePath){
-        log.info("Logout ALARM");
-        String regex = "\\((.*?)@";
-        Pattern p = Pattern.compile(regex);
-        try{
-            File file = new File(filePath);
-            file.setReadable(true);
-            Scanner scanner = new Scanner(file);
-
-            scanner.useDelimiter("\n");
-
-            Thread.sleep(2000);
-            while(scanner.hasNext()){
-                String record = scanner.next();
-                log.info(record);
-                Matcher m = p.matcher(record);
-                while (m.find()){
-                    String userName = m.group(1);
-                    if  (!userName.equals("WARNING")){
-                        alarmManagementUsecase.alarmDisconnected(userName,getNowTime());
-                    }
-                }
-            }
-            scanner.close();
-        }
-        catch (InterruptedException | RuntimeException | IOException exception){
-            log.warn("Got an exception when reading file {} :{}", filePath,exception.getMessage());
-        }
+        log.info("[ALARM] Deprecated Logout ALARM");
+//        String regex = "\\((.*?)@";
+//        Pattern p = Pattern.compile(regex);
+//        try{
+//            File file = new File(filePath);
+//            file.setReadable(true);
+//            Scanner scanner = new Scanner(file);
+//
+//            scanner.useDelimiter("\n");
+//
+//            Thread.sleep(2000);
+//            while(scanner.hasNext()){
+//                String record = scanner.next();
+//                log.info(record);
+//                Matcher m = p.matcher(record);
+//                while (m.find()){
+//                    String userName = m.group(1);
+//                    if  (!userName.equals("WARNING")){
+//                        String ipAddress = getIPFromLog(record);
+//                        alarmManagementUsecase.alarmDisconnected(userName,getNowTime(),ipAddress);
+//                    }
+//                }
+//            }
+//            scanner.close();
+//        }
+//        catch (InterruptedException | RuntimeException | IOException exception){
+//            log.warn("Got an exception when reading file {} :{}", filePath,exception.getMessage());
+//        }
     }
 
     private void connectAlarm(String filePath){
@@ -227,7 +249,8 @@ public class FileProcessor {
                 Matcher m = p.matcher(record);
                 while (m.find()){
                     String userName = m.group(1);
-                    alarmManagementUsecase.alarmConnected(userName,getNowTime());
+                    String ipAddress = getIPFromLog(record);
+                    alarmManagementUsecase.alarmConnected(userName,getNowTime(),ipAddress);
                 }
             }
             scanner.close();
@@ -305,7 +328,7 @@ public class FileProcessor {
                         Double value = Double.valueOf(valueRecord[0]);
                         DataRecord dataRecord = new DataRecord(timeStamp,key,value,deviceId,LocalDateTime.now().withNano(0),lat,lon);
                         log.info("Template 2 record: {}",dataRecord.toString());
-                        dataManagementUseCase.receiveData(dataRecord);
+                        dataManagementUseCase.receiveData(dataRecord,false);
                     }
                 }
             }
@@ -332,7 +355,7 @@ public class FileProcessor {
                 Double value = Double.valueOf(splitRecord[1]);
                 DataRecord dataRecord = new DataRecord(timestamp,key,value,deviceId,LocalDateTime.now().withNano(0),null,null);
                 log.info("Template 1 record: {}",dataRecord.toString());
-                dataManagementUseCase.receiveData(dataRecord);
+                dataManagementUseCase.receiveData(dataRecord,false);
             }
             scanner.close();
         }
@@ -379,7 +402,7 @@ public class FileProcessor {
                 Double value = Double.valueOf(splitRecord[1]);
                 DataRecord dataRecord = new DataRecord(timestamp,key,value,deviceId,LocalDateTime.now().withNano(0),null,null);
                 log.info("Template 3 record: {}",dataRecord.toString());
-                dataManagementUseCase.receiveData(dataRecord);
+                dataManagementUseCase.receiveData(dataRecord,false);
             }
             scanner.close();
         }
@@ -388,7 +411,7 @@ public class FileProcessor {
         }
     }
 
-    @Scheduled(cron = "0 0 0 */3 * *")
+//    @Scheduled(cron = "0 0 0 */3 * *")
     private void scheduledClean() {
         List<Integer> registered_devices = postgresDeviceRepository.getRegisteredDevices();
         for (Integer device_id : registered_devices) {
@@ -422,6 +445,22 @@ public class FileProcessor {
                 log.warn("Got an exception when cleaning folder {} :{}", dataFolder, exception.getMessage());
             }
         }
+    }
+
+    @Scheduled(fixedDelay = 60000)
+    private void scheduledLogoutAlarm(){
+        List<DeviceEntity> devices =  postgresDeviceRepository.getConnectedDevices();
+        for (DeviceEntity device: devices){
+            LocalDateTime now = LocalDateTime.now();
+            Integer timeout = device.getMaximumTimeout();
+            LocalDateTime activeRange = now.minusMinutes(timeout);
+
+            if (device.getLastActive().isBefore(activeRange)){
+                log.info("[ALARM] Detect logout alarm for device"+device.getId());
+                alarmManagementUsecase.alarmDisconnected(device);
+            }
+        }
+
     }
 
     private LocalDateTime getTimeStamp(String timeString){

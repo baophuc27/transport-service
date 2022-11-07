@@ -1,5 +1,5 @@
 package com.reeco.common.model.enumtype;
 
 public enum EntityType {
-    DASHBOARD, DEVICE, ALARM, CONNECTION, PARAM, CUSTOMID
+    DASHBOARD, DEVICE, ALARM, CONNECTION, PARAM, CUSTOMID, APIKEY, MQTTSHARE
 }

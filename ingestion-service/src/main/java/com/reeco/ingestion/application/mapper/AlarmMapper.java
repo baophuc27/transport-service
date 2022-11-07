@@ -1,7 +1,11 @@
 package com.reeco.ingestion.application.mapper;
 
 import com.reeco.common.model.dto.Alarm;
+import com.reeco.common.model.dto.AlarmMessage;
+import com.reeco.common.model.dto.Connection;
+import com.reeco.common.model.enumtype.Protocol;
 import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.AlarmInfo;
+import com.reeco.ingestion.infrastructure.persistence.cassandra.entity.ConnectionAlarmInfo;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -44,5 +48,22 @@ public interface AlarmMapper extends DomainEntityMapper<Alarm, AlarmInfo> {
             @Mapping(source = "frequenceType", target = "frequenceType")
     })
     AlarmInfo toPersistence(Alarm alarm);
+
+    @Mappings({
+            @Mapping(source = "alarmMessage.organizationId", target = "partitionKey.organizationId"),
+            @Mapping(source = "alarmMessage.connectionId", target = "partitionKey.connectionId"),
+            @Mapping(source = "alarmMessage.message",target = "alarmType"),
+            @Mapping(source = "protocol",target = "connectionProtocol"),
+            @Mapping(expression = "java(getNowTime())",target = "alarmTime"),
+            @Mapping(source = "description", target = "description")
+    })
+    ConnectionAlarmInfo fromAlarmMessage(AlarmMessage alarmMessage, String description, Protocol protocol);
+
+    default LocalDateTime getNowTime(){
+        LocalDateTime time = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        return time.format(formatter);
+        return time;
+    }
 
 }

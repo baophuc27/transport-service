@@ -3,7 +3,7 @@ includeBuild('./shares/api')
 //includeBuild('./services/core')
 //includeBuild('./services/config-service')
 //includeBuild('./services/transport-service')
-//includeBuild('./services/ingestion-service')
+//includeBuild('./services/ingestion-service')ew
 //includeBuild('./services/common')
 //includeBuild('./services')
 

@@ -3,7 +3,7 @@ package com.reeco.transport.infrastructure;
 import com.reeco.transport.infrastructure.kafka.ByteSerializer;
 import com.reeco.transport.infrastructure.kafka.KafkaBaseMsg;
 import com.reeco.transport.infrastructure.kafka.KafkaMsgCallback;
-import com.reeco.transport.infrastructure.model.AlarmMessage;
+import com.reeco.common.model.dto.AlarmMessage;
 import com.reeco.transport.infrastructure.model.DataRecordMessage;
 import com.reeco.transport.infrastructure.model.ResponseMessage;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class KafkaMessageProducer {
     @Value(value = "${spring.kafka.topic.response.name}")
     private String sendResponseTopicName;
 
-    @Value(value = "reeco_connection_noti_event_test")
+    @Value(value = "reeco_connection_noti_event")
     private String sendAlarmTopicName;
 
 
