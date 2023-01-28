@@ -1,9 +1,6 @@
 package com.reeco.transport.application.usecase;
 
-import com.reeco.transport.infrastructure.model.DeleteAttributeMessage;
-import com.reeco.transport.infrastructure.model.DeleteCustomIdMessage;
-import com.reeco.transport.infrastructure.model.UpsertAttributeMessage;
-import com.reeco.transport.infrastructure.model.UpsertCustomIdMessage;
+import com.reeco.transport.infrastructure.model.*;
 
 public interface DeviceManagementUseCase {
 
@@ -21,4 +18,12 @@ public interface DeviceManagementUseCase {
     void registerDevice(RegisterDeviceCommand command);
 
     void deleteDevice(DeleteDeviceCommand command);
+
+    void upsertApiKey(UpsertApiKeyMessage message);
+
+    void deleteApiKey(DeleteApiKeyMessage message);
+
+    void upsertMQTT(UpsertMQTTMessage message);
+
+    void deleteMQTT(DeleteMQTTMessage message);
 }

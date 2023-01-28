@@ -2,21 +2,15 @@ package com.reeco.transport.application.service;
 
 import com.reeco.transport.application.port.in.DeleteDevicePort;
 import com.reeco.transport.application.port.in.RegisterDevicePort;
-import com.reeco.transport.application.port.out.UpdateCustomIdPort;
+import com.reeco.transport.application.port.out.*;
 import com.reeco.transport.application.usecase.DeleteDeviceCommand;
 import com.reeco.transport.application.usecase.DeviceManagementUseCase;
 import com.reeco.transport.application.usecase.RegisterDeviceCommand;
 import com.reeco.transport.domain.DeviceConnection;
-import com.reeco.transport.infrastructure.model.DeleteCustomIdMessage;
-import com.reeco.transport.infrastructure.model.UpsertCustomIdMessage;
+import com.reeco.transport.infrastructure.model.*;
 import com.reeco.transport.utils.annotators.UseCase;
 import com.reeco.transport.utils.exception.EventProcessingException;
 import com.reeco.transport.application.mapper.ConnectionMapper;
-import com.reeco.transport.application.port.out.BeginReceivingDataPort;
-import com.reeco.transport.application.port.out.SaveAttributePort;
-import com.reeco.transport.application.port.out.StoreConfigurationPort;
-import com.reeco.transport.infrastructure.model.DeleteAttributeMessage;
-import com.reeco.transport.infrastructure.model.UpsertAttributeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +31,10 @@ public class DeviceManagementService implements DeviceManagementUseCase {
     private final SaveAttributePort saveAttributePort;
 
     private final UpdateCustomIdPort updateCustomIdPort;
+
+    private final UpdateApiKeyPort updateApiKeyPort;
+
+    private final UpdateMQTTPort updateMQTTPort;
 
     @Autowired
     private ConnectionMapper connectionMapper;
@@ -91,5 +89,25 @@ public class DeviceManagementService implements DeviceManagementUseCase {
     @Override
     public void deleteDevice(DeleteDeviceCommand command){
         deleteDevicePort.deleteDevice(command);
+    }
+
+    @Override
+    public void upsertApiKey(UpsertApiKeyMessage message) {
+        updateApiKeyPort.save(message);
+    }
+
+    @Override
+    public void deleteApiKey(DeleteApiKeyMessage message) {
+        updateApiKeyPort.delete(message);
+    }
+
+    @Override
+    public void upsertMQTT(UpsertMQTTMessage message) {
+        updateMQTTPort.save(message);
+    }
+
+    @Override
+    public void deleteMQTT(DeleteMQTTMessage message) {
+        updateMQTTPort.delete(message);
     }
 }

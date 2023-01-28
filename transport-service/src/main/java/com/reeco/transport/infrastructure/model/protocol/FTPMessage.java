@@ -23,8 +23,8 @@ public class FTPMessage extends ProtocolMessage {
     @JsonProperty("useSSL")
     boolean useSSL;
 
-    @JsonProperty("key")
-    String key;
+    @JsonProperty("apiKey")
+    String apiKey;
 
     @JsonProperty("ipWhiteList")
     List<String> ipWhiteList;
@@ -97,12 +97,12 @@ public class FTPMessage extends ProtocolMessage {
         this.useSSL = useSSL;
     }
 
-    public String getKey() {
-        return key;
+    public String getApiKey() {
+        return apiKey;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 
     public List<String> getIpWhiteList() {
@@ -137,7 +137,7 @@ public class FTPMessage extends ProtocolMessage {
                 ", userName='" + userName + '\'' +
                 ", password='" + password + '\'' +
                 ", useSSL=" + useSSL +
-                ", key='" + key + '\'' +
+                ", apiKey='" + apiKey + '\'' +
                 ", ipWhiteList=" + ipWhiteList +
                 ", removeAfterDays='" + removeAfterDays + '\'' +
                 ", vietnameseName='" + vietnameseName + '\'' +

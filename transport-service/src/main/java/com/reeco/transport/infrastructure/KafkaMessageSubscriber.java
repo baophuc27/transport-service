@@ -154,7 +154,36 @@ public class KafkaMessageSubscriber {
                         deviceManagementUseCase.deleteCustomId(deleteCustomIdMessage);
                         break;
                 }
-            case DEVICE: break;
+            case APIKEY:
+                switch (actionType){
+                    case UPSERT:
+                        UpsertApiKeyMessage upsertApiKeyMessage = parseObject(message.value(), UpsertApiKeyMessage.class);
+                        assert upsertApiKeyMessage != null;
+                        log.info("Received UPSERT API KEY message: {}",upsertApiKeyMessage.toString());
+                        deviceManagementUseCase.upsertApiKey(upsertApiKeyMessage);
+                        break;
+                    case DELETE:
+                        DeleteApiKeyMessage deleteApiKeyMessage = parseObject(message.value(), DeleteApiKeyMessage.class);
+                        assert deleteApiKeyMessage != null;
+                        log.info("Received DELETE API KEY message: {}",deleteApiKeyMessage.toString());
+                        deviceManagementUseCase.deleteApiKey(deleteApiKeyMessage);
+                        break;
+                }
+            case MQTTSHARE:
+                switch (actionType){
+                    case UPSERT:
+                        UpsertMQTTMessage upsertMQTTMessage = parseObject(message.value(), UpsertMQTTMessage.class);
+                        assert upsertMQTTMessage != null;
+                        log.info("Received UPSERT MQTT message: {}",upsertMQTTMessage.toString());
+                        deviceManagementUseCase.upsertMQTT(upsertMQTTMessage);
+                        break;
+                    case DELETE:
+                        DeleteMQTTMessage deleteMQTTMessage = parseObject(message.value(), DeleteMQTTMessage.class);
+                        assert deleteMQTTMessage != null;
+                        log.info("Received DELETE API KEY message: {}",deleteMQTTMessage.toString());
+                        deviceManagementUseCase.deleteMQTT(deleteMQTTMessage);
+                        break;
+                }
             case DASHBOARD: break;
             default: break;
         }

@@ -52,8 +52,10 @@ public class TransportConfiguration {
                                                     StoreConfigurationPort storeConfigurationPort,
                                                     DeleteDevicePort deleteDevicePort,
                                                     SaveAttributePort saveAttributePort,
-                                                    UpdateCustomIdPort updateCustomIdPort){
-        return new DeviceManagementService(registerDevicePort,beginReceivingDataPort,storeConfigurationPort,deleteDevicePort,saveAttributePort, updateCustomIdPort);
+                                                    UpdateCustomIdPort updateCustomIdPort,
+                                                    UpdateApiKeyPort updateApiKeyPort,
+                                                    UpdateMQTTPort updateMQTTPort){
+        return new DeviceManagementService(registerDevicePort,beginReceivingDataPort,storeConfigurationPort,deleteDevicePort,saveAttributePort, updateCustomIdPort, updateApiKeyPort,updateMQTTPort);
     }
 
     @Bean
@@ -102,6 +104,15 @@ public class TransportConfiguration {
         return new CustomIdAdapter();
     }
 
+    @Bean
+    UpdateApiKeyPort updateApiKeyPort(){
+        return new ApiKeyAdapter();
+    }
+
+    @Bean
+    UpdateMQTTPort updateMQTTPort(){
+        return new MQTTAdapter();
+    }
     @Bean
     KafkaMessageProducer kafkaMessageProducer( ){
         return new KafkaMessageProducer();
