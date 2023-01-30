@@ -51,6 +51,7 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
+	implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2")
 	implementation("org.mapstruct:mapstruct:${mapstructVersion}")
 	compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"

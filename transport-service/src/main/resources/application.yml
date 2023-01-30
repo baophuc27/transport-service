@@ -12,8 +12,8 @@ spring:
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:http://localhost:29092}
     consumer:
-      group-id: transport-service
-      auto-offset-reset: latest
+      group-id: transport-service1
+      auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
 

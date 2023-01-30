@@ -1,5 +1,6 @@
 package com.reeco.transport.infrastructure;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reeco.common.model.dto.DataSharingConnection;
 import com.reeco.common.model.enumtype.Protocol;
@@ -14,6 +15,7 @@ import com.reeco.transport.infrastructure.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Headers;
@@ -21,6 +23,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import com.reeco.common.model.dto.FTPConnection;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 
 import static com.reeco.common.model.enumtype.EntityType.CUSTOMID;
@@ -31,6 +34,12 @@ public class KafkaMessageSubscriber {
 
     @Autowired
     private final DeviceManagementUseCase deviceManagementUseCase;
+
+    @Autowired
+    private final MQTTTopicConfig mqttTopicConfig;
+
+    @Autowired
+    private final MQTTMessagePublisher mqttMessagePublisher;
 
     private ObjectMapper objectMapper;
 
@@ -51,6 +60,18 @@ public class KafkaMessageSubscriber {
         }
     }
 
+    @KafkaListener(topics = "reeco_time_series_event",containerFactory ="connectionListener")
+    public void readDataEvent(@Headers Map<String,byte[]> header, @Payload ConsumerRecord<String,byte[]> message) throws MqttException, JsonProcessingException {
+        DataRecordMessage dataRecordMessage = parseObject(message.value(), DataRecordMessage.class);
+
+        if (! dataRecordMessage.getParamName().contains("Predict")){
+            HashSet<String> topics = (HashSet<String>) mqttTopicConfig.getTopicById(dataRecordMessage.getOrganizationId(), dataRecordMessage.getConnectionId(), dataRecordMessage.getParamId());
+            for (String topic : topics){
+                mqttMessagePublisher.publish(topic,dataRecordMessage);
+            }
+        }
+
+    }
 //    @KafkaListener(topicPartitions = @TopicPartition(
 //            topic = "reeco_config_event",
 //            partitionOffsets = { @PartitionOffset(

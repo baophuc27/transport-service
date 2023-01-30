@@ -35,4 +35,9 @@ public class DataManagementService implements DataManagementUseCase {
         transferData(dataRecord);
     }
 
+    @Override
+    public void forwardMQTTMessage(DataRecord dataRecord) {
+
+    }
+
 }

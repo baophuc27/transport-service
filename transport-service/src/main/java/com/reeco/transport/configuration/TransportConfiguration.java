@@ -39,8 +39,8 @@ public class TransportConfiguration {
     }
 
     @Bean
-    KafkaMessageSubscriber kafkaMessageProcessor(DeviceManagementUseCase deviceManagementUseCase){
-        return new KafkaMessageSubscriber(deviceManagementUseCase);
+    KafkaMessageSubscriber kafkaMessageProcessor(DeviceManagementUseCase deviceManagementUseCase, MQTTTopicConfig mqttTopicConfig, MQTTMessagePublisher messagePublisher){
+        return new KafkaMessageSubscriber(deviceManagementUseCase, mqttTopicConfig, messagePublisher);
     }
 
     /* *
@@ -130,6 +130,11 @@ public class TransportConfiguration {
 
     @Bean
     GetAlarmInfoPort getAlarmInfoPort(){ return new GetFTPDeviceInfoAdapter();}
+
+//    @Bean
+//    MQTTMessagePublisher mqttMessagePublisher(){
+//        return new MQTTMessagePublisher();
+//    }
 
     @Bean
     SendAlarmPort sendAlarmPort(KafkaMessageProducer producer){

@@ -9,4 +9,6 @@ public interface DataManagementUseCase {
     void transferData(DataRecord dataRecord);
 
     void receiveData(DataRecord dataRecord, boolean isSyncData);
+
+    void forwardMQTTMessage(DataRecord dataRecord);
 }
