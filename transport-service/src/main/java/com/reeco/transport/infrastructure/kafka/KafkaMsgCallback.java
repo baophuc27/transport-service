@@ -21,6 +21,5 @@ public class KafkaMsgCallback implements ListenableFutureCallback<SendResult<Str
         if (result == null){
             return;
         }
-        log.info("Successfully sent message: {}",result.toString());
     }
 }

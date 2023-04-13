@@ -16,16 +16,17 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Slf4j
 @Infrastructure
-@RequiredArgsConstructor
 public class MQTTMessagePublisher {
 
     @Autowired
     private final ObjectMapper objectMapper;
 
-    public void publish(String topic, DataRecordMessage message) throws MqttException, JsonProcessingException {
-        MqttClient client = new MqttClient(
-                "tcp://localhost:1883", // serverURI in format: "protocol://name:port"
-                MqttClient.generateClientId(), // ClientId
+    private final MqttClient client;
+    public MQTTMessagePublisher(ObjectMapper objectMapper) throws MqttException {
+        this.objectMapper = objectMapper;
+        client = new MqttClient(
+                "tcp://localhost:3000", // serverURI in format: "protocol://name:port"
+                "admin", // ClientId
                 new MemoryPersistence()); // Persistence
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
         mqttConnectOptions.setUserName("admin");
@@ -49,7 +50,11 @@ public class MQTTMessagePublisher {
 //                System.out.println("complete");
             }
         });
-//        log.info("Publish message to: {}",topic);
+    }
+
+    public void publish(String topic, DataRecordMessage message) throws MqttException, JsonProcessingException {
+
+        log.info("Publish message: {} to: {}",message,topic);
         String data = objectMapper.writeValueAsString(message);
         client.publish(topic,data.getBytes(UTF_8),1,false);
 

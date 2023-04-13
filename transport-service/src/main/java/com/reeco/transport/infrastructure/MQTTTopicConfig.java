@@ -75,6 +75,9 @@ public class MQTTTopicConfig {
     }
     private void addTopicsToNodes(String topic, String ids, String enumType){
         String[] idList = ids.split(",");
+        if (ids.length() == 0){
+            return;
+        }
         if (enumType.equals("CONNECTION")){
             for (String id : idList){
                 Integer newId = Integer.parseInt(id);

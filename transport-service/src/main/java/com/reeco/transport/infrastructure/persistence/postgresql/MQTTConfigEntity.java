@@ -54,7 +54,7 @@ public class MQTTConfigEntity {
 
     public MQTTConfigEntity() {
         this.isActive = true;
-        this.access = 1;
+        this.access = 5;
     }
 
     public String getId() {
