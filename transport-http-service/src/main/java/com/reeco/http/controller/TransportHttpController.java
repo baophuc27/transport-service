@@ -50,8 +50,6 @@ public class TransportHttpController {
     @Autowired
     TransportHttpService transportHttpService;
 
-//    private final static ObjectMapper objectMapper = new ObjectMapper();
-
     @PostMapping("/receive-data")
     public ResponseEntity<ApiResponse> receiveData(@RequestHeader("access_key") String accessKey, @RequestHeader("connection_id") String id , @RequestBody RequestDto requestDto) throws Exception{
         String key = id+"%"+accessKey;
@@ -71,7 +69,6 @@ public class TransportHttpController {
         log.info("Load Connection to cache manager when start up");
     }
 
-//    @KafkaListener(topics = "reeco_config_event", containerFactory = "configEventListener")
     @KafkaListener(topics = "reeco_config_event", containerFactory = "configEventListener")
     public void listen(@Headers Map<String, byte[]> header, @Payload String config) {
         try {

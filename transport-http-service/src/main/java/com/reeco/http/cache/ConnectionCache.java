@@ -7,6 +7,7 @@ import com.reeco.http.model.entity.ConnectionByOrg;
 import com.reeco.http.model.entity.ParamsByOrg;
 import com.reeco.http.model.repo.ConnectionByOrgRepository;
 import com.reeco.http.model.repo.ParamsByOrgRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class ConnectionCache {
     @Autowired
     CacheManager cacheManager;
@@ -43,8 +45,14 @@ public class ConnectionCache {
     }
 
     public void put(Connection connection){
+
         if(connection!=null){
-            getCache().put(connection.getConnectionId().toString() + "%" +connection.getAccessToken(),connection);
+            String key = connection.getConnectionId().toString() + "%" +connection.getAccessToken();
+            log.info("Save key: {} with connection: {}", key,connection.toString());
+            getCache().put(key,connection);
+        }
+        else{
+            log.warn("Connection with access token: {} is existed.",connection.getAccessToken());
         }
     }
 
