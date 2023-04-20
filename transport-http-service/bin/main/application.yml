@@ -1,0 +1,45 @@
+server.port: 8043
+
+server.error.include-message: always
+
+spring:
+  data:
+    cassandra:
+      keyspace-name: ${CASSANDRA_KEYSPACE:reecotech}
+      username: ${CASSANDRA_USER:cassandra}
+      password: ${CASSANDRA_PASSWORD:cassandra}
+      contact-points: ${CASSANDRA_CONTACT_POINTS:118.69.53.93}
+      port: ${CASSANDRA_PORT:9042}
+      local-datacenter: datacenter1
+      request:
+        timeout: 15s
+      connection:
+        init-query-timeout: 15s
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+kafka:
+  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:118.69.53.93:29092} #118.69.53.93:29092
+
+  consumer:
+    config:
+      topic-in: reeco_config_event
+      group-id: ${KAFKA_CONFIG_EVENT_HTTP_GROUP_ID:reeco_config_event_http_group}
+      auto-offset-reset: ${KAFKA_CONFIG_AUTO_OFFSET_RESET:earliest}
+
+  producer:
+    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+
+  # profile dev
+  topics:
+    event-topic:
+      name: reeco_time_series_event
+      properties: "retention.ms:432000000;segment.bytes:26214400;retention.bytes:1048576000"
+
+    config-topic:
+      name: reeco_config_event
+      properties: "retention.ms:432000000;segment.bytes:26214400;retention.bytes:1048576000"
