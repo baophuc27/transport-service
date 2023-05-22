@@ -4,8 +4,6 @@ COPY --chown=gradle:gradle . /home/gradle/src/
 WORKDIR /home/gradle/src
 RUN gradle :core:build -Pversion=${VERSION} --no-daemon
 
-
-
 FROM openjdk:11
 EXPOSE 7001
 ARG VERSION
