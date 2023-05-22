@@ -12,6 +12,7 @@ import com.reeco.ingestion.application.port.out.InsertEventPort;
 import com.reeco.ingestion.application.port.out.NumStatRepository;
 import com.reeco.ingestion.application.service.*;
 import com.reeco.ingestion.application.usecase.*;
+import com.reeco.ingestion.cache.config.MQTTTopicForwardConfig;
 import com.reeco.ingestion.cache.service.*;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
@@ -89,4 +90,5 @@ public class IngestionServiceConfiguration {
     @Bean
     AggregateEventsPort aggregateEventsPort() {return new EventStatPersistenceAdapter();
     }
+
 }

@@ -31,4 +31,20 @@ public class ParameterDto {
     private String columnKey;
 
     private Long connectionId;
+
+    @Override
+    public String toString() {
+        return "ParameterDto{" +
+                "organizationId=" + organizationId +
+                ", stationId=" + stationId +
+                ", parameterId=" + parameterId +
+                ", parameterName='" + parameterName + '\'' +
+                ", indicatorName='" + indicatorName + '\'' +
+                ", indicatorType='" + indicatorType + '\'' +
+                ", indicatorKey='" + indicatorKey + '\'' +
+                ", unit='" + unit + '\'' +
+                ", columnKey='" + columnKey + '\'' +
+                ", connectionId=" + connectionId +
+                '}';
+    }
 }

@@ -6,6 +6,7 @@ import com.reeco.core.dmp.core.model.*;
 import com.reeco.core.dmp.core.repo.*;
 import com.reeco.core.dmp.core.until.ApiResponse;
 import com.reeco.core.dmp.core.until.NumericAggregate;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.temporal.ChronoUnit;
@@ -20,6 +21,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ChartService {
 
@@ -118,6 +120,7 @@ public class ChartService {
         chartResponse.setEndTime(chartDto.getEndTime());
         List<ParameterDataDto> parameterDataDtos = new ArrayList<>();
         for (ParameterDto parameterDto : chartDto.getParameterDtos()) {
+            log.info(String.valueOf(parameterDto));
             ParamsByOrg paramsByOrg = paramsByOrgRepository
                     .findByPartitionKeyOrganizationIdAndPartitionKeyParamId(parameterDto.getOrganizationId(),parameterDto.getParameterId())
                     .orElseThrow(()-> new Exception("Invalid Parameter!"));

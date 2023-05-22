@@ -4,7 +4,7 @@ version: '3.9'
 services:
   # App backend service
   reecotechservices:
-    image: arihub/reeco-data-services:47.2
+    image: arihub/reeco-data-services:test_23.11
     build:
       context: .
       dockerfile: dockerfile-all-in-one

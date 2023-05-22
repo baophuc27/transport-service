@@ -8,7 +8,7 @@ spring:
       keyspace-name: ${CASSANDRA_KEYSPACE:reecotech}
       username: ${CASSANDRA_USER:cassandra}
       password: ${CASSANDRA_PASSWORD:cassandra}
-      contact-points: ${CASSANDRA_CONTACT_POINTS:13.229.233.82}
+      contact-points: ${CASSANDRA_CONTACT_POINTS:localhost}
       port: ${CASSANDRA_PORT:9042}
       local-datacenter: datacenter1
       request:
