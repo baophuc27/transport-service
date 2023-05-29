@@ -447,9 +447,11 @@ public class FileProcessor {
         }
     }
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 20000)
     private void scheduledLogoutAlarm(){
         List<DeviceEntity> devices =  postgresDeviceRepository.getConnectedDevices();
+
+        log.info("\n[ALARM] Got "+ devices.size() + " connected device for check disconnect alarm.");
         for (DeviceEntity device: devices){
             LocalDateTime now = LocalDateTime.now();
             Integer timeout = device.getMaximumTimeout();
@@ -458,6 +460,10 @@ public class FileProcessor {
             if (device.getLastActive().isBefore(activeRange)){
                 log.info("[ALARM] Detect logout alarm for device"+device.getId());
                 alarmManagementUsecase.alarmDisconnected(device);
+            }
+            else{
+                log.info("[ALARM] Device with active range: "+activeRange.toString());
+                log.info(device.toString());
             }
         }
 

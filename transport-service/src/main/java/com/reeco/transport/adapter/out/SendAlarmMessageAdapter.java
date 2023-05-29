@@ -17,6 +17,6 @@ public class SendAlarmMessageAdapter implements SendAlarmPort {
     @Override
     public void send(AlarmMessage message) {
         log.info("Sending message: {}",message.toString());
-//        messageProducer.sendAlarmMessage(message);
+        messageProducer.sendAlarmMessage(message);
     }
 }
