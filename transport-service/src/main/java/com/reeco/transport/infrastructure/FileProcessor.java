@@ -447,7 +447,7 @@ public class FileProcessor {
         }
     }
 
-    @Scheduled(fixedDelay = 20000)
+    @Scheduled(fixedDelay = 60000)
     private void scheduledLogoutAlarm(){
         List<DeviceEntity> devices =  postgresDeviceRepository.getConnectedDevices();
 
