@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface ConnectionAlarmInfoRepository extends CassandraRepository<ConnectionAlarmInfo, ConnectionAlarmInfo.ConnectionAlarmKey> {
 
     @Query("select * from reecotech.connection_alarm\n" +
-            "where organization_id = ?0 and connection_id = ?1 ALLOW FILTERING ;")
+            "where organization_id = ?0 and connection_id = ?1 order by organization_id, alarm_time")
 
     List<ConnectionAlarmInfo> findHistoryByConnection(Long orgId, Long connectionId);
 

@@ -480,7 +480,6 @@ public class DataService {
         Long index = 0L;
         for (ConnectionAlarmInfo info: historyConnection){
             Long timestamp = info.getAlarmTime().atZone(ZoneId.of("GMT+7")).toEpochSecond();
-            index += 1;
 
             ConnectionHistory connectionHistory = new ConnectionHistory(
                     info.getPartitionKey().getOrganizationId(),
@@ -508,18 +507,6 @@ public class DataService {
                 }
             }
 
-            if (startIndex != null && startIndex > index){
-                continue;
-            }
-
-            if (endIndex != null && endIndex < index){
-                continue;
-            }
-
-            if (aLarmId != null && aLarmId != index){
-                continue;
-            }
-
             if (startTime != null && startTime > timestamp)
             {
                 continue;
@@ -529,9 +516,25 @@ public class DataService {
                 continue;
             }
 
+            index += 1;
+
+            if (startIndex != null && startIndex > index){
+                continue;
+            }
+
+            if (endIndex != null && endIndex < index){
+                continue;
+            }
+
+//            if (aLarmId != null && aLarmId != index){
+//                continue;
+//            }
 
             result.add(connectionHistory);
         }
+
+        // Reverse since query is order by alarm_time ASCENDING, while we need DESCENDING order
+        Collections.reverse(result);
 
         apiResponse.setMessage("Successful!");
         apiResponse.setData(result);

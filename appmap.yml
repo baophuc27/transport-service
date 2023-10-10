@@ -1,0 +1,5 @@
+name: reeco-dmp
+packages:
+- path: com.reeco.common
+- path: com.reeco.transport
+- path: static
