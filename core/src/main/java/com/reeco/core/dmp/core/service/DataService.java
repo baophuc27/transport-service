@@ -516,30 +516,38 @@ public class DataService {
                 continue;
             }
 
-            index += 1;
-
-            if (startIndex != null && startIndex > index){
-                continue;
-            }
-
-            if (endIndex != null && endIndex < index){
-                continue;
-            }
-
-//            if (aLarmId != null && aLarmId != index){
-//                continue;
-//            }
-
             result.add(connectionHistory);
         }
 
         // Reverse since query is order by alarm_time ASCENDING, while we need DESCENDING order
         Collections.reverse(result);
 
+        List<ConnectionHistory> slicedResult = sliceArrayList(result, startIndex, endIndex);
+
         apiResponse.setMessage("Successful!");
-        apiResponse.setData(result);
+        apiResponse.setData(slicedResult);
         return apiResponse;
     }
+
+    public static List<ConnectionHistory> sliceArrayList(List<ConnectionHistory> list, int fromIndex, int toIndex) {
+        // Ensure fromIndex is not less than 0
+        if (fromIndex < 0) {
+            fromIndex = 0;
+        }
+
+        // Ensure toIndex is not greater than the size of the list
+        if (toIndex > list.size()) {
+            toIndex = list.size();
+        }
+
+        // Ensure fromIndex is not greater than toIndex
+        if (fromIndex > toIndex) {
+            fromIndex = toIndex;
+        }
+
+        return list.subList(fromIndex, toIndex);
+    }
+
     public ApiResponse deleteConnectionHistory(Long orgId, Long connectionId, Long index){
 
         ApiResponse apiResponse = ApiResponse.getSuccessResponse();
