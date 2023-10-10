@@ -58,14 +58,14 @@ services:
     depends_on:
       - broker
 
-#  cassandra:
-#    image: scylladb/scylla
-#    mem_limit: 512m
-#    cpus: 1
-#    hostname: 'cassandra'
-#    container_name: 'cassandra'
-#    ports:
-#      - "9160:9160"
-#      - "9042:9042"
-#    volumes:
-#    - ./schema/:/opt/initdb/
+  cassandra:
+    image: scylladb/scylla
+    mem_limit: 512m
+    cpus: 1
+    hostname: 'cassandra'
+    container_name: 'cassandra'
+    ports:
+      - "9160:9160"
+      - "9042:9042"
+    volumes:
+    - ./schema/:/opt/initdb/
