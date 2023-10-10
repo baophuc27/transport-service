@@ -2,12 +2,13 @@ package com.reeco.transport.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
+@Getter
 public class DataRecord {
 
     LocalDateTime timeStamp;
@@ -23,4 +24,21 @@ public class DataRecord {
     Double lat;
 
     Double lon;
+
+
+    public Integer getDeviceId() {
+        return deviceId;
+    }
+
+    public LocalDateTime getReceivedAt() {
+        return receivedAt;
+    }
+
+    public Double getLat() {
+        return lat;
+    }
+
+    public Double getLon() {
+        return lon;
+    }
 }
