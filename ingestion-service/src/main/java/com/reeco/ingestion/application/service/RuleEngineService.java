@@ -58,7 +58,7 @@ public class RuleEngineService implements RuleEngineUseCase {
     }
 
     private boolean isMatchCount(Alarm alarm, AlarmRuleCache alarmRuleCache) {
-        return alarmRuleCache.getMatchedCount() == alarm.getNumOfMatch();
+        return alarmRuleCache.getMatchedCount().equals(alarm.getNumOfMatch());
     }
 
     private boolean isOutOfTimeRange(Alarm alarm,
@@ -142,7 +142,8 @@ public class RuleEngineService implements RuleEngineUseCase {
                 case NONE:
                     break;
                 case FIRST_TIME_ONLY: {
-                    if (isOutOfMatch) {
+//                    if (isOutOfMatch) {
+                    if (isMatchCount(alarm, alarmRuleCache)) {
                         alarmEventTemplate.send(ALARM_RULE_TOPIC, alarmEvent);
                         log.info("Sent Alarm {} as matched rule {}", alarmEvent, maintainType.name());
                     }
