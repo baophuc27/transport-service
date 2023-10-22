@@ -158,8 +158,6 @@ public class RuleEngineService implements RuleEngineUseCase {
                         alarmEventTemplate.send(ALARM_RULE_TOPIC, alarmEvent);
                         log.info("Sent Alarm {} as matched rule {}", alarmEvent, maintainType.name());
                         alarmRuleCache.setIsLastEventRaised(true);
-                    } else {
-                        alarmRuleCache.setIsLastEventRaised(false);
                     }
                     break;
                 }
@@ -183,6 +181,8 @@ public class RuleEngineService implements RuleEngineUseCase {
                 );
                 alarmEventTemplate.send(ALARM_RULE_TOPIC, alarmEvent);
                 log.info("Sent Alarm {} as no alarm raised (isAlarm = False)", alarmEvent);
+            } else {
+                log.info("No alarm message is pushed");
             }
             alarmRuleCache.setMatchedCount(0L);
             alarmRuleCache.setLastMatchedTime(event.getReceivedAt());
