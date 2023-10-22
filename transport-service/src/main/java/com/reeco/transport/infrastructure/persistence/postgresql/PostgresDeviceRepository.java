@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -32,6 +33,6 @@ public interface PostgresDeviceRepository extends JpaRepository<DeviceEntity, In
 
     @Transactional
     @Modifying
-    @Query(value = "UPDATE public.device set logged_out = ?2 WHERE id = ?1",nativeQuery = true)
-    void updateDeviceLoggedOut(Integer deviceId, boolean logged_out);
+    @Query(value = "UPDATE public.device set logged_out = ?2, last_active = ?3 WHERE id = ?1",nativeQuery = true)
+    void updateDeviceLoggedOut(Integer deviceId, boolean logged_out, LocalDateTime now);
 }

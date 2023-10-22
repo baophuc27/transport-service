@@ -14,4 +14,4 @@ include 'ingestion-service'
 include 'common'
 include 'core-service'
 include 'transport-http-service'
-
+include 'transport-service'

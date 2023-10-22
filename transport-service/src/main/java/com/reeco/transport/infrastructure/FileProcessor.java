@@ -267,6 +267,7 @@ public class FileProcessor {
         int templateId = postgresDeviceRepository.findTemplateById(deviceId);
         postgresDeviceRepository.updateDeviceActive(deviceId);
         DeviceEntity device = postgresDeviceRepository.findDeviceById(deviceId);
+        dataManagementUseCase.updateDeviceActiveStatus(deviceId);
         if (device.getActive()){
             switch (templateId){
                 case 1:
@@ -450,14 +451,20 @@ public class FileProcessor {
     @Scheduled(fixedDelay = 60000)
     private void scheduledLogoutAlarm(){
         List<DeviceEntity> devices =  postgresDeviceRepository.getConnectedDevices();
+
+        log.info("\n[ALARM] Got "+ devices.size() + " connected device for check disconnect alarm.");
         for (DeviceEntity device: devices){
             LocalDateTime now = LocalDateTime.now();
             Integer timeout = device.getMaximumTimeout();
             LocalDateTime activeRange = now.minusMinutes(timeout);
-
+            log.info(device.toString());
             if (device.getLastActive().isBefore(activeRange)){
                 log.info("[ALARM] Detect logout alarm for device"+device.getId());
                 alarmManagementUsecase.alarmDisconnected(device);
+            }
+            else{
+                log.info("[ALARM] Device with active range: "+activeRange.toString());
+
             }
         }
 

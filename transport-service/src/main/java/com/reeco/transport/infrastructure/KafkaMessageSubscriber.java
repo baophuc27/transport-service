@@ -64,7 +64,7 @@ public class KafkaMessageSubscriber {
     public void readDataEvent(@Headers Map<String,byte[]> header, @Payload ConsumerRecord<String,byte[]> message) throws MqttException, JsonProcessingException {
         DataRecordMessage dataRecordMessage = parseObject(message.value(), DataRecordMessage.class);
 
-        if (! dataRecordMessage.getParamName().contains("Predict")){
+        if (!dataRecordMessage.getParamName().toLowerCase().contains("predict")){
             HashSet<String> topics = (HashSet<String>) mqttTopicConfig.getTopicById(dataRecordMessage.getOrganizationId(), dataRecordMessage.getConnectionId(), dataRecordMessage.getParamId());
             for (String topic : topics){
                 mqttMessagePublisher.publish(topic,dataRecordMessage);

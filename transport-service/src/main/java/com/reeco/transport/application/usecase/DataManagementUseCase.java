@@ -11,4 +11,6 @@ public interface DataManagementUseCase {
     void receiveData(DataRecord dataRecord, boolean isSyncData);
 
     void forwardMQTTMessage(DataRecord dataRecord);
+
+    void updateDeviceActiveStatus(Integer deviceId);
 }

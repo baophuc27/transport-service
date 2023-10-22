@@ -1,5 +1,6 @@
 package com.reeco.transport.application.service;
 
+import com.reeco.transport.application.port.in.GetAlarmInfoPort;
 import com.reeco.transport.application.port.in.ReceiveFilePort;
 import com.reeco.transport.application.usecase.DataManagementUseCase;
 import com.reeco.transport.domain.DataRecord;
@@ -17,6 +18,8 @@ public class DataManagementService implements DataManagementUseCase {
     private final StreamingDataPort streamingDataPort;
 
     private final ReceiveFilePort receiveFilePort;
+
+    private final GetAlarmInfoPort getAlarmInfoPort;
 
     @Override
     public void batchingFile()
@@ -38,6 +41,11 @@ public class DataManagementService implements DataManagementUseCase {
     @Override
     public void forwardMQTTMessage(DataRecord dataRecord) {
 
+    }
+
+    @Override
+    public void updateDeviceActiveStatus(Integer deviceId) {
+        getAlarmInfoPort.updateDeviceLogout(deviceId,false);
     }
 
 }

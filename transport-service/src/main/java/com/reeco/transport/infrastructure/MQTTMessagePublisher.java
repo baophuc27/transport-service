@@ -26,7 +26,7 @@ public class MQTTMessagePublisher {
         this.objectMapper = objectMapper;
         client = new MqttClient(
                 "tcp://localhost:3000", // serverURI in format: "protocol://name:port"
-                "admin", // ClientId
+                "admin-dev", // ClientId
                 new MemoryPersistence()); // Persistence
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
         mqttConnectOptions.setUserName("admin");

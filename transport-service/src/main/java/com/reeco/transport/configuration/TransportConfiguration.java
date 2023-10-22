@@ -59,8 +59,8 @@ public class TransportConfiguration {
     }
 
     @Bean
-    DataManagementUseCase dataManagementUseCase(BatchingFilePort batchingFilePort, StreamingDataPort streamingDataPort, ReceiveFilePort receiveFilePort){
-        return new DataManagementService(batchingFilePort, streamingDataPort,receiveFilePort);
+    DataManagementUseCase dataManagementUseCase(BatchingFilePort batchingFilePort, StreamingDataPort streamingDataPort, ReceiveFilePort receiveFilePort, GetAlarmInfoPort getAlarmInfoPort){
+        return new DataManagementService(batchingFilePort, streamingDataPort,receiveFilePort,getAlarmInfoPort);
     }
 
     AlarmManagementUsecase alarmManagementUsecase(GetAlarmInfoPort getAlarmInfoPort, SendAlarmPort sendAlarmPort){
