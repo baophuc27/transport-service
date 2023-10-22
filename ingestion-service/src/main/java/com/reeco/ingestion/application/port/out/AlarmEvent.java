@@ -36,4 +36,6 @@ public class AlarmEvent {
 
     String value;
 
+    Boolean isAlarm;
+
 }

@@ -119,7 +119,7 @@ public class StoreConfigService implements StoreConfigUseCase {
 
         List<AlarmRuleCache> alarmRuleCaches = alarms
                 .stream()
-                .map(v -> new AlarmRuleCache(v.getId(), LocalDateTime.now(), 0L))
+                .map(v -> new AlarmRuleCache(v.getId(), LocalDateTime.now(), 0L, false))
                 .collect(Collectors.toList());
 
         alarmInfoRepository.saveAll(alarmInfoList).subscribe(v -> log.info("Saved alarms: {}", v));

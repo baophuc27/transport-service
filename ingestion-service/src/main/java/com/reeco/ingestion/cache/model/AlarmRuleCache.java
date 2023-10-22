@@ -15,4 +15,6 @@ public class AlarmRuleCache {
     private LocalDateTime lastMatchedTime;
 
     private Long matchedCount;
+
+    private Boolean isLastEventRaised;
 }
