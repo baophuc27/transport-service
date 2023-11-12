@@ -136,7 +136,8 @@ public class RuleEngineService implements RuleEngineUseCase {
                     alarm.getId(),
                     event.getEventTime(),
                     LocalDateTime.now(),
-                    event.getValue()
+                    event.getValue(),
+                    true
             );
             switch (maintainType) {
                 case NONE:
@@ -146,6 +147,7 @@ public class RuleEngineService implements RuleEngineUseCase {
                     if (isMatchCount(alarm, alarmRuleCache)) {
                         alarmEventTemplate.send(ALARM_RULE_TOPIC, alarmEvent);
                         log.info("Sent Alarm {} as matched rule {}", alarmEvent, maintainType.name());
+                        alarmRuleCache.setIsLastEventRaised(true);
                     }
                     break;
                 }
@@ -155,6 +157,7 @@ public class RuleEngineService implements RuleEngineUseCase {
                         alarmRuleCache.setLastMatchedTime(event.getEventTime());
                         alarmEventTemplate.send(ALARM_RULE_TOPIC, alarmEvent);
                         log.info("Sent Alarm {} as matched rule {}", alarmEvent, maintainType.name());
+                        alarmRuleCache.setIsLastEventRaised(true);
                     }
                     break;
                 }
@@ -162,8 +165,28 @@ public class RuleEngineService implements RuleEngineUseCase {
             alarmEventTemplate.send(ALARM_TOPIC, alarmEvent);
             log.info("Sent Alarm {} as matched condition", alarmEvent);
         } else {
+            Boolean isLastEventRaised = alarmRuleCache.getIsLastEventRaised();
+            if (isLastEventRaised) {
+                AlarmEvent alarmEvent = new AlarmEvent(
+                        event.getOrganizationId(),
+                        event.getWorkspaceId(),
+                        event.getStationId(),
+                        event.getConnectionId(),
+                        event.getParamId(),
+                        alarm.getId(),
+                        event.getEventTime(),
+                        LocalDateTime.now(),
+                        event.getValue(),
+                        false
+                );
+                alarmEventTemplate.send(ALARM_RULE_TOPIC, alarmEvent);
+                log.info("Sent Alarm {} as no alarm raised (isAlarm = False)", alarmEvent);
+            } else {
+                log.info("No alarm message is pushed");
+            }
             alarmRuleCache.setMatchedCount(0L);
             alarmRuleCache.setLastMatchedTime(event.getReceivedAt());
+            alarmRuleCache.setIsLastEventRaised(false);
         }
         ruleEngineCacheUseCase.put(alarmRuleCache);
         return isAlarmEvent;

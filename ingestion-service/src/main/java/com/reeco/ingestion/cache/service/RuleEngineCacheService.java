@@ -35,7 +35,7 @@ public class RuleEngineCacheService implements RuleEngineCacheUseCase {
                 .findAll()
                 .map(v->{
                     AlarmRuleCache alarmRuleCache = new AlarmRuleCache(v.getPartitionKey().getAlarmId(),
-                            LocalDateTime.now(), 0L);
+                            LocalDateTime.now(), 0L, false);
                     put(alarmRuleCache);
                     return alarmRuleCache;
                 }).subscribe();

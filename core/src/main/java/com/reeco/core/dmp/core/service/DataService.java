@@ -480,6 +480,7 @@ public class DataService {
         Long index = 0L;
         for (ConnectionAlarmInfo info: historyConnection){
             Long timestamp = info.getAlarmTime().atZone(ZoneId.of("GMT+7")).toEpochSecond();
+            index += 1;
 
             ConnectionHistory connectionHistory = new ConnectionHistory(
                     info.getPartitionKey().getOrganizationId(),
