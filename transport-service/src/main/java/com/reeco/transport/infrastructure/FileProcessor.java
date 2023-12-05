@@ -267,6 +267,8 @@ public class FileProcessor {
         int templateId = postgresDeviceRepository.findTemplateById(deviceId);
         postgresDeviceRepository.updateDeviceActive(deviceId);
         DeviceEntity device = postgresDeviceRepository.findDeviceById(deviceId);
+
+        alarmManagementUsecase.checkRaiseAlarmConnected(deviceId);
         dataManagementUseCase.updateDeviceActiveStatus(deviceId);
         if (device.getActive()){
             switch (templateId){
@@ -365,28 +367,6 @@ public class FileProcessor {
             }
     }
 
-    private void readFileO(String fileName,Path deviceDir) {
-        String filePath = deviceDir +"/" +fileName;
-        Path path = Paths.get(filePath);
-        try{
-            new Thread(() -> {
-                try {
-                    Thread.sleep(2000);
-                    System.out.println(Files.readAllLines(path));
-                } catch (IOException | InterruptedException exception) {
-                    exception.printStackTrace();
-                }
-            }).start();
-            List<String> read = Files.readAllLines(path);
-
-            System.out.println("hello string"+read);
-        }
-        catch (IOException exception){
-            log.warn("Got an exception when reading file: {}", fileName);
-            throw new FileProcessingException(exception.getMessage());
-        }
-    }
-
     private void readFile3(String filePath, int deviceId) {
         try{
             File file = new File(filePath);
@@ -412,7 +392,7 @@ public class FileProcessor {
         }
     }
 
-//    @Scheduled(cron = "0 0 0 */3 * *")
+    @Scheduled(cron = "0 0 0 */3 * *")
     private void scheduledClean() {
         List<Integer> registered_devices = postgresDeviceRepository.getRegisteredDevices();
         for (Integer device_id : registered_devices) {
@@ -448,7 +428,7 @@ public class FileProcessor {
         }
     }
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 90000)
     private void scheduledLogoutAlarm(){
         List<DeviceEntity> devices =  postgresDeviceRepository.getConnectedDevices();
 

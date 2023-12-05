@@ -8,8 +8,10 @@ import com.reeco.transport.utils.annotators.UseCase;
 import com.reeco.transport.application.port.out.BatchingFilePort;
 import com.reeco.transport.application.port.out.StreamingDataPort;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @UseCase
+@Slf4j
 @RequiredArgsConstructor
 public class DataManagementService implements DataManagementUseCase {
 
@@ -45,6 +47,7 @@ public class DataManagementService implements DataManagementUseCase {
 
     @Override
     public void updateDeviceActiveStatus(Integer deviceId) {
+
         getAlarmInfoPort.updateDeviceLogout(deviceId,false);
     }
 

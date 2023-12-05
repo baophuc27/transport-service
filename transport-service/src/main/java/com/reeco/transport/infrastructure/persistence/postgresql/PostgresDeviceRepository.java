@@ -31,6 +31,10 @@ public interface PostgresDeviceRepository extends JpaRepository<DeviceEntity, In
     @Query(value = "select * FROM public.device device WHERE device.logged_out = false",nativeQuery = true)
     List<DeviceEntity> getConnectedDevices();
 
+
+    @Query(value = "SELECT device.logged_out FROM public.device device WHERE device.id = ?1",nativeQuery = true)
+    boolean findLoggedOutById(Integer deviceId);
+
     @Transactional
     @Modifying
     @Query(value = "UPDATE public.device set logged_out = ?2, last_active = ?3 WHERE id = ?1",nativeQuery = true)

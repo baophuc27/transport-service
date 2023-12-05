@@ -7,6 +7,7 @@ public interface AlarmManagementUsecase {
 
     void alarmDisconnected(DeviceEntity device);
 
+    void checkRaiseAlarmConnected(Integer deviceId);
 
     void alarmTimeout(String ftpUsername, String eventTime);
 

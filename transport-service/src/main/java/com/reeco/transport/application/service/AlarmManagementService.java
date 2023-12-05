@@ -6,6 +6,7 @@ import com.reeco.transport.application.port.out.SendAlarmPort;
 import com.reeco.transport.application.usecase.AlarmManagementUsecase;
 import com.reeco.common.model.dto.AlarmMessage;
 import com.reeco.transport.infrastructure.persistence.postgresql.DeviceEntity;
+import com.reeco.transport.infrastructure.persistence.postgresql.PostgresDeviceRepository;
 import com.reeco.transport.utils.annotators.UseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,10 @@ public class AlarmManagementService implements AlarmManagementUsecase {
     private final GetAlarmInfoPort getAlarmInfoPort;
 
     private final SendAlarmPort sendAlarmPort;
+
+    @Autowired
+    private PostgresDeviceRepository postgresDeviceRepository;
+
 
     @Autowired
     private AlarmMapper mapper;
@@ -57,6 +62,23 @@ public class AlarmManagementService implements AlarmManagementUsecase {
             getAlarmInfoPort.updateDeviceLogout(device.getId(),true);
         }
 
+    }
+
+    @Override
+    public void checkRaiseAlarmConnected(Integer deviceId) {
+
+        LocalDateTime now = LocalDateTime.now();
+        boolean lastLoggedOut =  postgresDeviceRepository.findLoggedOutById(deviceId);
+        if (lastLoggedOut){
+            String message = "CONNECTED";
+            String ipAddress = "";
+            DeviceEntity device = postgresDeviceRepository.findDeviceById(deviceId);
+
+            AlarmMessage alarmMessage = mapper.fromDeviceEntity(device,message,String.valueOf(now),ipAddress);
+            sendAlarmPort.send(alarmMessage);
+            log.info("[CRITICAL] Send connected alarm: {}",alarmMessage);
+
+        }
     }
 
     @Override

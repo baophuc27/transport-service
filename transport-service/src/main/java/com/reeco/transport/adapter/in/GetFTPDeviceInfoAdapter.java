@@ -38,7 +38,11 @@ public class GetFTPDeviceInfoAdapter implements GetAlarmInfoPort {
     @Override
     public void updateDeviceLogout(Integer deviceId, boolean logged_out){
         LocalDateTime now = LocalDateTime.now();
+        boolean lastLoggedOut =  postgresDeviceRepository.findLoggedOutById(deviceId);
+        if (!lastLoggedOut && logged_out){
+            log.info("[CRITICAL] Need to raise alarm here");
+        }
         postgresDeviceRepository.updateDeviceLoggedOut(deviceId,logged_out,now);
-        log.info("Update log_out status of device: {} to {}",deviceId,logged_out);
+        log.info("Update log_out status of device: {} from {} to {}",deviceId,lastLoggedOut,logged_out);
     }
 }
