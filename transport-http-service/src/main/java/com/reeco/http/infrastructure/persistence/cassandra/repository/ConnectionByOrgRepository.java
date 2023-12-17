@@ -1,7 +1,7 @@
-package com.reeco.http.model.repo;
+package com.reeco.http.infrastructure.persistence.cassandra.repository;
 
 import com.reeco.common.model.enumtype.TransportType;
-import com.reeco.http.model.entity.ConnectionByOrg;
+import com.reeco.http.infrastructure.persistence.cassandra.entity.ConnectionByOrg;
 import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.data.cassandra.repository.Query;
 import org.springframework.stereotype.Repository;

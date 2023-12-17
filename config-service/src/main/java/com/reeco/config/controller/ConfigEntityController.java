@@ -209,7 +209,8 @@ class ConfigEntityController {
     @PostMapping("config/connection/{protocol}")
     private DeferredResult<ResponseEntity<String>> createConnection(
             @PathVariable("protocol") String protocol,
-            @RequestBody Map<String, Object> connectionPayload) {
+            @RequestBody Map<String, Object> connectionPayload
+    ) {
 
         DeferredResult<ResponseEntity<String>> responseWriter = new DeferredResult<>();
         log.info("Connection payload: {}", connectionPayload);

@@ -1,24 +1,27 @@
 package com.reeco.http.service;
 
+import com.reeco.common.model.dto.HTTPConnection;
 import com.reeco.common.model.dto.IncomingTsEvent;
 import com.reeco.http.cache.ConnectionCache;
-import com.reeco.http.model.dto.Connection;
-import com.reeco.http.model.dto.RequestDto;
-import com.reeco.http.model.dto.ParameterCache;
-import com.reeco.http.model.dto.RequestParam;
-import com.reeco.http.model.repo.ParamsByOrgRepository;
-import com.reeco.http.until.ApiResponse;
+import com.reeco.http.infrastructure.persistence.postgresql.entity.HTTPConnectionMetadata;
+import com.reeco.http.infrastructure.persistence.postgresql.repository.HTTPConnectionMetadataRepository;
+import com.reeco.http.mapper.HTTPConnectionMapper;
+import com.reeco.http.model.*;
+import com.reeco.http.infrastructure.persistence.cassandra.repository.ParamsByOrgRepository;
+import com.reeco.http.utils.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -28,16 +31,35 @@ public class TransportHttpService {
 
     @Autowired
     ParamsByOrgRepository paramsByOrgRepository;
+
+    @Autowired
+    HTTPConnectionMapper httpConnectionMapper;
+
+    @Autowired
+    HTTPConnectionMetadataRepository httpConnectionMetadataRepository;
+
     @Autowired
     private KafkaTemplate<String, IncomingTsEvent> kafkaProducerEventTemplate;
 
+    @Autowired
+    private KafkaTemplate<String, HTTPAlarmMessage> alarmMessageKafkaTemplate;
+
+    @Value(value = "${kafka.topics.conn-alarm-topic.name}")
+    private String connectionAlarmTopic;
+
+    @Value(value = "${kafka.topics.event-topic.name}")
+    private String eventTopic;
+
     public ApiResponse pushDataToKafka(RequestDto requestDto, String accessKey, String connectionId) throws Exception{
         ApiResponse apiResponse = ApiResponse.getSuccessResponse();
-//        Todo: Read param info from cache and push to Kafka
 
         List<IncomingTsEvent> allTsEvent = new ArrayList<>();
-        Connection connection = connectionCache.get(connectionId+"%"+accessKey);
+        Connection connection = connectionCache.get(connectionId + "%" + accessKey);
+        Optional<HTTPConnectionMetadata> httpConnectionMetadataOptional =
+                httpConnectionMetadataRepository.findById(Long.parseLong(connectionId));
+
         log.info("Get from cache key: {} connection: {}",connectionId+"%"+accessKey,connection.toString());
+
         for (RequestParam paramRequest: requestDto.getParams()) {
             IncomingTsEvent msg = new IncomingTsEvent();
             LocalDateTime currTime = LocalDateTime.now();
@@ -72,9 +94,32 @@ public class TransportHttpService {
         }
 
         for (IncomingTsEvent event : allTsEvent){
-            kafkaProducerEventTemplate.send("reeco_time_series_event", event);
+            kafkaProducerEventTemplate.send(eventTopic, event);
             log.info("Pushed message: {}",event);
         }
+
+        // Update lastActive time on HTTP Connection metadata
+        if (httpConnectionMetadataOptional.isPresent()) {
+            HTTPConnectionMetadata httpConnectionMetadata = httpConnectionMetadataOptional.get();
+            httpConnectionMetadata.setLastActive(LocalDateTime.now());
+            Boolean isLoggedOut = httpConnectionMetadata.getIsLoggedOut();
+            if (isLoggedOut) {
+                HTTPAlarmMessage httpAlarmMessage = new HTTPAlarmMessage(
+                        httpConnectionMetadata.getOrganizationId(),
+                        httpConnectionMetadata.getId(),
+                        httpConnectionMetadata.getWorkspaceId(),
+                        httpConnectionMetadata.getStationId(),
+                        "CONNECTED",
+                        httpConnectionMetadata.getLastActive()
+                );
+                alarmMessageKafkaTemplate.send(connectionAlarmTopic, httpAlarmMessage);
+                log.info("Send (RE)CONNECTED alarm on connection {}", httpConnectionMetadata.getId());
+
+                httpConnectionMetadata.setIsLoggedOut(false);
+            }
+            httpConnectionMetadataRepository.save(httpConnectionMetadata);
+        }
+
 
         apiResponse.setStatus(HttpStatus.OK);
         apiResponse.setMessage("Successful!");
@@ -96,4 +141,45 @@ public class TransportHttpService {
     }
 
 
+    public void storeHttpConnection(HTTPConnection httpConnection) {
+        HTTPConnectionMetadata httpConnectionMetadata = httpConnectionMapper.toHttpConnectionMetadata(httpConnection);
+        httpConnectionMetadataRepository.save(httpConnectionMetadata);
+    }
+
+    public void deleteHttpConnection(HTTPConnection httpConnection) {
+        HTTPConnectionMetadata httpConnectionMetadata = httpConnectionMapper.toHttpConnectionMetadata(httpConnection);
+        httpConnectionMetadataRepository.delete(httpConnectionMetadata);
+    }
+
+
+    public void checkConnectionStatus() {
+        List<HTTPConnectionMetadata> httpConnectionMetadataList = httpConnectionMetadataRepository.findAll();
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        for (HTTPConnectionMetadata httpConnectionMetadata: httpConnectionMetadataList) {
+
+            LocalDateTime lastActiveTime = httpConnectionMetadata.getLastActive();
+            int maximumTimeout = httpConnectionMetadata.getMaximumTimeout();
+            boolean isLoggedOut = httpConnectionMetadata.getIsLoggedOut();
+            boolean active = httpConnectionMetadata.getActive();
+
+            Duration duration = Duration.between(lastActiveTime, currentTime);
+            boolean isOverTimeout = Math.toIntExact(duration.toMinutes()) > maximumTimeout;
+            if (isOverTimeout && !isLoggedOut && active) {
+                HTTPAlarmMessage httpAlarmMessage = new HTTPAlarmMessage(
+                        httpConnectionMetadata.getOrganizationId(),
+                        httpConnectionMetadata.getId(),
+                        httpConnectionMetadata.getWorkspaceId(),
+                        httpConnectionMetadata.getStationId(),
+                        "DISCONNECTED",
+                        currentTime
+                );
+                alarmMessageKafkaTemplate.send(connectionAlarmTopic, httpAlarmMessage);
+                log.info("Send DISCONNECTED alarm on connection {}", httpConnectionMetadata.getId());
+
+                httpConnectionMetadata.setIsLoggedOut(true);
+                httpConnectionMetadataRepository.save(httpConnectionMetadata);
+            }
+        }
+    }
 }

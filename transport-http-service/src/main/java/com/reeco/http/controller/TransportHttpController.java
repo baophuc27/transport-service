@@ -9,26 +9,24 @@ import com.reeco.common.model.enumtype.Protocol;
 import com.reeco.common.model.enumtype.TransportType;
 import com.reeco.common.utils.AES;
 import com.reeco.http.cache.ConnectionCache;
-import com.reeco.http.model.dto.RequestDto;
-import com.reeco.http.model.dto.Connection;
-import com.reeco.http.model.dto.ParameterCache;
-import com.reeco.http.model.entity.ConnectionByOrg;
-import com.reeco.http.model.entity.ParamsByOrg;
-import com.reeco.http.model.repo.ConnectionByOrgRepository;
+import com.reeco.http.model.RequestDto;
+import com.reeco.http.model.Connection;
+import com.reeco.http.model.ParameterCache;
+import com.reeco.http.infrastructure.persistence.cassandra.entity.ConnectionByOrg;
+import com.reeco.http.infrastructure.persistence.cassandra.entity.ParamsByOrg;
+import com.reeco.http.infrastructure.persistence.cassandra.repository.ConnectionByOrgRepository;
 import com.reeco.http.service.TransportHttpService;
-import com.reeco.http.until.ApiResponse;
+import com.reeco.http.utils.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.json.JSONParser;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
@@ -53,7 +51,7 @@ public class TransportHttpController {
     @PostMapping("/receive-data")
     public ResponseEntity<ApiResponse> receiveData(@RequestHeader("access_key") String accessKey, @RequestHeader("connection_id") String id , @RequestBody RequestDto requestDto) throws Exception{
         String key = id+"%"+accessKey;
-        ApiResponse apiResponse = transportHttpService.pushDataToKafka(requestDto, accessKey , id);
+        ApiResponse apiResponse = transportHttpService.pushDataToKafka(requestDto, accessKey, id);
         return new ResponseEntity<>(apiResponse,apiResponse.getStatus());
     }
 
@@ -133,11 +131,13 @@ public class TransportHttpController {
                         switch (actionType){
                             case UPSERT:
                                 connectionCache.put(connection);
+                                transportHttpService.storeHttpConnection(httpConnection);
                                 log.info("Saved to cache: " + connection);
                                 break;
 
                             case DELETE:
                                 connectionCache.evict(connection.getConnectionId() +"%"+ connection.getAccessToken());
+                                transportHttpService.deleteHttpConnection(httpConnection);
                                 log.info("Evict connectionId cache: " + connection.getConnectionId());
                                 break;
                             default:
@@ -153,5 +153,12 @@ public class TransportHttpController {
             ex.printStackTrace();
         }
     }
+
+    @Scheduled(cron = "0 */1 * * * ?")
+    public void checkConnectionStatus() {
+        log.info("Checking connection status");
+        transportHttpService.checkConnectionStatus();
+    }
+
 
 }

@@ -1,7 +1,6 @@
-package com.reeco.http.model.entity;
+package com.reeco.http.infrastructure.persistence.cassandra.entity;
 
 //import com.reeco.common.model.enumtype.ParamType;
-import com.reeco.common.model.enumtype.AlarmType;
 import lombok.*;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;

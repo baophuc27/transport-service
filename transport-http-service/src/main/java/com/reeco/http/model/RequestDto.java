@@ -1,4 +1,4 @@
-package com.reeco.http.model.dto;
+package com.reeco.http.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

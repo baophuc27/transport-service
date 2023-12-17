@@ -1,6 +1,5 @@
-package com.reeco.http.model.entity;
+package com.reeco.http.infrastructure.persistence.cassandra.entity;
 
-import com.reeco.common.model.enumtype.AlarmType;
 import com.reeco.common.model.enumtype.TransportType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
