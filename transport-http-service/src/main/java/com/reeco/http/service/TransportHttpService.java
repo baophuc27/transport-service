@@ -164,7 +164,7 @@ public class TransportHttpService {
             boolean active = httpConnectionMetadata.getActive();
 
             Duration duration = Duration.between(lastActiveTime, currentTime);
-            boolean isOverTimeout = Math.toIntExact(duration.toMinutes()) > maximumTimeout;
+            boolean isOverTimeout = Math.toIntExact(duration.toMinutes()) >= maximumTimeout;
             if (isOverTimeout && !isLoggedOut && active) {
                 HTTPAlarmMessage httpAlarmMessage = new HTTPAlarmMessage(
                         httpConnectionMetadata.getOrganizationId(),

@@ -154,7 +154,7 @@ public class TransportHttpController {
         }
     }
 
-    @Scheduled(cron = "0 */1 * * * ?")
+    @Scheduled(cron = "0 */3 * * * ?")
     public void checkConnectionStatus() {
         log.info("Checking connection status");
         transportHttpService.checkConnectionStatus();
