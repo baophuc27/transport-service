@@ -12,7 +12,5 @@ public interface ConnectionAlarmInfoRepository extends CassandraRepository<Conne
 
     @Query("select * from reecotech.connection_alarm\n" +
             "where organization_id = ?0 and connection_id = ?1 order by organization_id, alarm_time")
-
     List<ConnectionAlarmInfo> findHistoryByConnection(Long orgId, Long connectionId);
-
 }

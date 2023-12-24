@@ -12,4 +12,6 @@ public interface PostgresApiKeyRepository extends JpaRepository<ApiKeyEntity,Int
     @Modifying
     @Query(value = "DELETE FROM public.api_key api WHERE id = ?1",nativeQuery = true)
     void deleteApiKeyEntityById(Integer id);
+
+    @Query(value = "SELECT * FROM public.api_key WHERE ")
 }
