@@ -352,50 +352,52 @@ public class DataService {
             });
         } else {
             List<DataPointDto> list = parameterDataDtos.get(0).getDataPointDtos();
-            for (int i = 0; i < list.size(); i++) {
-                List<String> rowData = new ArrayList<>();
-                rowData.add(String.valueOf(Timestamp.valueOf(list.get(i).getEventTime())));
-                for (ParameterDataDto parameterDataDto : parameterDataDtos) {
-                    DataPointDto dataPointDto = parameterDataDto.getDataPointDtos().get(i);
-                    switch (AggregateMethod.valueOf(chartDto.getAggregate())) {
-                        case INTERPOLATED:
-                            rowData.add(dataPointDto.getInterpolated());
-                            break;
-                        case MAX:
-                            rowData.add(dataPointDto.getMax());
-                            break;
-                        case MIN:
-                            rowData.add(dataPointDto.getMin());
-                            break;
-                        case MEAN:
-                            rowData.add(dataPointDto.getMean());
-                            break;
-                        case MEDIAN:
-                            rowData.add(dataPointDto.getMedian());
-                            break;
-                        case COUNT:
-                            rowData.add(String.valueOf(dataPointDto.getCount()));
-                            break;
-                        case SUM:
-                            rowData.add(dataPointDto.getSum());
-                            break;
-                        case RANGE:
-                            rowData.add(dataPointDto.getRange());
-                            break;
-                        case START:
-                            rowData.add(dataPointDto.getStart());
-                            break;
-                        case END:
-                            rowData.add(dataPointDto.getEnd());
-                            break;
-                        case DELTA:
-                            rowData.add(dataPointDto.getDelta());
-                            break;
-                        default:
-                            break;
+            if (!list.isEmpty()) {
+                for (int i = 0; i < list.size(); i++) {
+                    List<String> rowData = new ArrayList<>();
+                    rowData.add(String.valueOf(Timestamp.valueOf(list.get(i).getEventTime())));
+                    for (ParameterDataDto parameterDataDto : parameterDataDtos) {
+                        DataPointDto dataPointDto = parameterDataDto.getDataPointDtos().get(i);
+                        switch (AggregateMethod.valueOf(chartDto.getAggregate())) {
+                            case INTERPOLATED:
+                                rowData.add(dataPointDto.getInterpolated());
+                                break;
+                            case MAX:
+                                rowData.add(dataPointDto.getMax());
+                                break;
+                            case MIN:
+                                rowData.add(dataPointDto.getMin());
+                                break;
+                            case MEAN:
+                                rowData.add(dataPointDto.getMean());
+                                break;
+                            case MEDIAN:
+                                rowData.add(dataPointDto.getMedian());
+                                break;
+                            case COUNT:
+                                rowData.add(String.valueOf(dataPointDto.getCount()));
+                                break;
+                            case SUM:
+                                rowData.add(dataPointDto.getSum());
+                                break;
+                            case RANGE:
+                                rowData.add(dataPointDto.getRange());
+                                break;
+                            case START:
+                                rowData.add(dataPointDto.getStart());
+                                break;
+                            case END:
+                                rowData.add(dataPointDto.getEnd());
+                                break;
+                            case DELTA:
+                                rowData.add(dataPointDto.getDelta());
+                                break;
+                            default:
+                                break;
+                        }
                     }
+                    csvBody.add(rowData);
                 }
-                csvBody.add(rowData);
             }
         }
 
