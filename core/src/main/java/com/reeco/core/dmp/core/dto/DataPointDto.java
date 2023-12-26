@@ -104,4 +104,28 @@ public class DataPointDto {
         this.count = categoricalStatByOrg.getValueCount();
         this.eventTime = categoricalStatByOrg.getPartitionKey().getDate().atStartOfDay();
     }
+
+    @Override
+    public String toString() {
+        return "DataPointDto{" +
+                "value='" + value + '\'' +
+                ", eventTime=" + eventTime +
+                ", isAlarm=" + isAlarm +
+                ", alarmType='" + alarmType + '\'' +
+                ", alarmId=" + alarmId +
+                ", count=" + count +
+                ", max='" + max + '\'' +
+                ", min='" + min + '\'' +
+                ", mean='" + mean + '\'' +
+                ", median='" + median + '\'' +
+                ", sum='" + sum + '\'' +
+                ", range='" + range + '\'' +
+                ", start='" + start + '\'' +
+                ", end='" + end + '\'' +
+                ", delta='" + delta + '\'' +
+                ", interpolated='" + interpolated + '\'' +
+                ", lat=" + lat +
+                ", lon=" + lon +
+                '}';
+    }
 }

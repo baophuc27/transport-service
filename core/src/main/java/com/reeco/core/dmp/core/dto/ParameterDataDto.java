@@ -12,4 +12,12 @@ public class ParameterDataDto {
     private ParameterDto parameterDto;
 
     private List<DataPointDto> dataPointDtos;
+
+    @Override
+    public String toString() {
+        return "ParameterDataDto{" +
+                "parameterDto=" + parameterDto.toString() +
+                ", dataPointDtos=" + dataPointDtos.size() +
+                '}';
+    }
 }
