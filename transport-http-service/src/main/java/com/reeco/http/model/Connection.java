@@ -1,7 +1,7 @@
-package com.reeco.http.model.dto;
+package com.reeco.http.model;
 
 import com.reeco.common.model.enumtype.TransportType;
-import com.reeco.http.model.entity.ConnectionByOrg;
+import com.reeco.http.infrastructure.persistence.cassandra.entity.ConnectionByOrg;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

@@ -3,6 +3,14 @@ server.port: 8043
 server.error.include-message: always
 
 spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/configuration
+    username: admin
+    password: admin123
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
   data:
     cassandra:
       keyspace-name: ${CASSANDRA_KEYSPACE:reecotech}
@@ -42,4 +50,8 @@ kafka:
 
     config-topic:
       name: reeco_config_event
+      properties: "retention.ms:432000000;segment.bytes:26214400;retention.bytes:1048576000"
+
+    conn-alarm-topic:
+      name: reeco_connection_noti_event
       properties: "retention.ms:432000000;segment.bytes:26214400;retention.bytes:1048576000"

@@ -3,6 +3,13 @@ server.port: 8086
 server.error.include-message: always
 
 spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/configuration
+    username: admin
+    password: admin123
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
   profile:
     active: prod
 
@@ -11,7 +18,7 @@ spring:
       keyspace-name: ${CASSANDRA_KEYSPACE:reecotech}
       username: ${CASSANDRA_USER:cassandra}
       password: ${CASSANDRA_PASSWORD:cassandra}
-      contact-points: ${CASSANDRA_CONTACT_POINTS:118.69.53.93}
+      contact-points: ${CASSANDRA_CONTACT_POINTS:localhost}
       port: ${CASSANDRA_PORT:9042}
       local-datacenter: datacenter1
       request:

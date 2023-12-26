@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Data
@@ -23,6 +24,16 @@ public class HTTPConnection extends BaseConnection {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
     private LocalDateTime updatedAt;
+
+    private List<String> ipWhiteList;
+
+    private Integer maximumTimeout;
+
+    private Integer maximumAttachment;
+
+    private String notificationType;
+
+    private Long removeAfterDays;
 
     public HTTPConnection(){}
 
