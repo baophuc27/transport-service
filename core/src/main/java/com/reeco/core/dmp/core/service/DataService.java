@@ -474,8 +474,8 @@ public class DataService {
 //        }
 
         ApiResponse apiResponse = ApiResponse.getSuccessResponse();
-        log.info(orgId);
-        log.info(connectionId);
+//        log.info(orgId);
+//        log.info(connectionId);
         List<ConnectionAlarmInfo> historyConnection = connectionAlarmInfoRepository.findHistoryByConnection(orgId,connectionId);
         log.info(historyConnection.toString());
         List<ConnectionHistory> result = new ArrayList<>();
