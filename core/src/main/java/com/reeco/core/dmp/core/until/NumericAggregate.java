@@ -41,7 +41,6 @@ public class NumericAggregate {
 
         for (Map.Entry<Object, List<NumericalTsByOrg>> entry: dataGroup.entrySet()){
             DataPointDto dataPointDto = new DataPointDto();
-
             // Interpolation
             if (aggregate == AggregateMethod.INTERPOLATED) {
                 Double point = (double) ((LocalDateTime) entry.getKey()).toEpochSecond(ZoneOffset.UTC);
