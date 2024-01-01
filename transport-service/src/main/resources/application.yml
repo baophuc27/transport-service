@@ -7,6 +7,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/configuration
     username: admin
     password: admin123
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:http://localhost:29092}
     consumer:

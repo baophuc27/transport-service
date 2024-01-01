@@ -2,7 +2,9 @@ package com.reeco.transport.infrastructure.persistence.postgresql;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -11,6 +13,8 @@ import java.util.Date;
 @Entity
 @Table(name = "device")
 @Data
+@SQLDelete(sql = "UPDATE device SET deleted = true WHERE id=?")
+@Where(clause = "deleted = false")
 public class DeviceEntity {
     @Id
     private int id;
@@ -49,6 +53,9 @@ public class DeviceEntity {
     @Column(name = "last_active",columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
     @UpdateTimestamp
     private LocalDateTime lastActive;
+
+    @Column(name="deleted")
+    private boolean deleted = Boolean.FALSE;
 
 
     public int getId() {
