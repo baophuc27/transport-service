@@ -1,12 +1,12 @@
 package com.reeco.http.cache;
 
 import com.reeco.common.model.enumtype.TransportType;
-import com.reeco.http.model.dto.Connection;
-import com.reeco.http.model.dto.ParameterCache;
-import com.reeco.http.model.entity.ConnectionByOrg;
-import com.reeco.http.model.entity.ParamsByOrg;
-import com.reeco.http.model.repo.ConnectionByOrgRepository;
-import com.reeco.http.model.repo.ParamsByOrgRepository;
+import com.reeco.http.model.Connection;
+import com.reeco.http.model.ParameterCache;
+import com.reeco.http.infrastructure.persistence.cassandra.entity.ConnectionByOrg;
+import com.reeco.http.infrastructure.persistence.cassandra.entity.ParamsByOrg;
+import com.reeco.http.infrastructure.persistence.cassandra.repository.ConnectionByOrgRepository;
+import com.reeco.http.infrastructure.persistence.cassandra.repository.ParamsByOrgRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;

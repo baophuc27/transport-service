@@ -7,8 +7,6 @@ spring:
     url: jdbc:postgresql://localhost:5432/configuration
     username: admin
     password: admin123
-    hikari:
-      maxLifeTime: 60000
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   kafka:

@@ -256,6 +256,7 @@ public class DataService {
         List<ParameterDataDto> parameterDataDtos = new ArrayList<>();
 
         for (ParameterDto parameterDto : chartDto.getParameterDtos()) {
+//            log.info("Get data for: {}",parameterDto);
             ParamsByOrg paramsByOrg = paramsByOrgRepository
                     .findByPartitionKeyOrganizationIdAndPartitionKeyParamId(parameterDto.getOrganizationId(), parameterDto.getParameterId())
                     .orElseThrow(() -> new Exception("Invalid Parameter!"));
@@ -351,52 +352,36 @@ public class DataService {
                 return o1.get(0).compareTo(o2.get(0));
             });
         } else {
-            List<DataPointDto> list = parameterDataDtos.get(0).getDataPointDtos();
-            for (int i = 0; i < list.size(); i++) {
-                List<String> rowData = new ArrayList<>();
-                rowData.add(String.valueOf(Timestamp.valueOf(list.get(i).getEventTime())));
-                for (ParameterDataDto parameterDataDto : parameterDataDtos) {
-                    DataPointDto dataPointDto = parameterDataDto.getDataPointDtos().get(i);
-                    switch (AggregateMethod.valueOf(chartDto.getAggregate())) {
-                        case INTERPOLATED:
-                            rowData.add(dataPointDto.getInterpolated());
-                            break;
-                        case MAX:
-                            rowData.add(dataPointDto.getMax());
-                            break;
-                        case MIN:
-                            rowData.add(dataPointDto.getMin());
-                            break;
-                        case MEAN:
-                            rowData.add(dataPointDto.getMean());
-                            break;
-                        case MEDIAN:
-                            rowData.add(dataPointDto.getMedian());
-                            break;
-                        case COUNT:
-                            rowData.add(String.valueOf(dataPointDto.getCount()));
-                            break;
-                        case SUM:
-                            rowData.add(dataPointDto.getSum());
-                            break;
-                        case RANGE:
-                            rowData.add(dataPointDto.getRange());
-                            break;
-                        case START:
-                            rowData.add(dataPointDto.getStart());
-                            break;
-                        case END:
-                            rowData.add(dataPointDto.getEnd());
-                            break;
-                        case DELTA:
-                            rowData.add(dataPointDto.getDelta());
-                            break;
-                        default:
-                            break;
+            // Cause groupby in database will miss some timestamp -> create a default Map and fill parameter's value by its index
+            HashMap<String, List<String>> aggregatedDataMap = new HashMap<>();
+            for (int i =0; i < parameterDataDtos.size();i++){
+                ParameterDataDto parameterDataDto = parameterDataDtos.get(i);
+                for (DataPointDto dataPointDto: parameterDataDto.getDataPointDtos()) {
+                    String eventTimeKey = String.valueOf(Timestamp.valueOf(dataPointDto.getEventTime()));
+                    if (!aggregatedDataMap.containsKey(eventTimeKey)) {
+                        List<String> valueList = new ArrayList<>();
+                        for (int j=0;j< parameterDataDtos.size();j++){
+                            valueList.add("");
+                        }
+                        aggregatedDataMap.put(eventTimeKey, valueList);
                     }
+                    List<String> valueList = aggregatedDataMap.get(eventTimeKey);
+                    String value = getAggregatedNumeric(chartDto.getAggregate(), dataPointDto);
+                    valueList.set(i, value);
                 }
+            }
+            for (Map.Entry<String, List<String>> entry: aggregatedDataMap.entrySet()){
+                List<String> rowData = new ArrayList<>();
+                rowData.add(entry.getKey());
+                rowData.addAll(entry.getValue());
                 csvBody.add(rowData);
             }
+            csvBody.sort((o1, o2) -> {
+                // 0 is datetime column
+                if (o1.get(0) == null || o2.get(0) == null)
+                    return 0;
+                return o1.get(0).compareTo(o2.get(0));
+            });
         }
 
         csvBody.add(0, rowLabel);
@@ -418,7 +403,47 @@ public class DataService {
         encodedString = Base64.getEncoder().encodeToString(template.getInputStream().readAllBytes());
         return encodedString;
     }
-
+    private String getAggregatedNumeric(String aggregateMethod, DataPointDto dataPointDto){
+        String value = "";
+        switch (AggregateMethod.valueOf(aggregateMethod)) {
+            case INTERPOLATED:
+                value = dataPointDto.getInterpolated();
+                break;
+            case MAX:
+                value = dataPointDto.getMax();
+                break;
+            case MIN:
+                value = dataPointDto.getMin();
+                break;
+            case MEAN:
+                value = dataPointDto.getMean();
+                break;
+            case MEDIAN:
+                value = dataPointDto.getMedian();
+                break;
+            case COUNT:
+                value = String.valueOf(dataPointDto.getCount());
+                break;
+            case SUM:
+                value = dataPointDto.getSum();
+                break;
+            case RANGE:
+                value = dataPointDto.getRange();
+                break;
+            case START:
+                value = dataPointDto.getStart();
+                break;
+            case END:
+                value = dataPointDto.getEnd();
+                break;
+            case DELTA:
+                value = dataPointDto.getDelta();
+                break;
+            default:
+                break;
+        }
+        return value;
+    }
     public ApiResponse getLatestDataConnection(Long orgId, List<Long> connectionIds) throws Exception{
         ApiResponse apiResponse = ApiResponse.getSuccessResponse();
         LatestData latestData = new LatestData();
