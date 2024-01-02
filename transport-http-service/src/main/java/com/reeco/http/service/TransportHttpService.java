@@ -63,6 +63,7 @@ public class TransportHttpService {
         for (RequestParam paramRequest: requestDto.getParams()) {
             IncomingTsEvent msg = new IncomingTsEvent();
             LocalDateTime currTime = LocalDateTime.now();
+            LocalDateTime eventTime = paramRequest.getTimestamp();
             String requestDtoParamKey = paramRequest.getKey();
 
             List<ParameterCache> paramList = connection.getParameterList();
@@ -75,7 +76,7 @@ public class TransportHttpService {
                     msg.setStationId(param.getStationId());
                     msg.setConnectionId(Long.valueOf(connectionId));
                     msg.setParamId(param.getParamId());
-                    msg.setEventTime(currTime);
+                    msg.setEventTime(eventTime);
                     msg.setIndicatorId(param.getIndicatorId());
                     msg.setIndicatorName(param.getIndicatorName());
                     msg.setParamName(param.getParamName());
