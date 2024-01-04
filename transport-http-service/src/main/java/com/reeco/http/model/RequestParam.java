@@ -3,6 +3,8 @@ package com.reeco.http.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 public class RequestParam {
@@ -11,4 +13,6 @@ public class RequestParam {
     private String value;
 
     private String unit;
+
+    private LocalDateTime timestamp;
 }
