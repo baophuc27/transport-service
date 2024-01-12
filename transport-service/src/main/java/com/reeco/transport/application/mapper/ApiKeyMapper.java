@@ -1,5 +1,6 @@
 package com.reeco.transport.application.mapper;
 
+import com.reeco.common.model.dto.APIKey;
 import com.reeco.transport.infrastructure.model.UpsertApiKeyMessage;
 import com.reeco.transport.infrastructure.model.UpsertMQTTMessage;
 import com.reeco.transport.infrastructure.persistence.postgresql.ApiKeyEntity;
@@ -28,6 +29,15 @@ public interface ApiKeyMapper {
     })
     ApiKeyEntity messageToEntity(UpsertApiKeyMessage message);
 
+//    @Mappings({
+//            @Mapping(source = "id", target = "id"),
+//            @Mapping(source = "permission", target = "permission"),
+//            @Mapping(source = "key", target = "apiKey"),
+//            @Mapping(source = "organizationIds", target = "scope.organizationIds"),
+//            @Mapping(source = "parameterIds", target = "scope.parameterIds"),
+//            @Mapping(source = "connectionIds", target = "scope.connectionIds")
+//    })
+//    APIKey entityToDTO(ApiKeyEntity apiKeyEntity);
     @Mappings({
             @Mapping(source = "id",target = "id"),
             @Mapping(source="name",target="name"),

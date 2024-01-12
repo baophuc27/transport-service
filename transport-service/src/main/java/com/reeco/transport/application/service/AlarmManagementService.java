@@ -95,6 +95,5 @@ public class AlarmManagementService implements AlarmManagementUsecase {
             log.info("[ALARM] Send message: ");
             sendAlarmPort.send(alarmMessage);
         }
-
     }
 }

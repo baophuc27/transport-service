@@ -499,8 +499,10 @@ public class DataService {
 //        }
 
         ApiResponse apiResponse = ApiResponse.getSuccessResponse();
+//        log.info(orgId);
+//        log.info(connectionId);
         List<ConnectionAlarmInfo> historyConnection = connectionAlarmInfoRepository.findHistoryByConnection(orgId,connectionId);
-
+        log.info(historyConnection.toString());
         List<ConnectionHistory> result = new ArrayList<>();
         Long index = 0L;
         for (ConnectionAlarmInfo info: historyConnection){
@@ -548,7 +550,12 @@ public class DataService {
         // Reverse since query is order by alarm_time ASCENDING, while we need DESCENDING order
         Collections.reverse(result);
 
-        List<ConnectionHistory> slicedResult = sliceArrayList(result, startIndex, endIndex);
+        List<ConnectionHistory> slicedResult = result;
+
+        if (startIndex != null && endIndex != null){
+            slicedResult = sliceArrayList(result, startIndex, endIndex);
+        }
+
 
         apiResponse.setMessage("Successful!");
         apiResponse.setData(slicedResult);

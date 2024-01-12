@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.TimeZone;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })
 @EnableScheduling
 public class ReecoServiceIngestion {
 	public static void main(String[] args) {

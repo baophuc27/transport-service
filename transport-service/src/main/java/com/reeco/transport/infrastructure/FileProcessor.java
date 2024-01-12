@@ -78,7 +78,7 @@ public class FileProcessor {
                     watchService,
                     StandardWatchEventKinds.ENTRY_CREATE
             );
-            log.info("Observing files in: {}",relativePath);
+            log.info("Observing files in: {}",path.toAbsolutePath().toString());
         }
         catch (IOException ex){
             log.warn("Got an exception when register file watcher for: {}",relativePath);
