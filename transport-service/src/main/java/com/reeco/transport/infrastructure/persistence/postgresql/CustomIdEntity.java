@@ -1,9 +1,16 @@
 package com.reeco.transport.infrastructure.persistence.postgresql;
 
+import lombok.Data;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "customids")
+@Data
+@SQLDelete(sql = "UPDATE customid SET deleted = true WHERE id=?")
+@Where(clause = "deleted = false")
 public class CustomIdEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +25,9 @@ public class CustomIdEntity {
 
     @Column(name = "id_type")
     private String customIdType;
+
+    @Column(name="deleted")
+    private boolean deleted = Boolean.FALSE;
 
     public int getId() {
         return id;

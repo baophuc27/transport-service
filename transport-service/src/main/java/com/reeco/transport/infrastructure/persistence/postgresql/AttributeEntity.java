@@ -1,9 +1,16 @@
 package com.reeco.transport.infrastructure.persistence.postgresql;
 
+import lombok.Data;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "attribute")
+@Data
+@SQLDelete(sql = "UPDATE attribute SET deleted = true WHERE id=?")
+@Where(clause = "deleted = false")
 public class AttributeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,20 +41,23 @@ public class AttributeEntity {
     @Column(name = "device_id")
     private int deviceId;
 
-   @Column(name = "organization_id")
+    @Column(name = "organization_id")
     private int organizationId;
 
-   @Column(name = "param_id")
-   private int paramId;
+    @Column(name = "param_id")
+    private int paramId;
 
-   @Column(name = "station_id")
+    @Column(name = "station_id")
     private int stationId;
 
-   @Column(name = "workspace_id")
+    @Column(name = "workspace_id")
     private int workspaceId;
 
-   @Column(name = "indicator_id")
+    @Column(name = "indicator_id")
     private int indicatorId;
+
+    @Column(name="deleted")
+    private boolean deleted = Boolean.FALSE;
 
 //    @Column(name = "source_param_name")
 //    private String sourceParamName;

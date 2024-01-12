@@ -1,7 +1,14 @@
 package com.reeco.transport.infrastructure.persistence.postgresql;
+import lombok.Data;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import javax.persistence.*;
 @Entity
 @Table(name="mqtt_acls")
+@Data
+@SQLDelete(sql = "UPDATE mqtt_acls SET deleted = true WHERE id=?")
+@Where(clause = "deleted = false")
 public class MQTTConfigEntity {
 
     @Id
@@ -37,6 +44,9 @@ public class MQTTConfigEntity {
 
     @Column(name="name")
     private String name;
+
+    @Column(name="deleted")
+    private boolean deleted = Boolean.FALSE;
 
     public MQTTConfigEntity(String id, String username, String password, String topic, int access, String connectionIds, String organizationIds, String parameterIds, boolean isActive, boolean useSSL, String name){
         this.id = id;

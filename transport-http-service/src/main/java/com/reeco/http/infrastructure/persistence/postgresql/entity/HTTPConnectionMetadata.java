@@ -1,6 +1,8 @@
 package com.reeco.http.infrastructure.persistence.postgresql.entity;
 
 import lombok.Data;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -8,6 +10,8 @@ import java.time.LocalDateTime;
 @Entity
 @Data
 @Table(name="http_connection_metadata")
+@SQLDelete(sql = "UPDATE http_connection_metadata SET deleted = true WHERE id=?")
+@Where(clause = "deleted = false")
 public class HTTPConnectionMetadata {
 
     @Id
@@ -45,4 +49,7 @@ public class HTTPConnectionMetadata {
 
     @Column(name = "is_logged_out")
     private Boolean isLoggedOut = true;
+
+    @Column(name="deleted")
+    private Boolean deleted = false;
 }

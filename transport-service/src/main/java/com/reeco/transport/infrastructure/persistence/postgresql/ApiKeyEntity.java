@@ -1,12 +1,24 @@
 package com.reeco.transport.infrastructure.persistence.postgresql;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
+// Enable soft-delete in this entity
+// https://www.baeldung.com/jpa-soft-delete
+// https://www.baeldung.com/spring-data-jpa-delete
+// https://www.baeldung.com/spring-data-jpa-query
+// https://www.baeldung.com/spring-data-jpa-query-by-date
+
 @Entity
 @Table(name="api_key")
+@Data
+@SQLDelete(sql = "UPDATE api_key SET deleted = true WHERE id=?")
+@Where(clause = "deleted = false")
 public class ApiKeyEntity {
 
     @Id
@@ -28,6 +40,9 @@ public class ApiKeyEntity {
 
     @Column(name = "connectionids")
     private String connectionIds;
+
+    @Column(name="deleted")
+    private boolean deleted = Boolean.FALSE;
 
     public int getId() {
         return id;

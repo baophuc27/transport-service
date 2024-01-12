@@ -9,6 +9,8 @@ spring:
     password: admin123
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:http://localhost:29092}
     consumer:

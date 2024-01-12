@@ -1,11 +1,16 @@
 package com.reeco.transport.infrastructure.persistence.postgresql;
 
 import lombok.Data;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "ftp")
+@Data
+@SQLDelete(sql = "UPDATE ftp SET deleted = true WHERE id=?")
+@Where(clause = "deleted = false")
 public class FtpEntity {
     @Id
     @Column(name = "id")
@@ -31,6 +36,9 @@ public class FtpEntity {
 
     @Column(name = "directory")
     private String directory;
+
+    @Column(name="deleted")
+    private boolean deleted = Boolean.FALSE;
 
     public FtpEntity(int id, String userName, String password, String key, String hostName, int hostPort, String fileType) {
         this.id = id;
