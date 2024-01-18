@@ -3,6 +3,14 @@ server.port: 7002
 server.error.include-message: always
 
 spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/configuration
+    username: admin
+    password: admin123
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
   data:
     cassandra:
       keyspace-name: ${CASSANDRA_KEYSPACE:reecotech}

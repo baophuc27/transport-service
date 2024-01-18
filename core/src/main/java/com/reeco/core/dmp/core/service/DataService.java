@@ -1,11 +1,11 @@
 package com.reeco.core.dmp.core.service;
 
 import com.reeco.core.dmp.core.dto.*;
-import com.reeco.core.dmp.core.model.*;
-import com.reeco.core.dmp.core.repo.*;
-import com.reeco.core.dmp.core.until.ApiResponse;
-import com.reeco.core.dmp.core.until.Comparison;
-import com.reeco.core.dmp.core.until.NumericAggregate;
+import com.reeco.core.dmp.core.model.cassandra.*;
+import com.reeco.core.dmp.core.repository.cassandra.*;
+import com.reeco.core.dmp.core.utils.ApiResponse;
+import com.reeco.core.dmp.core.utils.Comparison;
+import com.reeco.core.dmp.core.utils.NumericAggregate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;

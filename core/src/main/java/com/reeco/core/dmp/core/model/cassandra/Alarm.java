@@ -1,4 +1,4 @@
-package com.reeco.core.dmp.core.model;
+package com.reeco.core.dmp.core.model.cassandra;
 
 import com.reeco.common.model.enumtype.AlarmType;
 import com.reeco.common.model.enumtype.FrequenceType;

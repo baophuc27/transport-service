@@ -1,11 +1,12 @@
 package com.reeco.core.dmp.core.service;
 
 
+import com.reeco.core.dmp.core.annotations.Traceable;
 import com.reeco.core.dmp.core.dto.*;
-import com.reeco.core.dmp.core.model.*;
-import com.reeco.core.dmp.core.repo.*;
-import com.reeco.core.dmp.core.until.ApiResponse;
-import com.reeco.core.dmp.core.until.NumericAggregate;
+import com.reeco.core.dmp.core.model.cassandra.*;
+import com.reeco.core.dmp.core.repository.cassandra.*;
+import com.reeco.core.dmp.core.utils.ApiResponse;
+import com.reeco.core.dmp.core.utils.NumericAggregate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,7 @@ public class ChartService {
     private CategoricalTsByOrgRepository categoricalTsByOrgRepository;
 
     @Autowired
-    private  CategoricalStatByOrgRepository categoricalStatByOrgRepository;
+    private CategoricalStatByOrgRepository categoricalStatByOrgRepository;
 
     @Autowired
     private AlarmRepository alarmRepository;

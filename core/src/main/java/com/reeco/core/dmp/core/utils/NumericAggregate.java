@@ -1,11 +1,11 @@
-package com.reeco.core.dmp.core.until;
+package com.reeco.core.dmp.core.utils;
 
 import com.reeco.core.dmp.core.dto.AggregateMethod;
 import com.reeco.core.dmp.core.dto.Resolution;
 import com.reeco.core.dmp.core.dto.DataPointDto;
-import com.reeco.core.dmp.core.model.Alarm;
-import com.reeco.core.dmp.core.model.NumericalStatByOrg;
-import com.reeco.core.dmp.core.model.NumericalTsByOrg;
+import com.reeco.core.dmp.core.model.cassandra.Alarm;
+import com.reeco.core.dmp.core.model.cassandra.NumericalStatByOrg;
+import com.reeco.core.dmp.core.model.cassandra.NumericalTsByOrg;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
