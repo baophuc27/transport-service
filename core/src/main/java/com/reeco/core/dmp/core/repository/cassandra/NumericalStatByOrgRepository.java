@@ -1,6 +1,7 @@
-package com.reeco.core.dmp.core.repo;
+package com.reeco.core.dmp.core.repository.cassandra;
 
-import com.reeco.core.dmp.core.model.NumericalStatByOrg;
+import com.reeco.core.dmp.core.annotations.Traceable;
+import com.reeco.core.dmp.core.model.cassandra.NumericalStatByOrg;
 
 import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.data.cassandra.repository.Query;
@@ -19,6 +20,7 @@ public interface NumericalStatByOrgRepository extends CassandraRepository<Numeri
 //
 //    @Override
 //    <S extends NumericalStatByOrg> Mono<S> save(S entity);
+    @Traceable
     @Query("select * from numeric_stats_by_organization\n" +
             "where organization_id=?0\n" +
             "and param_id = ?1\n" +

@@ -1,5 +1,6 @@
-package com.reeco.core.dmp.core.repo;
-import com.reeco.core.dmp.core.model.CategoricalStatByOrg;
+package com.reeco.core.dmp.core.repository.cassandra;
+import com.reeco.core.dmp.core.annotations.Traceable;
+import com.reeco.core.dmp.core.model.cassandra.CategoricalStatByOrg;
 import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.data.cassandra.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,6 +11,7 @@ import java.util.List;
 @Repository
 public interface CategoricalStatByOrgRepository extends CassandraRepository<CategoricalStatByOrg, CategoricalStatByOrg.Key> {
 
+    @Traceable
     @Query("select * from categorical_stats_by_organization\n" +
             "where organization_id=?0\n" +
             "and param_id = ?1\n" +

@@ -1,5 +1,4 @@
-package com.reeco.core.dmp.core.model;
-
+package com.reeco.core.dmp.core.model.cassandra;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,10 +10,10 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Table("categorical_stats_by_organization")
+@Table("numeric_stats_by_organization")
 @Data
 @AllArgsConstructor
-public class CategoricalStatByOrg {
+public class NumericalStatByOrg {
     @PrimaryKeyClass
     @Data
     @AllArgsConstructor
@@ -28,17 +27,41 @@ public class CategoricalStatByOrg {
 
         @PrimaryKeyColumn(name = "param_id", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
         private Long paramId;
-
-        @PrimaryKeyColumn(name = "value", ordinal = 3, type = PrimaryKeyType.CLUSTERED)
-        private String value;
     }
 
     @PrimaryKey
-    private CategoricalStatByOrg.Key partitionKey;
+    private NumericalStatByOrg.Key partitionKey;
+
+    @Column("min")
+    private Double min;
+
+    @Column("max")
+    private Double max;
+
+    @Column("median")
+    private Double median;
+
+    @Column("mean")
+    private Double mean;
+
+    @Column("acc")
+    private Double acc;
+
+    @Column("std")
+    private Double std;
 
     @Column("count")
-    private Long valueCount;
+    private Long count;
 
     @Column("last_updated")
-    private LocalDateTime lastUpdated;
+    LocalDateTime lastUpdated;
+
+    @Column("is_alarm")
+    private Boolean isAlarm;
+
+    @Column("alarm_id")
+    private Long alarmId;
+
+    @Column("alarm_type")
+    private String alarmType;
 }

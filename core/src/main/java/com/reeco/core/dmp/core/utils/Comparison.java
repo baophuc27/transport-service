@@ -1,7 +1,7 @@
-package com.reeco.core.dmp.core.until;
+package com.reeco.core.dmp.core.utils;
 
 import com.reeco.common.model.enumtype.AlarmType;
-import com.reeco.core.dmp.core.model.Alarm;
+import com.reeco.core.dmp.core.model.cassandra.Alarm;
 
 import java.util.List;
 

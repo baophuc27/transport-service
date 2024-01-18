@@ -1,11 +1,10 @@
 package com.reeco.core.dmp.core.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.reeco.core.dmp.core.model.CategoricalStatByOrg;
-import com.reeco.core.dmp.core.model.CategoricalTsByOrg;
-import com.reeco.core.dmp.core.model.NumericalStatByOrg;
-import com.reeco.core.dmp.core.model.NumericalTsByOrg;
+import com.reeco.core.dmp.core.model.cassandra.CategoricalStatByOrg;
+import com.reeco.core.dmp.core.model.cassandra.CategoricalTsByOrg;
+import com.reeco.core.dmp.core.model.cassandra.NumericalStatByOrg;
+import com.reeco.core.dmp.core.model.cassandra.NumericalTsByOrg;
 import lombok.*;
 
 import java.time.LocalDateTime;
