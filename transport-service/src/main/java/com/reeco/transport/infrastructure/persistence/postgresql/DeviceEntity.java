@@ -134,6 +134,14 @@ public class DeviceEntity {
         return templateFormat;
     }
 
+    public Boolean getActive() {
+        return active;
+    }
+
+    public LocalDateTime getLastActive() {
+        return lastActive;
+    }
+
     public void setTemplateFormat(int templateFormat) {
         this.templateFormat = templateFormat;
     }

@@ -39,4 +39,5 @@ public interface PostgresDeviceRepository extends JpaRepository<DeviceEntity, In
     @Modifying
     @Query(value = "UPDATE public.device set logged_out = ?2, last_active = ?3 WHERE id = ?1",nativeQuery = true)
     void updateDeviceLoggedOut(Integer deviceId, boolean logged_out, LocalDateTime now);
+
 }
