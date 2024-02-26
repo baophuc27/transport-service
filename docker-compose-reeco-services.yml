@@ -18,6 +18,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    volumes:
+      - ./logs:/logs
 #    ports:
 #    - 8986:8986
 
@@ -55,6 +57,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    volumes:
+      - ./logs:/logs
 
   coreservice:
     build:
@@ -71,6 +75,7 @@ services:
       retries: 5
     volumes:
       - ../uploads:/uploads
+      - ./logs:/logs
     environment:
       CASSANDRA_KEYSPACE: ${CASSANDRA_KEYSPACE}
       CASSANDRA_USER: ${CASSANDRA_USER}
@@ -104,6 +109,8 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
       KAFKA_CONFIG_AUTO_OFFSET_RESET: ${KAFKA_CONFIG_AUTO_OFFSET_RESET}
     restart: always
+    volumes:
+      - ./logs:/logs
   
   transportservice:
     build:
@@ -123,4 +130,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    volumes:
+      - ./logs:/logs
 
