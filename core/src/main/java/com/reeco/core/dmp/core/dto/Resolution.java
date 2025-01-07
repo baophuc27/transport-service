@@ -2,6 +2,7 @@ package com.reeco.core.dmp.core.dto;
 
 public enum Resolution {
     DEFAULT(0.15),
+    MIN_15(0.25),
     MIN_30(0.5), HOUR_1(1d), HOUR_2(2d), HOUR_4(4d), HOUR_8(8d),
     DAY_1(24d), DAY_3(72d),
     WEEK_1(168d), WEEK_2(336d),

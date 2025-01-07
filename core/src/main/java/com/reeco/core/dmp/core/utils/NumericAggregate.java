@@ -32,7 +32,7 @@ public class NumericAggregate {
             int hours = e.getPartitionKey().getEventTime().getHour();
             int minutesOver = minutes % (int)(resolution.getValueFromEnum()*60);
             int hoursOver = 0;
-            if (resolution != Resolution.MIN_30 && resolution != Resolution.DEFAULT) {
+            if (resolution != Resolution.MIN_30 && resolution != Resolution.DEFAULT && resolution != Resolution.MIN_15) {
                 hoursOver = hours % (int) (resolution.getValueFromEnum() * 1);
             }
             return e.getPartitionKey().getEventTime().truncatedTo(ChronoUnit.MINUTES).withMinute(minutes - minutesOver)

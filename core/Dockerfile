@@ -1,6 +1,6 @@
 FROM openjdk:12.0.2
 
-EXPOSE 7002
+EXPOSE 7001
 
 ADD ./build/libs/*.jar app.jar
 

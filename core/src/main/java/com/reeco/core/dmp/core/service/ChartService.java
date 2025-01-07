@@ -122,10 +122,17 @@ public class ChartService {
         List<ParameterDataDto> parameterDataDtos = new ArrayList<>();
         for (ParameterDto parameterDto : chartDto.getParameterDtos()) {
             log.info(String.valueOf(parameterDto));
-            ParamsByOrg paramsByOrg = paramsByOrgRepository
-                    .findByPartitionKeyOrganizationIdAndPartitionKeyParamId(parameterDto.getOrganizationId(),parameterDto.getParameterId())
+            ParamsByOrg paramsByOrg;
+            try{
+                 paramsByOrg = paramsByOrgRepository.findByPartitionKeyOrganizationIdAndPartitionKeyParamId(parameterDto.getOrganizationId(),parameterDto.getParameterId())
                     .orElseThrow(()-> new Exception("Invalid Parameter!"));
-            Indicator indicator = indicatorInfoRepository.findByPartitionKeyIndicatorId(paramsByOrg.getIndicatorId()).orElseThrow(()-> new Exception("Invalid Indicator"));
+            } catch (Exception e){
+                continue;
+            }
+            log.info(String.valueOf(paramsByOrg));
+            Indicator indicator = indicatorInfoRepository.findIndicator(paramsByOrg.getIndicatorId());
+            log.info(String.valueOf(indicator));
+//            Indicator indicator = indicatorInfoRepository.findByPartitionKeyIndicatorId(paramsByOrg.getIndicatorId()).orElseThrow(()-> new Exception("Invalid Indicator"));
             ParameterDataDto parameterDataDto = new ParameterDataDto();
             parameterDto.setIndicatorType(indicator.getValueType());
             parameterDto.setIndicatorName(indicator.getIndicatorName());
@@ -141,7 +148,7 @@ public class ChartService {
                 else {
                     Resolution resolution = Resolution.valueOf(chartDto.getResolution());
                     List<Alarm> alarms = alarmRepository.findByPartitionKeyOrganizationIdAndPartitionKeyParamId(parameterDto.getOrganizationId(),parameterDto.getParameterId());
-                    if (resolution.equals(Resolution.DEFAULT) || resolution.equals(Resolution.MIN_30) ||
+                    if (resolution.equals(Resolution.DEFAULT) || resolution.equals(Resolution.MIN_15) || resolution.equals(Resolution.MIN_30) ||
                         resolution.equals(Resolution.HOUR_1) || resolution.equals(Resolution.HOUR_2) ||
                         resolution.equals(Resolution.HOUR_4) || resolution.equals(Resolution.HOUR_8)) {
 
@@ -175,7 +182,7 @@ public class ChartService {
                     dataPointDtos = calculateCategoricalData(categoricalTsByOrgs, Resolution.DEFAULT);
                 } else {
                     Resolution resolution = Resolution.valueOf(chartDto.getResolution());
-                    if (resolution.equals(Resolution.DEFAULT) || resolution.equals(Resolution.MIN_30) ||
+                    if (resolution.equals(Resolution.DEFAULT) || resolution.equals(Resolution.MIN_15) || resolution.equals(Resolution.MIN_30) ||
                         resolution.equals(Resolution.HOUR_1) || resolution.equals(Resolution.HOUR_2) ||
                         resolution.equals(Resolution.HOUR_4) || resolution.equals(Resolution.HOUR_8)) {
                         List<CategoricalTsByOrg> categoricalTsByOrgs = categoricalTsByOrgRepository.findDataDetail(
@@ -356,7 +363,7 @@ public class ChartService {
                 else {
                     Resolution resolution = Resolution.valueOf(chartDto.getResolution());
                     List<Alarm> alarms = alarmRepository.findByPartitionKeyOrganizationIdAndPartitionKeyParamId(parameterDto.getOrganizationId(), parameterDto.getParameterId());
-                    if (resolution.equals(Resolution.DEFAULT) || resolution.equals(Resolution.MIN_30) || resolution.equals(
+                    if (resolution.equals(Resolution.DEFAULT) || resolution.equals(Resolution.MIN_15) || resolution.equals(Resolution.MIN_30) || resolution.equals(
                             Resolution.HOUR_1)
                             || resolution.equals(Resolution.HOUR_2) || resolution.equals(Resolution.HOUR_4) || resolution.equals(
                             Resolution.HOUR_8)) {
@@ -385,7 +392,7 @@ public class ChartService {
                     dataPointDtos = calculateCategoricalData(categoricalTsByOrgs, Resolution.DEFAULT).stream().filter(DataPointDto::getIsAlarm).collect(Collectors.toList());
                 } else {
                     Resolution resolution = Resolution.valueOf(chartDto.getResolution());
-                    if (resolution.equals(Resolution.DEFAULT) || resolution.equals(Resolution.MIN_30) || resolution.equals(
+                    if (resolution.equals(Resolution.DEFAULT) || resolution.equals(Resolution.MIN_15) || resolution.equals(Resolution.MIN_30) || resolution.equals(
                             Resolution.HOUR_1)
                             || resolution.equals(Resolution.HOUR_2) || resolution.equals(Resolution.HOUR_4) || resolution.equals(
                             Resolution.HOUR_8)) {

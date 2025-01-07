@@ -309,7 +309,7 @@ public class DataService {
                     }
                 }
                 // Aggregate
-                else if (resolution.equals(Resolution.MIN_30) || resolution.equals(Resolution.HOUR_1) ||
+                else if (resolution.equals(Resolution.MIN_15) || resolution.equals(Resolution.MIN_30) || resolution.equals(Resolution.HOUR_1) ||
                         resolution.equals(Resolution.HOUR_2) || resolution.equals(Resolution.HOUR_4) ||
                         resolution.equals(Resolution.HOUR_8)) {
 
