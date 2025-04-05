@@ -72,6 +72,7 @@ public class ShareAPIKeyController {
 
         try{
             if (getDeviceInfoDTO == null){
+                log.info("null dto");
                 List<APIKeyDeviceInfoDTO> apiKeyDeviceInfoDTOList = apiKeyService.getAllDeviceInfo(token);
                 return new ResponseEntity<>(apiKeyDeviceInfoDTOList,apiResponse.getStatus());
             }

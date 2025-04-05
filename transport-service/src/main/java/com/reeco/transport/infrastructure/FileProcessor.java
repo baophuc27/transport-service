@@ -80,9 +80,9 @@ public class FileProcessor {
             );
             log.info("Observing files in: {}",path.toAbsolutePath().toString());
         }
-        catch (IOException ex){
+        catch (IOException | NullPointerException ex){
             log.warn("Got an exception when register file watcher for: {}",relativePath);
-            throw new FileProcessingException(ex.getMessage());
+//            throw new FileProcessingException(ex.getMessage());
         }
     }
 

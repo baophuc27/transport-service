@@ -71,7 +71,7 @@ public class APIKeyService {
         String[] idsArray = connectionIds.split(",");
         List<String> idsList = Arrays.asList(idsArray);
 
-        if (!idsList.contains(deviceId.toString())){
+        if (deviceId == null || !idsList.contains(deviceId.toString())){
             throw new NotPermittedException("This API Key can not access your requested resource.");
         }
         APIKeyDeviceInfoDTO deviceInfoDTO = getDeviceInfoFromId(deviceId);
@@ -84,6 +84,7 @@ public class APIKeyService {
             throw new AuthenticationFailedException("Invalid key");
         }
         List<APIKeyDeviceInfoDTO> apiKeyDeviceInfoDTOList = new ArrayList<>();
+        log.info(apiKeyEntity.getConnectionIds());
         for (String connectionId : apiKeyEntity.getConnectionIds().split(",")){
             APIKeyDeviceInfoDTO deviceInfoDTO = getDeviceInfoFromId(Integer.valueOf(connectionId));
             apiKeyDeviceInfoDTOList.add(deviceInfoDTO);
@@ -112,6 +113,14 @@ public class APIKeyService {
 
     private String makeRequest(GetHistoricDataDTO getHistoricDataDTO){
         List<RequestParameterDto> requestParameterDtos = getAccessibleParameterFromCustomIds(getHistoricDataDTO.getId());
+
+        int limit = 99999;
+        try{
+            limit = getHistoricDataDTO.getLimit();
+        }
+        catch (Exception e){
+            log.info("No limit");
+        }
 
         String output = "";
         try {
@@ -157,7 +166,7 @@ public class APIKeyService {
                  response.append(line);
              }
 
-             output = convertJSONFormat(String.valueOf(response),aggregateType);
+             output = convertJSONFormat(String.valueOf(response),aggregateType,limit);
             connection.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
@@ -165,7 +174,7 @@ public class APIKeyService {
         return output;
     }
 
-    private String convertJSONFormat(String originalJSON,String aggregateType){
+    private String convertJSONFormat(String originalJSON,String aggregateType,int limit){
         // Parse the original JSON
         JsonObject originalJsonObject = new Gson().fromJson(originalJSON, JsonObject.class);
 
@@ -185,9 +194,7 @@ public class APIKeyService {
         JsonArray parameterDatas = originalJsonObject.getAsJsonArray("parameterDatas");
         Integer count = 0;
         Integer countElement = 0;
-
-
-
+        Integer limitEachParameter = 0;
         // Create data array
         JsonArray data = new JsonArray();
 
@@ -206,6 +213,7 @@ public class APIKeyService {
             JsonArray dataPointDtos = parameterDataObject.getAsJsonArray("dataPointDtos");
             for (JsonElement dataPoint : dataPointDtos) {
                 countElement += 1;
+                limitEachParameter += 1;
                 JsonObject newDataPoint = new JsonObject();
                 newDataPoint.addProperty("ts", dataPoint.getAsJsonObject().get("eventTime").getAsString());
                 JsonObject f = new JsonObject();
@@ -216,6 +224,10 @@ public class APIKeyService {
                 f.add(count.toString(), dataValue);
                 newDataPoint.add("f", f);
                 data.add(newDataPoint);
+                if (limitEachParameter == limit){
+                    limitEachParameter = 0;
+                    break;
+                }
             }
             count += 1;
         }

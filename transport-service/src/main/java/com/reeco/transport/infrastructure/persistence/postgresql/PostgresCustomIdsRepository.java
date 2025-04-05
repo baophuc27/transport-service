@@ -10,7 +10,7 @@ public interface PostgresCustomIdsRepository extends JpaRepository<CustomIdEntit
     @Query(value = "DELETE FROM public.customids cid WHERE cid.id_type = ?1 AND cid.original_id = ?2",nativeQuery = true)
     void deleteCustomIdEntity(String customIdType, Integer originalId);
 
-    @Query(value = "SELECT cid.original_id FROM public.customids cid WHERE cid.id_type = 'CONNECTION' and cid.custom_id = ?1", nativeQuery = true)
+    @Query(value = "SELECT cid.original_id FROM public.customids cid WHERE cid.id_type = 'CONNECTION' and cid.custom_id = ?1 ORDER BY cid.id DESC LIMIT 1", nativeQuery = true)
     Integer getConnectionIdFromCustomId(String customId);
 
     @Query(value = "SELECT cid.custom_id FROM public.customids cid WHERE cid.id_type='CONNECTION' and cid.original_id = ?1 ORDER BY cid.id DESC LIMIT 1",nativeQuery = true)
